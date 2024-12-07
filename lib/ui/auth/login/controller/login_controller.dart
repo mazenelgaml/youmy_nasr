@@ -132,7 +132,7 @@ class LoginController extends GetxController{
       if (response.statusCode == 200) {
         // Successful login
         LoginModel loginModel = LoginModel.fromJson(response.data);
-
+        await Get.find<CacheHelper>().saveData(key: "token", value: "${loginModel.token}");
         if (loginModel.isHasPermission==true) {
           showDialog(
             context: context,
