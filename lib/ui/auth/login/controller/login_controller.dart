@@ -144,7 +144,7 @@ class LoginController extends GetxController{
                   TextButton(
                     child: Text("OK"),
                     onPressed: () {
-                      Get.offAndToNamed(HomeScreen.routeName); // Navigate to home screen
+                      Get.offAllNamed(HomeScreen.routeName); // Navigate to home screen
                     },
                   ),
                 ],
