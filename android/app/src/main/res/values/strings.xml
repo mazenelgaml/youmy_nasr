@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Yomy Merchant</string>
+    <string name="facebook_app_id">519974963058041</string>
+    <string name="fb_login_protocol_scheme">fb519974963058041</string>
+    <string name="facebook_client_token">b260786a256b3643a58ce34dce667130</string>
+
+
+</resources>
