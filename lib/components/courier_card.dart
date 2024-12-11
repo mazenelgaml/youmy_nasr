@@ -37,7 +37,7 @@ class _CourierCardState extends State<CourierCard> {
           children: [
             Container(
               width: getProportionateScreenWidth(double.infinity),
-              height: getProportionateScreenHeight(150),
+              height: getProportionateScreenHeight(170),
               padding: EdgeInsets.all(getProportionateScreenWidth(10)),
               decoration: BoxDecoration(
                 color: kSecondaryColor.withOpacity(0.1),
@@ -59,11 +59,11 @@ class _CourierCardState extends State<CourierCard> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           CustomText(
-                            text: widget.courier.name,
+                            text: widget.courier.name??"",
                             fontSize: 23,
                             align: Alignment.topLeft,),
                           SizedBox(height: getProportionateScreenHeight(10)),
-                          CustomText(text: widget.courier.mobile, fontSize: 18),
+                          CustomText(text: widget.courier.mobile??"", fontSize: 18),
                           SizedBox(height: getProportionateScreenHeight(20)),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -106,7 +106,7 @@ class _CourierCardState extends State<CourierCard> {
                                 ),
                                 onTap: () {
                                   var activeStatus=widget.courier.isActive?'InActive':'Active';
-                                  _displayDialog(context,'Alert','Do you want to $activeStatus ${widget.courier.name} courier?!');
+                                  _displayDialog(context,'Alert','Do you want to $activeStatus ${widget.courier.name??""} courier?!');
                                 },
                               ),
                             ],

@@ -59,15 +59,15 @@ class _ProductBranchCardState extends State<ProductBranchCard> {
                       Column(
                         children: [
                           CustomText(
-                              text: widget.branch.name,
+                              text: widget.branch.name??"",
                               fontSize: 20,
                               fontColor: KPrimaryColor),
                           SizedBox(height: getProportionateScreenHeight(10)),
-                          CustomText(text: widget.branch.address, fontSize: 18),
+                          CustomText(text: widget.branch.address??"", fontSize: 18),
                           SizedBox(height: getProportionateScreenHeight(10)),
                           RatingBar.builder(
                             itemSize: 30,
-                            initialRating: widget.branch.rating,
+                            initialRating: widget.branch.rating??0,
                             minRating: 1,
                             direction: Axis.horizontal,
                             allowHalfRating: true,

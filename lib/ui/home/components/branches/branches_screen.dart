@@ -8,16 +8,17 @@ import 'package:merchant/util/Constants.dart';
 
 import '../../../../util/size_config.dart';
 
-
 class BranchesScreen extends StatelessWidget {
   const BranchesScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Initialize SizeConfig here
+    SizeConfig().init(context);
 
     return Scaffold(
       appBar: AppBar(
-        leading:null,
+        leading: null,
         title: const CustomText(
           text: 'Branches',
           align: Alignment.center,
@@ -29,7 +30,7 @@ class BranchesScreen extends StatelessWidget {
           child: Column(
             children: [
               const BranchesData(),
-              SizedBox(height: getProportionateScreenWidth(30)),
+              SizedBox(height: getProportionateScreenWidth(30)), // Now safe to use
             ],
           ),
         ),
@@ -37,11 +38,10 @@ class BranchesScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: KPrimaryColor,
         onPressed: () {
-          Navigator.pushNamed(
-              context, NewBranchScreen.routeName);
+          Navigator.pushNamed(context, NewBranchScreen.routeName);
         },
-        child:  const Icon(
-          Icons.add,size: 29,
+        child: const Icon(
+          Icons.add, size: 29,
         ),
       ),
     );

@@ -9,7 +9,7 @@ class DioConsumer extends ApiConsumer {
 
   DioConsumer({required this.dio}) {
     dio.options.baseUrl = EndPoint.baseUrl; // Set base URL
-    dio.interceptors.add(ApiInterceptor()); // Add custom headers
+    dio.interceptors.add(ApiInterceptor()); // Add custom headers globally via interceptor
     dio.interceptors.add(LogInterceptor(
       request: true,
       requestHeader: true,
@@ -26,12 +26,14 @@ class DioConsumer extends ApiConsumer {
         dynamic data,
         Map<String, dynamic>? queryParameters,
         bool isFromData = false,
+        Map<String, dynamic>? headers, // Additional headers
       }) async {
     try {
       final response = await dio.delete(
         path,
         data: isFromData ? FormData.fromMap(data) : data,
         queryParameters: queryParameters,
+        options: Options(headers: headers), // Pass headers
       );
       return response.data;
     } on DioException catch (e) {
@@ -44,12 +46,13 @@ class DioConsumer extends ApiConsumer {
       String path, {
         Object? data,
         Map<String, dynamic>? queryParameters,
+        Map<String, dynamic>? headers, // Additional headers
       }) async {
     try {
       final response = await dio.get(
         path,
-        data: data,
         queryParameters: queryParameters,
+        options: Options(headers: headers), // Pass headers
       );
       return response.data;
     } on DioException catch (e) {
@@ -63,12 +66,14 @@ class DioConsumer extends ApiConsumer {
         dynamic data,
         Map<String, dynamic>? queryParameters,
         bool isFromData = false,
+        Map<String, dynamic>? headers, // Additional headers
       }) async {
     try {
       final response = await dio.patch(
         path,
         data: isFromData ? FormData.fromMap(data) : data,
         queryParameters: queryParameters,
+        options: Options(headers: headers), // Pass headers
       );
       return response.data;
     } on DioException catch (e) {
@@ -82,12 +87,14 @@ class DioConsumer extends ApiConsumer {
         dynamic data,
         Map<String, dynamic>? queryParameters,
         bool isFromData = false,
+        Map<String, dynamic>? headers, // Additional headers
       }) async {
     try {
       final response = await dio.post(
         path,
         data: isFromData ? FormData.fromMap(data) : data,
         queryParameters: queryParameters,
+        options: Options(headers: headers), // Pass headers
       );
       return response.data;
     } on DioException catch (e) {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:merchant/data/model/Courier.dart';
+import 'package:merchant/data/model/courier.dart';
 
 import 'Product.dart';
 

@@ -6,7 +6,7 @@ import 'package:merchant/components/branch_card.dart';
 import 'package:merchant/components/custom_chip.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/data/model/Branch.dart';
-import 'package:merchant/data/model/Courier.dart';
+import 'package:merchant/data/model/courier.dart';
 import 'package:merchant/ui/auth/signup/screens/address/body_address.dart';
 import 'package:merchant/ui/home/components/branches/components/branches_data.dart';
 import 'package:merchant/ui/home/components/couriers/components/couriers_data.dart';
@@ -460,7 +460,7 @@ class _BottomSheetBodyState extends State<BottomSheetBody> {
       value: selectedCourier,
       items: demoCouriers.map((courier) {
         return DropdownMenuItem<Courier>(
-          child: Text(courier.name),
+          child: Text(courier.name??""),
           value: courier,
         );
       }).toList(),
@@ -552,3 +552,35 @@ void handleClick(String value) {
       break;
   }
 }
+List<Courier> demoCouriers = [
+  Courier(
+    id: 1,
+    name: "Ahmed Sayed ",
+    mobile: "011156879542",
+  ),
+  Courier(id: 2, name: "Tamer Anwar", mobile: "012587542123", isActive: false),
+  Courier(
+    id: 3,
+    name: "Akram Mohamed",
+    mobile: "010857445327",
+  ),
+  Courier(
+    id: 3,
+    name: "Akram Mohamed",
+    mobile: "010857445327",
+  ),
+  Courier(
+    id: 3,
+    name: "Akram Mohamed",
+    mobile: "010857445327",
+  ),
+  Courier(
+      id: 4, name: "Ashraf Mohamed", mobile: "012365478952", isActive: false),
+
+
+
+
+
+
+
+];

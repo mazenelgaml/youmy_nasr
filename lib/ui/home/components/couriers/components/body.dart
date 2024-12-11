@@ -6,6 +6,7 @@ import 'package:merchant/ui/home/components/branches/components/branches_data.da
 import 'package:merchant/ui/home/components/couriers/components/couriers_data.dart';
 import 'package:merchant/ui/home/components/couriers/new_courier/new_courier_screen.dart';
 import 'package:merchant/util/Constants.dart';
+import 'package:merchant/data/model/courier.dart' as your_courier;
 
 import '../../../../../util/size_config.dart';
 

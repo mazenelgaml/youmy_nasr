@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/util/extensions.dart';
 
 import '../../../../components/custom_text_form_field.dart';
@@ -64,7 +65,7 @@ class LoginController extends GetxController{
         }
         return null;
       },
-      hintText: 'Password',
+      hintText: signInTextPass.tr,
       textInputType: TextInputType.visiblePassword,
       textInputAction: TextInputAction.done,
       suffixIcon: const Icon(Icons.visibility_off),
@@ -75,7 +76,7 @@ class LoginController extends GetxController{
     return CustomTextFormField(
       controller: emailController,
       textInputType: TextInputType.emailAddress,
-      hintText: 'Email/Phone No',
+      hintText: signInTextEmail.tr,
       onPressed: (value) {
         email = value;
       },
@@ -133,7 +134,7 @@ class LoginController extends GetxController{
         // Successful login
         LoginModel loginModel = LoginModel.fromJson(response.data);
         await Get.find<CacheHelper>().saveData(key: "token", value: "${loginModel.token}");
-        if (loginModel.isHasPermission==true) {
+        if (loginModel.isHasPermission==false) {
           showDialog(
             context: context,
             builder: (BuildContext context) {
