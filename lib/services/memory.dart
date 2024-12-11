@@ -1,68 +1,66 @@
+import 'dart:ui';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class CacheHelper extends GetxService{
+class CacheHelper extends GetxService {
   CacheHelper(this.sharedPreferences);
   final SharedPreferences sharedPreferences;
 
-//! Here The Initialize of cache .
+  //! Initialize CacheHelper
   static Future<CacheHelper> init() async {
-    // await GetStorage.init();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return CacheHelper(prefs);
   }
 
+  //! Get data from SharedPreferences
   String? getDataString({required String key}) {
     return sharedPreferences.getString(key);
   }
-  loggingOut(){
+
+  //! Logout by clearing specific data
+  void loggingOut() {
     sharedPreferences.remove("id");
   }
 
-//! this method to put data in local database using key
-
+  //! Save data to SharedPreferences
   Future<bool> saveData({required String key, required dynamic value}) async {
     if (value is bool) {
       return await sharedPreferences.setBool(key, value);
-    }
-
-    if (value is String) {
+    } else if (value is String) {
       return await sharedPreferences.setString(key, value);
-    }
-
-    if (value is int) {
+    } else if (value is int) {
       return await sharedPreferences.setInt(key, value);
     } else {
       return await sharedPreferences.setDouble(key, value);
     }
   }
 
-//! this method to get data already saved in local database
-
+  //! Retrieve data from SharedPreferences
   dynamic getData({required String key}) {
     return sharedPreferences.get(key);
   }
 
-//! remove data using specific key
-
+  //! Remove data using specific key
   Future<bool> removeData({required String key}) async {
     return await sharedPreferences.remove(key);
   }
 
-//! this method to check if local database contains {key}
+  //! Check if SharedPreferences contains a specific key
   Future<bool> containsKey({required String key}) async {
     return sharedPreferences.containsKey(key);
   }
 
-  Future<bool> clearData({required String key}) async {
-    return sharedPreferences.clear();
-  }
-  bool get checkUserIsSignedIn  {
-    return sharedPreferences.containsKey("id");
+  //! Clear all data from SharedPreferences
+  Future<bool> clearData() async {
+    return await sharedPreferences.clear();
   }
 
+  //! Check if user is signed in
+  bool get checkUserIsSignedIn {
+    return sharedPreferences.containsKey("token");
+  }
 
-//! this fun to put data in local data base using key
+  //! General method to save data
   Future<dynamic> put({
     required String key,
     required dynamic value,
@@ -74,5 +72,15 @@ class CacheHelper extends GetxService{
     } else {
       return await sharedPreferences.setInt(key, value);
     }
+  }
+
+  //! Active Locale management
+  Locale get activeLocale {
+    final localeCode = sharedPreferences.getString('activeLocale') ?? 'en';
+    return Locale(localeCode);
+  }
+
+  set activeLocale(Locale activeLocale) {
+    sharedPreferences.setString('activeLocale', activeLocale.languageCode);
   }
 }

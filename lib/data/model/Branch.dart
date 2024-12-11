@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class Branch {
-  final int id;
-  final String name,description, address, email, workingHours, paymentMethods;
-  final double rating;
+  final int? id;
+  final String? name,description, address, email, workingHours, paymentMethods;
+  final double? rating;
   final StoreState status;
 
   Branch({required this.id,

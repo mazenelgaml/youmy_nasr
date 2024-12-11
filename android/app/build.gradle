@@ -19,15 +19,14 @@ android {
 
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.yomy.merchant"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 23 // Minimum SDK version should be 23 or above for runtime permissions
+        targetSdk = 33 // or higher, ensure it's compatible with your target Android version
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
+
+
 
     buildTypes {
         release {

@@ -29,7 +29,7 @@ class _BranchFilterWidgetState extends State<BranchFilterWidget> {
       onTap: widget.onPress(),
       child: Container(
         padding: EdgeInsets.all(getProportionateScreenWidth(10)),
-        child: CustomText(text:widget.branch.name,),
+        child: CustomText(text:widget.branch.name??"",),
         margin: const EdgeInsets.all(15.0),
         decoration: BoxDecoration(
           color: KOpacityPrimaryColor,

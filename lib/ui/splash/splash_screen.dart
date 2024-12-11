@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:merchant/ui/auth/login/login_screen.dart';
 import 'package:splash_view/source/presentation/pages/splash_view.dart';
 import 'package:splash_view/source/presentation/widgets/done.dart';
+
+import '../../services/memory.dart';
+import '../home/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   static var routeName = "/splash";
@@ -34,8 +39,8 @@ class _SplashScreenState extends State<SplashScreen> {
         backgroundColor: const Color(0xffffffff),
         duration: const Duration(seconds: 4),
         done: Done(
-    LoginScreen()),
-            // Get.find<CacheHelper>().checkUserIsSignedIn?const HomeScreen():const WelcomeScreen()),
+
+            Get.find<CacheHelper>().checkUserIsSignedIn?const HomeScreen():const LoginScreen()),
 
         logo: const Stack(
             alignment: Alignment.topCenter,

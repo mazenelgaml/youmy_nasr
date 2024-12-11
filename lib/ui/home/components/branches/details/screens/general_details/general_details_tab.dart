@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:merchant/components/custom_text.dart';
@@ -44,7 +43,7 @@ class _BranchGeneralDetailsTabState extends State<BranchGeneralDetailsTab> {
               child: AspectRatio(
                 aspectRatio: 1,
                 child: Hero(
-                  tag: widget.branch.id,
+                  tag: widget.branch.id??0,
                   child: Image.asset(
                     'assets/images/logo.png',
                     fit: BoxFit.fill,
@@ -53,7 +52,7 @@ class _BranchGeneralDetailsTabState extends State<BranchGeneralDetailsTab> {
               ),
             ),
             CustomText(
-              text: widget.branch.name,
+              text: widget.branch.name??"",
               fontSize: 25,
               fontColor: KPrimaryColor,
               align: Alignment.center,
@@ -83,7 +82,7 @@ class _BranchGeneralDetailsTabState extends State<BranchGeneralDetailsTab> {
               height: getProportionateScreenHeight(10),
             ),
             CustomText(
-              text: widget.branch.address,
+              text: widget.branch.address??"",
               align: Alignment.center,
             ),
             SizedBox(
@@ -91,7 +90,7 @@ class _BranchGeneralDetailsTabState extends State<BranchGeneralDetailsTab> {
             ),
             RatingBar.builder(
               itemSize: 30,
-              initialRating: widget.branch.rating,
+              initialRating: widget.branch.rating??0,
               minRating: 1,
               direction: Axis.horizontal,
               allowHalfRating: true,
@@ -108,12 +107,12 @@ class _BranchGeneralDetailsTabState extends State<BranchGeneralDetailsTab> {
             ),
             CustomText(text:'Working Hours',fontColor: KPrimaryColor,
             fontWeight: FontWeight.bold,),
-            CustomText(text:widget.branch.workingHours),
+            CustomText(text:widget.branch.workingHours??""),
             SizedBox(
               height: getProportionateScreenHeight(10),
             ),
             CustomText(text:'Payment Methods', fontWeight: FontWeight.bold,fontColor: KPrimaryColor,),
-            CustomText(text:widget.branch.paymentMethods),
+            CustomText(text:widget.branch.paymentMethods??""),
             SizedBox(
               height: getProportionateScreenHeight(100),
             ),

@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:merchant/services/memory.dart';
 import 'package:merchant/ui/auth/login/login_screen.dart';
 import 'package:merchant/ui/auth/signup/signup_screen.dart';
 import 'package:merchant/ui/profile/components/bank_account/bank_account_screen.dart';
@@ -12,6 +14,7 @@ import 'package:merchant/ui/profile/components/security/security_screen.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../components/custom_text.dart';
+import '../../../services/localization_services.dart';
 import '../../../util/Constants.dart';
 
 import '../../home/components/branches/new_branch/new_branch_screen.dart';
@@ -107,8 +110,20 @@ class _BodyState extends State<Body> {
             ProfileMenu(
               text: "Language",
               icon: Icons.language,
-              press: () {},
+              press: () {
+                final cacheHelper = Get.find<CacheHelper>();
+
+                // Toggle between Arabic and English
+                final newLocale = cacheHelper.activeLocale == SupportedLocales.arabic
+                    ? SupportedLocales.english
+                    : SupportedLocales.arabic;
+
+                // Update in storage and GetX
+                cacheHelper.activeLocale = newLocale;
+                Get.updateLocale(newLocale);
+              },
             ),
+
             ProfileMenu(
               text: "About the app",
               icon: Icons.info_outline,

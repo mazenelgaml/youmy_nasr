@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:merchant/components/branch_card.dart';
 
 import '../../../../../data/model/Branch.dart';
 import '../../../../../util/size_config.dart';
+import '../controller/branches_controller.dart';
 
 
 class BranchesData extends StatelessWidget {
@@ -10,6 +12,9 @@ class BranchesData extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return GetBuilder(
+        init: BranchesController(),
+    builder: (BranchesController controller) {
     return Column(
       children: [
         Padding(
@@ -22,9 +27,9 @@ class BranchesData extends StatelessWidget {
           child: Column(
             children: [
               ...List.generate(
-                demoBranches.length,
+                controller.branchesNames?.length??0,
                     (index) {
-                      return BranchCard(branch: demoBranches[index]);// here by default width and height is 0
+                      return BranchCard(branch:controller.branches[index]);// here by default width and height is 0
                 },
               ),
               SizedBox(width: getProportionateScreenWidth(20)),
@@ -32,6 +37,6 @@ class BranchesData extends StatelessWidget {
           ),
         )
       ],
-    );
+    );});
   }
 }

@@ -5,6 +5,7 @@ import '../../../components/colored_custom_text.dart';
 import '../../../components/custom_button.dart';
 import '../../../components/custom_text.dart';
 import '../../../components/form_error.dart';
+import '../../../services/translation_key.dart';
 import '../../../util/Constants.dart';
 import '../../../util/keyboard.dart';
 import '../../../util/size_config.dart';
@@ -64,8 +65,8 @@ class LoginScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         SizedBox(height: getProportionateScreenHeight(10)),
-                        const CustomText(
-                          text: 'Welcome to Yomy - Merchant,',
+                         CustomText(
+                          text: signInTitle.tr,
                           fontSize: 25,
                           fontColor: KPrimaryColor,
                           fontFamily: 'Roboto Italic',
@@ -79,8 +80,8 @@ class LoginScreen extends StatelessWidget {
                         SizedBox(height: getProportionateScreenHeight(20)),
                         GestureDetector(
                           onTap: () => Get.toNamed(ForgetPasswordScreen.routeName),
-                          child: const CustomText(
-                            text: 'Forget Password?',
+                          child:  CustomText(
+                            text: signInTextForgetPass.tr,
                             fontFamily: 'Roboto Bold',
                             fontSize: 16,
                             fontColor: KPrimaryColor,
@@ -88,7 +89,7 @@ class LoginScreen extends StatelessWidget {
                         ),
                         SizedBox(height: getProportionateScreenHeight(60)),
                         CustomButton(
-                          text: "Login",
+                          text: signInTextBTN.tr,
                           press: () {
                             if (controller.formKey.currentState!.validate()) {
                               controller.formKey.currentState!.save();
@@ -107,10 +108,10 @@ class LoginScreen extends StatelessWidget {
                     onTap: () {
                       Get.toNamed(SignUpScreen.routeName); // Replaced Navigator.pushNamed with Get.toNamed
                     },
-                    child: const CustomRichText(
+                    child:  CustomRichText(
                       align: Alignment.center,
-                      text1: 'Don\'t have an account?',
-                      text2: ' SignUp',
+                      text1: dontHaveAnAccount.tr,
+                      text2: signUpTextBTN.tr,
                     ),
                   ),
                   SizedBox(height: getProportionateScreenHeight(30)),

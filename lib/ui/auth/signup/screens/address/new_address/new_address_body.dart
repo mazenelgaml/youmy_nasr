@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 
 import '../../../../../../components/custom_button.dart';
 import '../../../../../../components/custom_text.dart';
@@ -7,6 +8,7 @@ import '../../../../../../components/form_error.dart';
 import '../../../../../../util/keyboard.dart';
 import '../../../../../../util/size_config.dart';
 import '../../../../../home/home_screen.dart';
+import '../../../controller/signup_controller.dart';
 
 class SignUpFormNewAddress extends StatefulWidget {
   const SignUpFormNewAddress({Key? key}) : super(key: key);
@@ -64,16 +66,6 @@ class _SignUpFormNewAddressState extends State<SignUpFormNewAddress> {
         errors.remove(error);
       });
     }
-  }
-  CustomTextFormField buildLocationOnMapField() {
-    return CustomTextFormField(
-      hintText: 'Location on map',
-      suffixIcon: const Icon(Icons.location_on),
-      readOnly: true,
-      onPressed: () {},
-      onChange: () {},
-      onValidate: () {},
-    );
   }
 
   DropdownButton<String> buildCityField() {
@@ -158,50 +150,53 @@ class _SignUpFormNewAddressState extends State<SignUpFormNewAddress> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          SizedBox(
-            height: getProportionateScreenWidth(20),
-          ),
-          buildLocationOnMapField(),
-          SizedBox(height: getProportionateScreenHeight(20)),
-          buildCityField(),
-          SizedBox(height: getProportionateScreenHeight(20)),
-          buildRegionField(),
-          SizedBox(height: getProportionateScreenHeight(20)),
-          buildStreetField(),
-          SizedBox(height: getProportionateScreenHeight(20)),
-          buildBuildingField(),
-          SizedBox(height: getProportionateScreenHeight(20)),
-          buildFloorField(),
-          SizedBox(height: getProportionateScreenHeight(20)),
-          buildFlatField(),
-          SizedBox(height: getProportionateScreenHeight(20)),
-          FormError(errors: errors),
-          SizedBox(height: getProportionateScreenHeight(20)),
-          CustomButton(
-            text: "Finish",
-            press: () {
-              // if (_formKey.currentState!.validate()) {
-              //   _formKey.currentState!.save();
-                // if all are valid then go to success screen
-                KeyboardUtil.hideKeyboard(context);
-                Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => const HomeScreen()),
-                    (Route<dynamic> route) => false);
-              // }
-            },
-          ),
-          SizedBox(height: getProportionateScreenHeight(40)),
-        ],
-      ),
-    );
+    return GetBuilder(
+        init: SignupController(context),
+        builder: (SignupController controller) {
+          return Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                SizedBox(
+                  height: getProportionateScreenWidth(20),
+                ),
+                controller.buildLocationOnMapField(context),
+                SizedBox(height: getProportionateScreenHeight(20)),
+                buildCityField(),
+                SizedBox(height: getProportionateScreenHeight(20)),
+                buildRegionField(),
+                SizedBox(height: getProportionateScreenHeight(20)),
+                buildStreetField(),
+                SizedBox(height: getProportionateScreenHeight(20)),
+                buildBuildingField(),
+                SizedBox(height: getProportionateScreenHeight(20)),
+                buildFloorField(),
+                SizedBox(height: getProportionateScreenHeight(20)),
+                buildFlatField(),
+                SizedBox(height: getProportionateScreenHeight(20)),
+                FormError(errors: errors),
+                SizedBox(height: getProportionateScreenHeight(20)),
+                CustomButton(
+                  text: "Finish",
+                  press: () {
+                    // if (_formKey.currentState!.validate()) {
+                    //   _formKey.currentState!.save();
+                    // if all are valid then go to success screen
+                    KeyboardUtil.hideKeyboard(context);
+                    Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                const HomeScreen()),
+                        (Route<dynamic> route) => false);
+                    // }
+                  },
+                ),
+                SizedBox(height: getProportionateScreenHeight(40)),
+              ],
+            ),
+          );
+        });
   }
-
-
 }
