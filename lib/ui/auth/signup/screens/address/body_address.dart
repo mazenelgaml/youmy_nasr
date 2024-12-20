@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:merchant/components/custom_button.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/components/custom_text_form_field.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/auth/signup/screens/address/address_form.dart';
 import '../../../../../util/Constants.dart';
 import '../../../../../util/size_config.dart';
 import '../../../../home/home_screen.dart';
+import 'package:get/get.dart';
+
+import '../../controller/signup_controller.dart';
 
 final List<String> cities = [
   "Select City",
@@ -42,7 +46,10 @@ class _BodyAddressState extends State<BodyAddress> {
   //region variables
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GetBuilder(
+        init: SignupController(context),
+        builder: (SignupController controller) {
+          return Scaffold(
       body: SafeArea(
         child: SizedBox(
           width: double.infinity,
@@ -53,8 +60,8 @@ class _BodyAddressState extends State<BodyAddress> {
               child: Column(
                 children: [
                   SizedBox(height: SizeConfig.screenHeight * 0.02),
-                  const CustomText(
-                    text: 'Addresses',
+                   CustomText(
+                    text: merchantAdrress.tr,
                     align: Alignment.center,
                     fontColor: KPrimaryColor,
                     fontWeight: FontWeight.bold,
@@ -73,7 +80,7 @@ class _BodyAddressState extends State<BodyAddress> {
         },
         child: const Icon(Icons.add_location),
       ),
-    );
+    );});
   }
 
   //endregion
@@ -108,7 +115,7 @@ class _BodyAddressState extends State<BodyAddress> {
                     height: getProportionateScreenWidth(20),
                   ),
                   CustomTextFormField(
-                    hintText: 'Location on map',
+                    hintText: merchantLocation.tr,
                     suffixIcon: const Icon(Icons.location_on),
                     readOnly: true,
                     onPressed: () {},
@@ -117,7 +124,7 @@ class _BodyAddressState extends State<BodyAddress> {
                   ),
                   SizedBox(height: getProportionateScreenHeight(20)),
                   DropdownButton(
-                    hint: const CustomText(text: 'Select City',),
+                    hint:  CustomText(text: merchantSelectCity.tr,),
                     iconSize: 40,
                     isExpanded: true,
                     value: selectedCity,
@@ -135,7 +142,7 @@ class _BodyAddressState extends State<BodyAddress> {
                   ),
                   SizedBox(height: getProportionateScreenHeight(20)),
                   DropdownButton(
-                    hint: const CustomText(text: 'Select Region',),
+                    hint:  CustomText(text: merchantSelectRegion.tr,),
                     iconSize: 40,
                     isExpanded: true,
                     value: selectedRegion,
@@ -152,16 +159,16 @@ class _BodyAddressState extends State<BodyAddress> {
                     },
                   ),
                   SizedBox(height: getProportionateScreenHeight(20)),
-                 CustomTextFormField(hintText: 'Street', onPressed: (){}, onChange: (){}, onValidate: (){}),
+                 CustomTextFormField(hintText: merchantStreet.tr, onPressed: (){}, onChange: (){}, onValidate: (){}),
                   SizedBox(height: getProportionateScreenHeight(20)),
-                  CustomTextFormField(hintText: 'Building', onPressed: (){}, onChange: (){}, onValidate: (){}),
+                  CustomTextFormField(hintText: merchantBuilding.tr, onPressed: (){}, onChange: (){}, onValidate: (){}),
                   SizedBox(height: getProportionateScreenHeight(20)),
-                  CustomTextFormField(hintText: 'FLat', onPressed: (){}, onChange: (){}, onValidate: (){}),
+                  CustomTextFormField(hintText: merchantFlat.tr, onPressed: (){}, onChange: (){}, onValidate: (){}),
                   SizedBox(height: getProportionateScreenHeight(20)),
-                  CustomTextFormField(hintText: 'Floor',textInputAction: TextInputAction.done, onPressed: (){}, onChange: (){}, onValidate: (){}),
+                  CustomTextFormField(hintText: merchantFloor.tr,textInputAction: TextInputAction.done, onPressed: (){}, onChange: (){}, onValidate: (){}),
                   SizedBox(height: getProportionateScreenHeight(40)),
                   CustomButton(
-                    text: 'Create',
+                    text: create.tr,
                     press: () => {
                     Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(

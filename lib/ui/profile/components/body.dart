@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:merchant/services/memory.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/auth/login/login_screen.dart';
 import 'package:merchant/ui/auth/signup/signup_screen.dart';
 import 'package:merchant/ui/profile/components/bank_account/bank_account_screen.dart';
@@ -17,6 +18,7 @@ import '../../../components/custom_text.dart';
 import '../../../services/localization_services.dart';
 import '../../../util/Constants.dart';
 
+import '../../auth/start/start_screen.dart';
 import '../../home/components/branches/new_branch/new_branch_screen.dart';
 import '../notification/notifiction_screen.dart';
 import 'profile_menu.dart';
@@ -34,8 +36,8 @@ class _BodyState extends State<Body> {
     return Scaffold(
       appBar: AppBar(
         leading: null,
-        title: const CustomText(
-          text: 'My Account',
+        title:  CustomText(
+          text: profileScreenTitle.tr,
           align: Alignment.center,
           fontColor: KPrimaryColor,
         ),
@@ -82,33 +84,33 @@ class _BodyState extends State<Body> {
               ),
             ),
             ProfileMenu(
-              text: 'Merchant & Store Details',
+              text: merchantAndStoreDetails.tr,
               icon: Icons.store,
               press: () =>
                   {Navigator.pushNamed(context, SignUpScreen.routeName)},
             ),
             ProfileMenu(
-              text: "Security & login",
+              text: securityAndLogIn.tr,
               icon: Icons.person_add_alt_1,
               press: () {Navigator.pushNamed(context, SecurityScreen.routeName);},
             ),
             ProfileMenu(
-              text: "Inbox",
+              text: inBox.tr,
               icon: Icons.notifications_active_sharp,
               press: () {Navigator.pushNamed(context, NotificationScreen.routeName);},
             ),
             ProfileMenu(
-              text: "Settlement Reports",
+              text: settlementReports.tr,
               icon: Icons.description,
               press: () {Navigator.pushNamed(context, ReportScreen.routeName);},
             ),
             ProfileMenu(
-              text: "Bank account information",
+              text: bankAccountInformation.tr,
               icon: Icons.wallet_travel,
               press: () {Navigator.pushNamed(context, BankAccountScreen.routeName);},
             ),
             ProfileMenu(
-              text: "Language",
+              text: language.tr,
               icon: Icons.language,
               press: () {
                 final cacheHelper = Get.find<CacheHelper>();
@@ -125,7 +127,7 @@ class _BodyState extends State<Body> {
             ),
 
             ProfileMenu(
-              text: "About the app",
+              text: aboutTheApp.tr,
               icon: Icons.info_outline,
               press: () {
                 print("https://www.google.com/");
@@ -133,7 +135,7 @@ class _BodyState extends State<Body> {
               },
             ),
             ProfileMenu(
-              text: "Contact us",
+              text: contactUs.tr,
               icon: Icons.call,
               press: () {
                 _makePhoneCall('+201022248887');
@@ -141,14 +143,15 @@ class _BodyState extends State<Body> {
               },
             ),
             ProfileMenu(
-              text: "Privacy Policy",
+              text: privacyPolicy.tr,
               icon: Icons.privacy_tip_sharp,
               press: () {
-                _launchInWebViewOrVC("https://twitter.com/home");
+                Get.to(()=>StartScreen());
+                // _launchInWebViewOrVC("https://twitter.com/home");
               },
             ),
             ProfileMenu(
-              text: "Share the app with friends",
+              text: shareTheAppWithFriends.tr,
               icon: Icons.share,
               press: () {
                 String share =
@@ -157,7 +160,7 @@ class _BodyState extends State<Body> {
               },
             ),
             ProfileMenu(
-              text: "Log Out",
+              text: logOut.tr,
               icon: Icons.logout,
               press: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(

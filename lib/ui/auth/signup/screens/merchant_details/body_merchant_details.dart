@@ -1,9 +1,10 @@
 import 'dart:io';
-
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:merchant/components/profile_image_widget.dart';
+import 'package:merchant/services/translation_key.dart';
 import '../../../../../components/custom_text.dart';
 import '../../../../../util/Constants.dart';
 import '../../../../../util/size_config.dart';
@@ -31,7 +32,7 @@ class _BodyMerchantDetailsState extends State<BodyMerchantDetails> {
             child: Column(
               children: [
                 SizedBox(height: SizeConfig.screenHeight * 0.02),
-                const CustomText(text: 'Merchant Details',align: Alignment.center,fontColor: KPrimaryColor,fontWeight: FontWeight.bold,),
+                 CustomText(text: merchantDetials.tr,align: Alignment.center,fontColor: KPrimaryColor,fontWeight: FontWeight.bold,),
                 SizedBox(height: SizeConfig.screenHeight * 0.02),// 4%
                 SizedBox(
                   height: 88,
@@ -85,13 +86,13 @@ class _BodyMerchantDetailsState extends State<BodyMerchantDetails> {
     showDialog<ImageSource>(
       context: context,
       builder: (context) =>
-          AlertDialog(content: const Text("Choose image source"), actions: [
+          AlertDialog(content:  Text(chooseImageSource.tr), actions: [
             MaterialButton(
-              child: const Text("Camera"),
+              child:  Text(camera.tr),
               onPressed: () => Navigator.pop(context, ImageSource.camera),
             ),
             MaterialButton(
-              child: const Text("Gallery"),
+              child:  Text(gallery.tr),
               onPressed: () => Navigator.pop(context, ImageSource.gallery),
             ),
           ]),

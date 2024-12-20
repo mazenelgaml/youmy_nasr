@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:merchant/services/translation_key.dart';
 import '../../../../../../../components/custom_button.dart';
 import '../../../../../../../components/custom_text.dart';
 import '../../../../../../../components/custom_text_form_field.dart';
@@ -6,7 +7,7 @@ import '../../../../../../../components/form_error.dart';
 import '../../../../../../../util/keyboard.dart';
 import '../../../../../../../util/size_config.dart';
 import '../../../../../home_screen.dart';
-
+import 'package:get/get.dart';
 
 class BranchAddressBody extends StatefulWidget {
   const BranchAddressBody({Key? key}) : super(key: key);
@@ -18,7 +19,7 @@ class BranchAddressBody extends StatefulWidget {
 class _BranchAddressBodyState extends State<BranchAddressBody> {
   //region variables
   final List<String> cities = [
-    "Select City",
+    merchantSelectCity.tr,
     "Cairo",
     "Alexandria",
     "Luxor",
@@ -29,7 +30,7 @@ class _BranchAddressBodyState extends State<BranchAddressBody> {
   ];
 
   final List<String> regions = [
-    "Select Region",
+    merchantSelectRegion.tr,
     "Maddi",
     "Tahrir",
     "Down Town",
@@ -43,8 +44,8 @@ class _BranchAddressBodyState extends State<BranchAddressBody> {
   String? name, type, summary, address, workingHours, paymentTypes;
   bool cash = false, visa = false, credit = false;
   final List<String?> errors = [];
-  var selectedCity = "Select City";
-  var selectedRegion = "Select Region";
+  var selectedCity = merchantSelectCity.tr;
+  var selectedRegion = merchantSelectRegion.tr;
 
   //endregion
 
@@ -67,7 +68,7 @@ class _BranchAddressBodyState extends State<BranchAddressBody> {
   }
   CustomTextFormField buildLocationOnMapField() {
     return CustomTextFormField(
-      hintText: 'Location on map',
+      hintText: locationText.tr,
       suffixIcon: const Icon(Icons.location_on),
       readOnly: true,
       onPressed: () {},
@@ -78,8 +79,8 @@ class _BranchAddressBodyState extends State<BranchAddressBody> {
 
   DropdownButton<String> buildCityField() {
     return DropdownButton(
-      hint: const CustomText(
-        text: 'Select City',
+      hint:  CustomText(
+        text:merchantSelectCity.tr,
       ),
       iconSize: 40,
       isExpanded: true,
@@ -100,8 +101,8 @@ class _BranchAddressBodyState extends State<BranchAddressBody> {
 
   DropdownButton<String> buildRegionField() {
     return DropdownButton(
-      hint: const CustomText(
-        text: 'Select Region',
+      hint:  CustomText(
+        text: merchantSelectRegion.tr,
       ),
       iconSize: 40,
       isExpanded: true,
@@ -122,7 +123,7 @@ class _BranchAddressBodyState extends State<BranchAddressBody> {
 
   CustomTextFormField buildStreetField() {
     return CustomTextFormField(
-        hintText: 'Street',
+        hintText: merchantStreet.tr,
         onPressed: () {},
         onChange: () {},
         onValidate: () {});
@@ -130,7 +131,7 @@ class _BranchAddressBodyState extends State<BranchAddressBody> {
 
   CustomTextFormField buildBuildingField() {
     return CustomTextFormField(
-        hintText: 'Building',
+        hintText: merchantBuilding.tr,
         onPressed: () {},
         onChange: () {},
         onValidate: () {});
@@ -138,7 +139,7 @@ class _BranchAddressBodyState extends State<BranchAddressBody> {
 
   CustomTextFormField buildFlatField() {
     return CustomTextFormField(
-        hintText: 'FLat',
+        hintText: merchantFlat.tr,
         textInputAction: TextInputAction.done,
         onPressed: () {},
         onChange: () {},
@@ -147,7 +148,7 @@ class _BranchAddressBodyState extends State<BranchAddressBody> {
 
   CustomTextFormField buildFloorField() {
     return CustomTextFormField(
-        hintText: 'Floor',
+        hintText: merchantFloor.tr,
         textInputAction: TextInputAction.next,
         onPressed: () {},
         onChange: () {},
@@ -184,7 +185,7 @@ class _BranchAddressBodyState extends State<BranchAddressBody> {
           FormError(errors: errors),
           SizedBox(height: getProportionateScreenHeight(20)),
           CustomButton(
-            text: "Finish",
+            text: finishBTN.tr,
             press: () {
               // if (_formKey.currentState!.validate()) {
               //   _formKey.currentState!.save();

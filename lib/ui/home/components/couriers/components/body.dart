@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:merchant/components/branch_card.dart';
+import 'package:get/get.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/data/model/Branch.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/home/components/branches/components/branches_data.dart';
 import 'package:merchant/ui/home/components/couriers/components/couriers_data.dart';
 import 'package:merchant/ui/home/components/couriers/new_courier/new_courier_screen.dart';
@@ -20,8 +21,8 @@ class Body extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: null,
-        title: const CustomText(
-          text: 'Couriers',
+        title:  CustomText(
+          text: couriersTitle.tr,
           align: Alignment.center,
           fontColor: KPrimaryColor,
         ),

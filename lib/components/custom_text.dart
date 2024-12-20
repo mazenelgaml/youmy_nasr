@@ -1,6 +1,10 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:merchant/services/memory.dart';
+
+import '../services/localization_services.dart';
 
 class CustomText extends StatelessWidget {
   final String text;
@@ -29,7 +33,10 @@ class CustomText extends StatelessWidget {
         child: Text(
           text,
           maxLines: 1,
-          style: TextStyle(
+          textAlign:Get.find<CacheHelper>()
+            .activeLocale == SupportedLocales.english ?TextAlign.left:TextAlign.right
+          ,style: TextStyle(
+
               fontWeight: fontWeight,
               fontSize: fontSize,
               color: fontColor,

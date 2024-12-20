@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:merchant/ui/auth/signup/screens/attachments/attachments_screen.dart';
 import 'package:merchant/util/Constants.dart';
+import 'controller/signup_controller.dart';
 import 'screens/general_information/body_general_information.dart';
 import 'screens/merchant_details/body_merchant_details.dart';
 import 'screens/address/new_address/new_adress_screen.dart';
@@ -20,7 +22,9 @@ class SignUpScreen extends StatelessWidget {
         appBar: AppBar(
             backgroundColor: Colors.white,
             leading: GestureDetector(
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  Navigator.pop(context);
+                },
                 child: const Icon(Icons.arrow_back)),
             bottom: const TabBar(
               labelStyle:tabBarStyle,

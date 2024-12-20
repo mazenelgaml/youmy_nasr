@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:merchant/components/custom_text.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/util/extensions.dart';
-
+import 'package:get/get.dart';
 import '../../../../../../../components/custom_button.dart';
 import '../../../../../../../components/custom_text_form_field.dart';
 import '../../../../../../../util/Constants.dart';
@@ -61,7 +62,7 @@ class _BranchPaymentBodyState extends State<BranchPaymentBody> {
                 onTap: () {
                   //go to terms screen
                 },
-                child: const CustomText(text: 'Cash ')),
+                child:  CustomText(text: cashText.tr)),
           ]),
           Row(children: [
             Checkbox(
@@ -77,7 +78,7 @@ class _BranchPaymentBodyState extends State<BranchPaymentBody> {
                 onTap: () {
                   //go to terms screen
                 },
-                child: const CustomText(text: 'Visa from home ')),
+                child:  CustomText(text: visaFromHomeText.tr)),
           ]),
           Row(children: [
             Checkbox(
@@ -93,15 +94,15 @@ class _BranchPaymentBodyState extends State<BranchPaymentBody> {
                 onTap: () {
                   //go to terms screen
                 },
-                child: const CustomText(text: 'Credit Card ')),
+                child:  CustomText(text: creditCardText.tr)),
           ]),
           SizedBox(height: getProportionateScreenHeight(20)),
           CustomText(
-            text: 'Collection is by electronic payment',fontSize: 14,
+            text: electronicPayment.tr,fontSize: 14,
           ),
           SizedBox(height: getProportionateScreenHeight(20)),
           CustomButton(
-            text: "Continue",
+            text: continueText.tr,
             press: () {
               // if (_formKey.currentState!.validate()) {
               //   _formKey.currentState!.save();
@@ -119,7 +120,7 @@ class _BranchPaymentBodyState extends State<BranchPaymentBody> {
   CustomTextFormField buildPaymentTypesField() {
     return CustomTextFormField(
         obscureText: true,
-        hintText: 'Payment Types',
+        hintText: paymentTypesText.tr,
         textInputAction: TextInputAction.done,
         onPressed: (newValue) => paymentTypes = newValue,
         onChange: (value) {
@@ -154,7 +155,7 @@ class _BranchPaymentBodyState extends State<BranchPaymentBody> {
         }
         return null;
       },
-      hintText: 'Working Hours',
+      hintText: workingHoursText.tr,
       textInputAction: TextInputAction.next,
     );
   }
@@ -162,7 +163,7 @@ class _BranchPaymentBodyState extends State<BranchPaymentBody> {
   CustomTextFormField buildAddressField() {
     return CustomTextFormField(
       textInputType: TextInputType.text,
-      hintText: 'Address',
+      hintText: merchantAdrress.tr,
       onPressed: (value) {
         address = value;
       },
@@ -187,7 +188,7 @@ class _BranchPaymentBodyState extends State<BranchPaymentBody> {
   CustomTextFormField buildNameField() {
     return CustomTextFormField(
       textInputType: TextInputType.text,
-      hintText: 'Merchant Name',
+      hintText: merchantName.tr,
       onPressed: (value) {
         name = value;
       },
@@ -213,7 +214,7 @@ class _BranchPaymentBodyState extends State<BranchPaymentBody> {
   CustomTextFormField buildTypeField() {
     return CustomTextFormField(
       textInputType: TextInputType.text,
-      hintText: 'Type',
+      hintText: merchantType.tr,
       suffixIcon: const Icon(Icons.arrow_drop_down),
       onPressed: (value) {
         type = value;
@@ -240,7 +241,7 @@ class _BranchPaymentBodyState extends State<BranchPaymentBody> {
   CustomTextFormField buildSummaryField() {
     return CustomTextFormField(
       textInputType: TextInputType.text,
-      hintText: 'Summary',
+      hintText: merchantSummary.tr,
       onPressed: (value) {
         summary = value;
       },

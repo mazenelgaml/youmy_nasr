@@ -1,32 +1,53 @@
 import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:merchant/ui/home/home_screen.dart';
 import 'package:merchant/util/extensions.dart';
-import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
-
 import '../../../../components/custom_text_form_field.dart';
-import '../../../../models/error_model.dart';
+import '../../../../models/cities_list_model.dart' as model;
+import '../../../../models/coutry_list_model.dart';
 import '../../../../models/job_List_model.dart';
-import '../../../../models/login_model.dart';
+import '../../../../models/region_list_model.dart';
+import '../../../../models/sign_up_error_model.dart';
+import '../../../../services/localization_services.dart';
 import '../../../../services/memory.dart';
+import '../../../../services/translation_key.dart';
 import '../../../../util/Constants.dart';
-import '../../../home/home_screen.dart';
-
 class SignupController extends GetxController {
   List<String> jobNames=[]; // List of job names to show in the dropdown
-  List<Jobs>? selectJob=[]; // Full job data if needed for future use
+  List<Jobs>? jobList=[];
+  List<String>? selectCity=[];
+  List<String>? selectCountry=[];
+  var selectedCity = merchantSelectCity.tr;
+  var selectedCountry = merchantCountry.tr;
+  int? countryCode;
+  int? cityCode;
+  int? regionCode;
+  double latitude=0;
+  double longitude=0;
+  List<model.cities>? citiesName=[];
+  List<CountryData>? countriesName=[];
+  List<String>? selectRegion=[];
+  var selectedRegion = merchantSelectRegion.tr;
+  List<Region>? RegionName=[];// Full job data if needed for future use
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController mobileNumberController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController locationController = TextEditingController();
+  TextEditingController merchantNameController = TextEditingController();
+  TextEditingController typeController = TextEditingController();
+  TextEditingController summaryController = TextEditingController();
+  TextEditingController streetController = TextEditingController();
+  TextEditingController buildingController = TextEditingController();
+  TextEditingController floorController = TextEditingController();
+  TextEditingController apartmentController = TextEditingController();
 SignupController( this.context);
   BuildContext context;
   @override
@@ -37,7 +58,8 @@ SignupController( this.context);
     checkLocationPermission().then((_) {
       getCurrentLocation(context);
     });
-    await getCurrentLocation(context);// Fetch job data when the controller initializes
+    await getCurrentLocation(context);
+
   }
   Future<void> checkLocationPermission() async {
     var status = await Permission.location.status;
@@ -77,16 +99,24 @@ SignupController( this.context);
       desiredAccuracy: LocationAccuracy.high,
     );
 
+    // Store latitude and longitude in variables
+     latitude = position.latitude;
+    longitude = position.longitude;
+
+    // You can use these variables in another function now
+    // Example: pass them to another function
+
+
     List<Placemark> placemarks = await placemarkFromCoordinates(
-      position.latitude,
-      position.longitude,
+      latitude,
+      longitude,
     );
 
     Placemark place = placemarks.first;
 
-      locationController.text =
-      "${place.street}, ${place.locality}, ${place.country}";
-         update();
+    locationController.text =
+    "${place.street}, ${place.locality}, ${place.country}";
+    update();
   }
   CustomTextFormField buildLocationOnMapField(BuildContext context) {
     return CustomTextFormField(
@@ -106,33 +136,177 @@ SignupController( this.context);
       },
     );
   }
-
-
   final formKey = GlobalKey<FormState>();
   var pickedImage = File("");
+  String? nameMerchant, type, summary, address, workingHours, paymentTypes;
+  bool cash = false, visa = false, credit = false;
+
   String? email, name, mobile, job, password, confirmPassword;
   bool remember = false;
   final List<String?> errors = [];
-
+   String? selectedJob;
   void addError({String? error}) {
     if (!errors.contains(error)) {
       errors.add(error);
       update();
     }
   }
-
   void removeError({String? error}) {
     if (errors.contains(error)) {
       errors.remove(error);
       update();
     }
   }
-
+  CustomTextFormField buildPaymentTypesField() {
+    return CustomTextFormField(
+        obscureText: true,
+        hintText: paymentTypes?.tr??"",
+        textInputAction: TextInputAction.done,
+        onPressed: (newValue) => paymentTypes = newValue,
+        onChange: (value) {
+          if (value.isNotEmpty) {
+            removeError(error: kMerchantPaymentTypesNullError);
+          }
+        },
+        onValidate: (value) {
+          if (value!.isEmpty) {
+            addError(error: kMerchantPaymentTypesNullError);
+            return "";
+          }
+          return null;
+        });
+  }
+  CustomTextFormField buildWorkingHoursField() {
+    return CustomTextFormField(
+      onPressed: (value) {
+        workingHours = value;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kMerchantWorkingHoursNullError);
+        }
+        return null;
+      },
+      onValidate: (value) {
+        if (value!.isEmpty) {
+          addError(error: kMerchantWorkingHoursNullError);
+          return "";
+        }
+        return null;
+      },
+      hintText: workingHours?.tr??"",
+      textInputAction: TextInputAction.next,
+    );
+  }
+  CustomTextFormField buildAddressField() {
+    return CustomTextFormField(
+      textInputType: TextInputType.text,
+      hintText: merchantAdrress.tr,
+      onPressed: (value) {
+        address = value;
+      },
+      onValidate: (value) {
+        if (value.isEmpty) {
+          addError(error: kAddressNullError);
+          return "";
+        }
+        return null;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kAddressNullError);
+        } else if (value.toString().isValidEmail()) {
+          removeError(error: kAddressNullError);
+        }
+        return null;
+      },
+    );
+  }
+  CustomTextFormField buildNameMerchantField() {
+    return CustomTextFormField(
+      controller: merchantNameController,
+      textInputType: TextInputType.text,
+      hintText: merchantName.tr,
+      onPressed: (value) {
+        nameMerchant = value;
+      },
+      onValidate: (value) {
+        if (value!.isEmpty) {
+          addError(error: kMerchantNameNullError);
+          return "";
+        } else if (value.toString().isEmpty) {
+          addError(error: kMerchantNameNullError);
+          return "";
+        }
+        return null;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kMerchantNameNullError);
+        }
+        return null;
+      },
+    );
+  }
+  CustomTextFormField buildTypeField() {
+    return CustomTextFormField(
+      controller:typeController,
+      textInputType: TextInputType.text,
+      hintText: merchantType.tr,
+      suffixIcon: const Icon(Icons.arrow_drop_down),
+      onPressed: (value) {
+        type = value;
+      },
+      onValidate: (value) {
+        if (value!.isEmpty) {
+          addError(error: kMerchantTypeNullError);
+          return "";
+        } else if (value.toString().isEmpty) {
+          addError(error: kMerchantTypeNullError);
+          return "";
+        }
+        return null;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kMerchantTypeNullError);
+        }
+        return null;
+      },
+    );
+  }
+  CustomTextFormField buildSummaryField() {
+    return CustomTextFormField(
+      controller: summaryController,
+      textInputType: TextInputType.text,
+      hintText: merchantSummary.tr,
+      onPressed: (value) {
+        summary = value;
+      },
+      onValidate: (value) {
+        if (value!.isEmpty) {
+          addError(error: kMerchantSummaryNullError);
+          return "";
+        } else if (value.toString().isEmpty) {
+          addError(error: kMerchantSummaryNullError);
+          return "";
+        }
+        return null;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kMerchantSummaryNullError);
+        }
+        return null;
+      },
+    );
+  }
   CustomTextFormField buildConfirmPasswordField() {
     return CustomTextFormField(
+      controller: passwordController,
       obscureText: true,
       textInputType: TextInputType.visiblePassword,
-      hintText: 'Confirm Password',
+      hintText: signUpConfirmPassword.tr,
       textInputAction: TextInputAction.done,
       suffixIcon: const Icon(Icons.visibility_off),
       onPressed: (newValue) => confirmPassword = newValue,
@@ -156,9 +330,9 @@ SignupController( this.context);
       },
     );
   }
-
   CustomTextFormField buildPasswordField() {
     return CustomTextFormField(
+      controller: passwordController,
       onPressed: (value) {
         password = value;
       },
@@ -180,16 +354,16 @@ SignupController( this.context);
         }
         return null;
       },
-      hintText: 'Password',
+      hintText: signUpPassword.tr,
       textInputType: TextInputType.visiblePassword,
       suffixIcon: const Icon(Icons.visibility_off),
     );
   }
-
   CustomTextFormField buildEmailField() {
     return CustomTextFormField(
+      controller: emailController,
       textInputType: TextInputType.emailAddress,
-      hintText: 'Email',
+      hintText: signUpEmail.tr,
       onPressed: (value) {
         email = value;
       },
@@ -213,11 +387,11 @@ SignupController( this.context);
       },
     );
   }
-
   CustomTextFormField buildNameField() {
     return CustomTextFormField(
+      controller: nameController,
       textInputType: TextInputType.text,
-      hintText: 'Name',
+      hintText: signUpName.tr,
       onPressed: (value) {
         name = value;
       },
@@ -239,11 +413,11 @@ SignupController( this.context);
       },
     );
   }
-
   CustomTextFormField buildMobileField() {
     return CustomTextFormField(
+      controller: mobileNumberController,
       textInputType: TextInputType.phone,
-      hintText: 'Mobile No',
+      hintText: mobileNO.tr,
       onPressed: (value) {
         mobile = value;
       },
@@ -265,11 +439,44 @@ SignupController( this.context);
       },
     );
   }
-
+  CustomTextFormField buildStreetField() {
+    return CustomTextFormField(
+      controller: streetController,
+        hintText: merchantStreet.tr,
+        onPressed: () {},
+        onChange: () {},
+        onValidate: () {});
+  }
+  CustomTextFormField buildBuildingField() {
+    return CustomTextFormField(
+      controller: buildingController,
+        hintText: merchantBuilding.tr,
+        onPressed: () {},
+        onChange: () {},
+        onValidate: () {});
+  }
+  CustomTextFormField buildFlatField() {
+    return CustomTextFormField(
+      controller: apartmentController,
+        hintText: merchantFlat.tr,
+        textInputAction: TextInputAction.done,
+        onPressed: () {},
+        onChange: () {},
+        onValidate: () {});
+  }
+  CustomTextFormField buildFloorField() {
+    return CustomTextFormField(
+      controller: floorController,
+        hintText: merchantFloor.tr,
+        textInputAction: TextInputAction.next,
+        onPressed: () {},
+        onChange: () {},
+        onValidate: () {});
+  }
   ListTile buildJobField(BuildContext context) {
     return  ListTile(
       title: Text(
-        job ?? 'Select a job',
+        job ?? selectAJob.tr,
         style: TextStyle(
           color: Colors.grey.shade400,
         ),
@@ -278,7 +485,7 @@ SignupController( this.context);
       // Display the selected job or prompt to select
       trailing: Icon(Icons.arrow_drop_down),
       onTap: () async {
-        final selectedJob = await showMenu<String>(
+         selectedJob = await showMenu<String>(
           context: context,
           position: RelativeRect.fromLTRB(200, 400, 200, 0), // Adjust position if needed
           items: jobNames.map((jobName) {
@@ -292,22 +499,21 @@ SignupController( this.context);
 
             job = selectedJob; // Update selected job
          update();
-          removeError(error: 'Job is required'); // Remove error if job is selected
+          removeError(error: jobIsRequiredText.tr); // Remove error if job is selected
         }
       },
     );
   }
-
   void pickImage(BuildContext context) {
     showDialog<ImageSource>(
       context: context,
-      builder: (context) => AlertDialog(content: const Text("Choose image source"), actions: [
+      builder: (context) => AlertDialog(content:  Text(chooseImageSource.tr), actions: [
         MaterialButton(
-          child: const Text("Camera"),
+          child:  Text(camera.tr),
           onPressed: () => Navigator.pop(context, ImageSource.camera),
         ),
         MaterialButton(
-          child: const Text("Gallery"),
+          child:  Text(gallery.tr),
           onPressed: () => Navigator.pop(context, ImageSource.gallery),
         ),
       ]),
@@ -321,7 +527,6 @@ SignupController( this.context);
       }
     });
   }
-
   ImageProvider getImage(File file) {
     if (file.path.isEmpty) {
       return const AssetImage("assets/images/profile.png");
@@ -329,12 +534,11 @@ SignupController( this.context);
       return FileImage(file);
     }
   }
-
   Future<void> GetJobsLists() async {
     print("hello");
     final Dio dio = Dio(
       BaseOptions(
-        baseUrl: "https://apiezz.dalia-ezzat.com/api",
+        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
         validateStatus: (status) {
           return status != null && status < 500;
         },
@@ -342,16 +546,17 @@ SignupController( this.context);
     );
     try {
       final response = await dio.post(
-        "/v1/jobs/searchData",
+        "/api/v1/jobs/search",
         data: {
           "search": {
-            "langId": 2,
+            "langId":  Get.find<CacheHelper>()
+                .activeLocale == SupportedLocales.english?2:1,
           },
         },
         options: Options(
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImVlYTQzZjIyLTI5MzktNDc4YS04OTcxLWFhM2U2ZWVlYmFhZSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQHJvb3QuY29tIiwiZnVsbE5hbWUiOiJyb290IEFkbWluIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6InJvb3QiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9zdXJuYW1lIjoiQWRtaW4iLCJpcEFkZHJlc3MiOiIxNTQuMTgwLjIyLjEwNyIsInRlbmFudCI6InJvb3QiLCJpbWFnZV91cmwiOiIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9tb2JpbGVwaG9uZSI6IiIsImV4cCI6MTczMzgzMjM5MH0.beV7cPDcb90jXSa8kH1QJ_6tcHO4WdoBeygkH-PYRW4", // Replace with your actual token
+            "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: "token")}", // Replace with your actual token
           },
         ),
       );
@@ -359,9 +564,9 @@ SignupController( this.context);
         print("a");
         // Successful response
         JobListModel jobListModel = JobListModel.fromJson(response.data);
-        selectJob = jobListModel.data;
-        print(selectJob);// Save full job data if needed
-        jobNames = selectJob?.map((job) => job.jobName ?? '').toList() ?? [];
+        jobList = jobListModel.data;
+        print(jobList);// Save full job data if needed
+        jobNames = jobList?.map((job) => job.jobName ?? '').toList() ?? [];
         print(jobNames);
         update();// Extract only job names
       } else {
@@ -377,7 +582,538 @@ SignupController( this.context);
       );
     }update();
   }
+  ListTile buildCityField() {
+    return ListTile(
+      title: Text(selectedCity ?? 'Select City'),
+      trailing: Icon(Icons.arrow_drop_down,size: 40,),
+      onTap: () async {
+        await PostCityLists();
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Select City'),
+              content: SingleChildScrollView(
+                child: ListTileTheme(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
+                  minLeadingWidth: 40.0, // Set minimum leading width
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: selectCity?.map((city) {
+                      return ListTile(
+                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
+                        title: Text(city),
+                        onTap: () {
+                          selectedCity = city;
+                          Navigator.pop(context); // Close the dialog
+                          update(); // Update the UI
+                        },
+                      );
+                    }).toList() ?? [],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+  ListTile buildCountryField() {
+    return ListTile(
+      title: Text(selectedCountry ?? 'Select Country'),
+      trailing: Icon(Icons.arrow_drop_down,size: 40,),
+      onTap: () async {
+        await PostCountryLists();
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Select Country'),
+              content: SingleChildScrollView(
+                child: ListTileTheme(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
+                  minLeadingWidth: 40.0, // Set minimum leading width
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: selectCountry?.map((country) {
+                      return ListTile(
+                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
+                        title: Text(country),
+                        onTap: () {
+                          selectedCountry = country;
+                          Navigator.pop(context); // Close the dialog
+                          update(); // Update the UI
+                        },
+                      );
+                    }).toList() ?? [],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+  Future<void> PostCityLists() async {
+     countryCode = countriesName?.firstWhere((country) => country.countryName == selectedCountry).id;
+    print("hello");
+    final Dio dio = Dio(
+      BaseOptions(
+        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
+        validateStatus: (status) {
+          return status != null && status < 500;
+        },
+      ),
+    );
+    try {
+      final response = await dio.post(
+        "/api/v1/cityHeaders/searchData",
+        data: {
+            "search": {
+              "countryID":countryCode,
+              "LangId": Get.find<CacheHelper>()
+                  .activeLocale == SupportedLocales.english?2:1,
+            }
 
+      },
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: "token")}"
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        print("aaaaaaaaaaaaaaa");
+        // Successful response
+        print(response.data,);
+        model.CitiesListModel citiesListModel = model.CitiesListModel.fromJson(response.data);
+        citiesName = citiesListModel.data;
+        print(citiesName);// Save full job data if needed
+        selectCity = citiesName?.map((city) => city.cityName ?? '').toList() ?? [];
+        update();
+        print(selectCity);
+        update();// Extract only job names
+      } else {
+        // Error handling for failed response
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(content: Text('Failed to load cities')),
+        );
+      }
+    } catch (e) {
+      // Handle any errors that occur during the API call
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(content: Text('Error occurred while connecting to the API')),
+      );
+    }update();
+  }
+  Future<void> PostCountryLists() async {
+    print("hello");
+    final Dio dio = Dio(
+      BaseOptions(
+        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
+        validateStatus: (status) {
+          return status != null && status < 500;
+        },
+      ),
+    );
+    try {
+      final response = await dio.post(
+        "/api/v1/countries/searchData",
+        data: {
+          "search": {
+            "LangId": Get.find<CacheHelper>()
+                .activeLocale == SupportedLocales.english?2:1,
+          }
+
+        },
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: "token")}"
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        print("aaaaaaaaaaaaaaa");
+        // Successful response
+        print(response.data,);
+        CountryListModel countriesListModel = CountryListModel.fromJson(response.data);
+        countriesName = countriesListModel.data;
+        print(countriesName);// Save full job data if needed
+        selectCountry = countriesName?.map((city) => city.countryName ?? '').toList() ?? [];
+        update();
+        print(selectCountry);
+        update();// Extract only job names
+      } else {
+        // Error handling for failed response
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(content: Text('Failed to load cities')),
+        );
+      }
+    } catch (e) {
+      // Handle any errors that occur during the API call
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(content: Text('Error occurred while connecting to the API')),
+      );
+    }update();
+  }
+  Future<void> signUp(BuildContext context) async {
+    await Get.find<CacheHelper>().saveData(key: "mobileNo", value: mobileNumberController.text.trim());
+    print(Get.find<CacheHelper>().getData(key: "year"));
+    print(Get.find<CacheHelper>().getData(key: "companyCode"));
+    print(emailController.text);
+    print(passwordController.text);
+    print(mobileNumberController.text);
+    print(nameController.text);
+    print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+
+    int? jobCode = jobList?.firstWhere((job) => job.jobName == selectedJob).id;
+    print(jobCode);
+
+    final Dio dio = Dio(BaseOptions(
+      baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
+      validateStatus: (status) {
+        return status != null && status <= 500;
+      },
+    ));
+
+    try {
+      final response = await dio.post(
+        "/api/v1/vendors/merchantCreate",
+        data: {
+          "companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
+          "branchCode": 2,
+          "year": Get.find<CacheHelper>().getData(key: "year"),
+          "vendorcode": "445588",
+          "vendorNameEng": nameController.text.trim(),
+          "vendorNameAra": nameController.text.trim(),
+          "email": emailController.text.trim(),
+          "mobile1": mobileNumberController.text.trim(),
+          "isMerchant": true,
+          "jobCode": "$jobCode",  // ensure it's a string
+          "password": passwordController.text.trim()
+        },
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: "token")}"
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        print("ttttttttttttttttttttttttttt");
+        int?code=response.data;
+        DefaultTabController.of(context).animateTo(1);
+
+      } else {
+        // Log the entire response for debugging
+        print("Response Data: ${response.data}");
+
+        // Handle error model
+        SignUpErrorModel responseModel = SignUpErrorModel.fromJson(response.data);
+
+        // Use messages if available
+        String errorMessage = "An error occurred, but no detailed message was provided.";
+
+        // Check if messages are available and not empty
+        if (responseModel.messages?.isNotEmpty == true) {
+          errorMessage = responseModel.messages!.join(", ");
+        }
+        // Check if vendorCode errors are available and not empty
+        else if (responseModel.errors?.vendorCode?.isNotEmpty == true) {
+          errorMessage = responseModel.errors!.vendorCode!.join(", ");
+        }
+
+        print("Messages: ${responseModel.messages}");
+        print("VendorCode Errors: ${responseModel.errors?.vendorCode}");
+
+        // Show error dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Error"),
+              content: Text(errorMessage),
+              actions: [
+                TextButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Get.back();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e) {
+      // Catch and log unexpected errors
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text("An unexpected error occurred: $e"),
+            actions: [
+              TextButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Get.back();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      print("Error: $e");
+    }
+  }
+  Future<void> createStore(BuildContext context) async {
+    print("companyCode: ${Get.find<CacheHelper>().getData(key: "companyCode")}");
+    print("descriptionAra: ${Get.find<CacheHelper>().getData(key: "merchantSummary")}");
+    print("descriptionEng: ${Get.find<CacheHelper>().getData(key: "merchantName")}");
+    print("companyNameAra: ${Get.find<CacheHelper>().getData(key: "merchantName")}");
+    print("companyNameEng: ${Get.find<CacheHelper>().getData(key: "merchantName")}");
+    print("mobile1: ${Get.find<CacheHelper>().getData(key: "mobileNo")}");
+    print("address: ${locationController.text.trim()}");
+    print("countryID: $countryCode");
+    print("cityCode: $cityCode");
+    print("zoneCode: $regionCode");
+    print("street: ${streetController.text.trim()}");
+    print("building: ${buildingController.text.trim()}");
+    print("apartment: ${apartmentController.text.trim()}");
+    print("floor: ${floorController.text.trim()}");
+    print("latitude: $latitude");
+    print("longitude: $longitude");
+    print("addressOnMap: ${locationController.text.trim()}");
+
+    final Dio dio = Dio(BaseOptions(
+      baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
+      validateStatus: (status) {
+        return status != null && status <= 500;
+      },
+    ));
+
+    try {
+      final response = await dio.post(
+        "/api/v1/companies",
+        data: {
+          "id": 0,
+          "companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
+          "descriptionAra": Get.find<CacheHelper>().getData(key: "merchantSummary"),
+          "descriptionEng": Get.find<CacheHelper>().getData(key: "merchantName"),
+          "companyNameAra": Get.find<CacheHelper>().getData(key: "merchantName"),
+          "companyNameEng": Get.find<CacheHelper>().getData(key: "merchantName"),
+          "companyTypeCode": "1",
+          "mobile1": "${Get.find<CacheHelper>().getData(key: "mobileNo")}",
+          "mobile2": "11",
+          "address": locationController.text.trim(),
+          "tel1": "11",
+          "tel2": "11",
+          "fax1": "11",
+          "countryID": countryCode,
+          "cityCode": cityCode,
+          "zoneCode": regionCode,
+          "street": streetController.text.trim(),
+          "building": buildingController.text.trim(),
+          "apartment": apartmentController.text.trim(),
+          "floor": floorController.text.trim(),
+          "latitude": "$latitude",
+          "longitude": "$longitude",
+          "addressOnMap": locationController.text.trim(),
+          // Add VendorCode here
+          "storePaymentMethodList": [
+            {
+              "companyCode": 0,
+              "paymentMethodCode": "1"
+            }
+          ],
+          "storeWorkDayList": [
+            {
+              "companyCode": 0,
+              "dayCode": 1,
+              "fromTime": "16:55:10",
+              "toTime": "16:55:10"
+            }
+          ]
+        }
+        ,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: "token")}"
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        print("ttttttttttttttttttttttttttt");
+        int?code=response.data;
+        Get.offAllNamed(HomeScreen.routeName);
+      } else {
+        // Log the entire response for debugging
+        print("Response Data: ${response.data}");
+
+        // Handle error model
+        SignUpErrorModel responseModel = SignUpErrorModel.fromJson(response.data);
+
+        // Use messages if available
+        String errorMessage = "An error occurred, but no detailed message was provided.";
+
+        // Check if messages are available and not empty
+        if (responseModel.messages?.isNotEmpty == true) {
+          errorMessage = responseModel.messages!.join(", ");
+        }
+        // Check if vendorCode errors are available and not empty
+        else if (responseModel.errors?.vendorCode?.isNotEmpty == true) {
+          errorMessage = responseModel.errors!.vendorCode!.join(", ");
+        }
+
+        print("Messages: ${responseModel.messages}");
+        print("VendorCode Errors: ${responseModel.errors?.vendorCode}");
+
+        // Show error dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Error"),
+              content: Text(errorMessage),
+              actions: [
+                TextButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Get.back();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e) {
+      // Catch and log unexpected errors
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text("An unexpected error occurred: $e"),
+            actions: [
+              TextButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Get.back();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      print("Error: $e");
+    }
+  }
+  ListTile buildRegionField() {
+    return ListTile(
+      title: Text(selectedRegion ?? 'Select region'),
+      trailing: Icon(Icons.arrow_drop_down,size: 40,),
+      onTap: () async {
+        await PostRegionLists();
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Select Region'),
+              content: SingleChildScrollView(
+                child: ListTileTheme(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
+                  minLeadingWidth: 40.0, // Set minimum leading width
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: selectRegion?.map((region) {
+                      return ListTile(
+                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
+                        title: Text(region),
+                        onTap: () {
+                          selectedRegion = region;
+                          Navigator.pop(context);
+                          regionCode = RegionName?.firstWhere((region) => region.zoneName == selectedRegion).zoneCode;// Close the dialog
+                          update(); // Update the UI
+                        },
+                      );
+                    }).toList() ?? [],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+  Future<void> PostRegionLists() async {
+     cityCode = citiesName?.firstWhere((city) => city.cityName == selectedCity).cityCode;
+
+    print("hello");
+    final Dio dio = Dio(
+      BaseOptions(
+        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
+        validateStatus: (status) {
+          return status != null && status < 500;
+        },
+      ),
+    );
+    try {
+      final response = await dio.post(
+        "/api/v1/cityDetails/searchData",
+        data: {
+
+          "search": {
+            "cityCode": cityCode,
+            "LangId": Get.find<CacheHelper>()
+                .activeLocale == SupportedLocales.english?2:1,
+          }
+
+        },
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: "token")}"
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        print("aaaaaaaaaaaaaaa");
+        // Successful response
+        print(response.data,);
+        RegionListModel regionListModel = RegionListModel.fromJson(response.data);
+        RegionName = regionListModel.data;
+        print(RegionName);// Save full job data if needed
+        selectRegion = RegionName?.map((region) => region.zoneName ?? '').toList() ?? [];
+        print(selectRegion);
+      // Extract only job names
+      } else {
+        // Error handling for failed response
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(content: Text('Failed to load regions')),
+        );
+      }
+    } catch (e) {
+      // Handle any errors that occur during the API call
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(content: Text('Error occurred while connecting to the API')),
+      );
+
+    }
+
+    print(regionCode);
+    update();
+
+  }
   void submit() {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();

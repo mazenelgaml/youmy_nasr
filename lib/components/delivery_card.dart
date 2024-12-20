@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:merchant/services/translation_key.dart';
 import '../data/model/Delivery.dart';
 import '../details/details_screen.dart';
 import '../util/Constants.dart';
 import '../util/size_config.dart';
 import 'custom_text.dart';
+import 'package:get/get.dart';
 
 class DeliveryCard extends StatefulWidget {
   const DeliveryCard({
@@ -61,13 +63,13 @@ class _DeliveryCardState extends State<DeliveryCard> {
                     ),
                     SizedBox(height: getProportionateScreenHeight(10)),
                     CustomText(
-                        text: "From : ${widget.delivery.from.toString()} KM", fontSize: 18),
+                        text: "${fromText.tr}: ${widget.delivery.from.toString()} ${kmText.tr}", fontSize: 18),
                     SizedBox(height: getProportionateScreenHeight(10)),
                     CustomText(
-                        text:"To: ${ widget.delivery.to.toString()} KM", fontSize: 18),
+                        text:"${toText.tr}: ${ widget.delivery.to.toString()}${kmText.tr}", fontSize: 18),
                     SizedBox(height: getProportionateScreenHeight(10)),
                     CustomText(
-                        text: "Cost: ${widget.delivery.cost.toString()} LE", fontSize: 18),
+                        text: "${costText.tr}: ${widget.delivery.cost.toString()} ${leText.tr}", fontSize: 18),
                     SizedBox(height: getProportionateScreenHeight(20)),
                   ],
                 ),

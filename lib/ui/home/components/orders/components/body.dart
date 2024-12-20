@@ -1,5 +1,5 @@
 import 'dart:ffi';
-
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:merchant/components/branch_card.dart';
@@ -7,6 +7,7 @@ import 'package:merchant/components/custom_chip.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/data/model/Branch.dart';
 import 'package:merchant/data/model/courier.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/auth/signup/screens/address/body_address.dart';
 import 'package:merchant/ui/home/components/branches/components/branches_data.dart';
 import 'package:merchant/ui/home/components/couriers/components/couriers_data.dart';
@@ -48,8 +49,8 @@ class _BodyState extends State<Body> {
     return Scaffold(
       appBar: AppBar(
         leading: null,
-        title: const CustomText(
-          text: 'Orders',
+        title:  CustomText(
+          text: ordersTitle.tr,
           align: Alignment.center,
           fontColor: KPrimaryColor,
         ),

@@ -26,9 +26,9 @@ class CustomTextFormField extends StatelessWidget {
       this.suffixIcon,
       this.textInputAction = TextInputAction.next,
       this.readOnly = false,
-      required this.onPressed,
-      required this.onChange,
-      required this.onValidate,  this.controller, this.suffixList})
+       required this.onPressed,
+        required this.onChange,
+        required this.onValidate,  this.controller, this.suffixList})
       : super(key: key);
 
   @override

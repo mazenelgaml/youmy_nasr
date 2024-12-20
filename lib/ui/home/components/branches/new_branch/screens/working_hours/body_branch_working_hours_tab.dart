@@ -4,11 +4,12 @@ import 'package:merchant/data/model/Product.dart';
 import 'package:merchant/util/Constants.dart';
 import 'package:merchant/util/extensions.dart';
 import 'package:merchant/util/size_config.dart';
-
+import 'package:get/get.dart';
 import '../../../../../../../components/custom_button.dart';
 import '../../../../../../../components/custom_text_form_field.dart';
 import '../../../../../../../components/form_error.dart';
 import '../../../../../../../components/working_hour_card.dart';
+import '../../../../../../../services/translation_key.dart';
 
 
 class BranchWorkingHoursBody extends StatefulWidget {
@@ -64,14 +65,14 @@ class _BranchWorkingHoursBodyState extends State<BranchWorkingHoursBody> {
                 onTap: () {
                   //go to terms screen
                 },
-                child: const CustomText(text: 'Daily ')),
+                child:  CustomText(text: dailyText.tr)),
           ]),
           SizedBox(height: getProportionateScreenHeight(10)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const CustomText(
-                text: 'From',
+              CustomText(
+                text: fromText.tr,
                 fontColor: KPrimaryColor,
               ),
               DropdownButton(
@@ -89,12 +90,12 @@ class _BranchWorkingHoursBodyState extends State<BranchWorkingHoursBody> {
                   });
                 },
               ),
-              const CustomText(
-                text: 'AM',
+               CustomText(
+                text: timeText.tr,
                 fontColor: KPrimaryColor,
               ),
-              const CustomText(
-                text: 'To',
+               CustomText(
+                text: toText.tr,
                 fontColor: KPrimaryColor,
               ),
               DropdownButton(
@@ -112,8 +113,8 @@ class _BranchWorkingHoursBodyState extends State<BranchWorkingHoursBody> {
                   });
                 },
               ),
-              const CustomText(
-                text: 'PM',
+               CustomText(
+                text: toTimeText.tr,
                 fontColor: KPrimaryColor,
               )
             ],
@@ -122,8 +123,8 @@ class _BranchWorkingHoursBodyState extends State<BranchWorkingHoursBody> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const CustomText(
-                text: 'Except',
+               CustomText(
+                text: exceptText.tr,
               ),
               SizedBox(
                   width: 36,
@@ -157,7 +158,7 @@ class _BranchWorkingHoursBodyState extends State<BranchWorkingHoursBody> {
           FormError(errors: errors),
           SizedBox(height: getProportionateScreenHeight(40)),
           CustomButton(
-            text: "Continue",
+            text: continueText.tr,
             press: () {
               // if (_formKey.currentState!.validate()) {
               //   _formKey.currentState!.save();
@@ -174,7 +175,7 @@ class _BranchWorkingHoursBodyState extends State<BranchWorkingHoursBody> {
   CustomTextFormField buildPaymentTypesField() {
     return CustomTextFormField(
         obscureText: true,
-        hintText: 'Payment Types',
+        hintText: paymentTypesText.tr,
         textInputAction: TextInputAction.done,
         onPressed: (newValue) => paymentTypes = newValue,
         onChange: (value) {
@@ -209,7 +210,7 @@ class _BranchWorkingHoursBodyState extends State<BranchWorkingHoursBody> {
         }
         return null;
       },
-      hintText: 'Working Hours',
+      hintText: workingHoursText.tr,
       textInputAction: TextInputAction.next,
     );
   }
@@ -217,7 +218,7 @@ class _BranchWorkingHoursBodyState extends State<BranchWorkingHoursBody> {
   CustomTextFormField buildAddressField() {
     return CustomTextFormField(
       textInputType: TextInputType.text,
-      hintText: 'Address',
+      hintText: merchantAdrress.tr,
       onPressed: (value) {
         address = value;
       },
@@ -242,7 +243,7 @@ class _BranchWorkingHoursBodyState extends State<BranchWorkingHoursBody> {
   CustomTextFormField buildNameField() {
     return CustomTextFormField(
       textInputType: TextInputType.text,
-      hintText: 'Merchant Name',
+      hintText: merchantName.tr,
       onPressed: (value) {
         name = value;
       },
@@ -268,7 +269,7 @@ class _BranchWorkingHoursBodyState extends State<BranchWorkingHoursBody> {
   CustomTextFormField buildTypeField() {
     return CustomTextFormField(
       textInputType: TextInputType.text,
-      hintText: 'Type',
+      hintText: merchantType.tr,
       suffixIcon: const Icon(Icons.arrow_drop_down),
       onPressed: (value) {
         type = value;
@@ -295,7 +296,7 @@ class _BranchWorkingHoursBodyState extends State<BranchWorkingHoursBody> {
   CustomTextFormField buildSummaryField() {
     return CustomTextFormField(
       textInputType: TextInputType.text,
-      hintText: 'Summary',
+      hintText: merchantSummary.tr,
       onPressed: (value) {
         summary = value;
       },

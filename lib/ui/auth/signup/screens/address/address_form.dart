@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/util/extensions.dart';
 import '../../../../../components/address_card.dart';
@@ -10,6 +11,7 @@ import '../../../../../data/model/Product.dart';
 import '../../../../../util/Constants.dart';
 import '../../../../../util/size_config.dart';
 import '../../../../home/home_screen.dart';
+import '../../controller/signup_controller.dart';
 
 class SignUpFormAddress extends StatefulWidget {
   const SignUpFormAddress({Key? key}) : super(key: key);
@@ -19,34 +21,17 @@ class SignUpFormAddress extends StatefulWidget {
 }
 
 class _SignUpFormAddressState extends State<SignUpFormAddress> {
-  final _formKey = GlobalKey<FormState>();
-  String? name, type, summary, address, workingHours, paymentTypes;
-  bool cash= false,visa= false,credit = false;
 
-  final List<String?> errors = [];
-
-  void addError({String? error}) {
-    if (!errors.contains(error)) {
-      setState(() {
-        errors.add(error);
-      });
-    }
-  }
-
-  void removeError({String? error}) {
-    if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
-    }
-  }
 
 
 
   @override
   Widget build(BuildContext context) {
+    return GetBuilder(
+        init: SignupController(context),
+    builder: (SignupController controller) {
     return Form(
-      key: _formKey,
+      key: controller.formKey,
       child: Column(
         children: [
           SizedBox(height: getProportionateScreenHeight(10)),
@@ -68,12 +53,12 @@ class _SignUpFormAddressState extends State<SignUpFormAddress> {
               ],
             ),
           ),
-          FormError(errors: errors),
+          FormError(errors: controller.errors),
 
 
         ],
       ),
-    );
+    );});
 
   }
 

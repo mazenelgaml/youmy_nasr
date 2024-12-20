@@ -48,6 +48,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - lib/services/app_translation.dart
 
 
   fonts:

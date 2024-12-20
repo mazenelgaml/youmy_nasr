@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/home/components/branches/new_branch/screens/payments/body_branch_payments_tab.dart';
 import '../../../../../../../components/custom_text.dart';
 import '../../../../../../../util/Constants.dart';
 import '../../../../../../../util/size_config.dart';
-
+import 'package:get/get.dart';
 
 class BranchPaymentTab extends StatelessWidget {
   const BranchPaymentTab({Key? key}) : super(key: key);
@@ -20,7 +21,7 @@ class BranchPaymentTab extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: SizeConfig.screenHeight * 0.02),
-                const CustomText(text: 'Payments',align: Alignment.center,fontColor: KPrimaryColor,fontWeight: FontWeight.bold,),
+                 CustomText(text: paymentsText.tr,align: Alignment.center,fontColor: KPrimaryColor,fontWeight: FontWeight.bold,),
                 SizedBox(height: SizeConfig.screenHeight * 0.02),// 4%
                 const BranchPaymentBody(),
 
