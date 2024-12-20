@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:merchant/components/custom_text.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/home/components/branches/new_branch/screens/delivery_fees/components/Body.dart';
-
+import 'package:get/get.dart';
 import '../../../../../../../components/custom_button.dart';
 import '../../../../../../../components/custom_text_form_field.dart';
 import '../../../../../../../util/Constants.dart';
@@ -28,8 +29,8 @@ class _BranchDeliveryFeesTabState extends State<BranchDeliveryFeesTab> {
               child: Column(
                 children: [
                   SizedBox(height: SizeConfig.screenHeight * 0.02),
-                  const CustomText(
-                    text: 'Delivery Fees',
+                  CustomText(
+                    text: deliveryFeesText.tr,
                     align: Alignment.center,
                     fontColor: KPrimaryColor,
                     fontWeight: FontWeight.bold,
@@ -98,8 +99,8 @@ class _BottomSheetBodyState extends State<BottomSheetBody> {
               SizedBox(
                 height: getProportionateScreenWidth(20),
               ),
-              const CustomText(
-                text: 'New Delivery Fees',
+               CustomText(
+                text: newDeliveryFeesText.tr,
                 align: Alignment.center,
                 fontColor: KPrimaryColor,
                 fontSize: 23,
@@ -107,7 +108,7 @@ class _BottomSheetBodyState extends State<BottomSheetBody> {
               SizedBox(height: getProportionateScreenWidth(20))
               ,
               CustomTextFormField(
-                hintText: 'From',
+                hintText: fromText.tr,
                 textInputType: TextInputType.number,
                 onPressed: () {},
                 onChange: () {},
@@ -115,7 +116,7 @@ class _BottomSheetBodyState extends State<BottomSheetBody> {
               ),
               SizedBox(height: getProportionateScreenHeight(20)),
               CustomTextFormField(
-                  hintText: 'To',
+                  hintText: toText.tr,
                   textInputType: TextInputType.number,
                   textInputAction: TextInputAction.done,
                   onPressed: () {},
@@ -123,7 +124,7 @@ class _BottomSheetBodyState extends State<BottomSheetBody> {
                   onValidate: () {}),
               SizedBox(height: getProportionateScreenHeight(40)),
               CustomTextFormField(
-                  hintText: 'Cost',
+                  hintText: costText.tr,
                   textInputType: TextInputType.number,
                   textInputAction: TextInputAction.done,
                   onPressed: () {},
@@ -131,7 +132,7 @@ class _BottomSheetBodyState extends State<BottomSheetBody> {
                   onValidate: () {}),
               SizedBox(height: getProportionateScreenHeight(40)),
               CustomButton(
-                text: 'Create',
+                text: Create.tr,
                 press: () => {Navigator.pop(context)},
               ),
               SizedBox(height: getProportionateScreenHeight(40)),

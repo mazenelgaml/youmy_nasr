@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/util/Constants.dart';
+
+import '../../../services/localization_services.dart';
+import '../../../services/memory.dart';
 
 
 
@@ -27,7 +31,7 @@ class ProfileMenu extends StatelessWidget {
           children: [
             Icon(icon,size: 22,),
             SizedBox(width: 20),
-            Expanded(child: CustomText(text: text,fontColor: Colors.grey,fontSize: 19,)),
+            Expanded(child: CustomText(text: text,align: Get.find<CacheHelper>().activeLocale == SupportedLocales.english?Alignment.topLeft:Alignment.topRight,fontColor: Colors.grey,fontSize: 19,)),
           ],
         ),
       ),

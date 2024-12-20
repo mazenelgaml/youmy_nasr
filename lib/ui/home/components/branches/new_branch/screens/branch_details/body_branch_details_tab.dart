@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/util/Constants.dart';
 import 'package:merchant/util/extensions.dart';
 import '../../../../../../../components/custom_button.dart';
 import '../../../../../../../components/custom_text_form_field.dart';
 import '../../../../../../../components/form_error.dart';
 import '../../../../../../../util/size_config.dart';
+import 'package:get/get.dart';
 
 
 class BranchDetailsBody extends StatefulWidget {
@@ -54,11 +56,11 @@ class _BranchDetailsBodyState extends State<BranchDetailsBody> {
           FormError(errors: errors),
           SizedBox(height: getProportionateScreenHeight(60)),
           CustomButton(
-            text: "Next",
+            text: next.tr,
             press: () {
               // if (_formKey.currentState!.validate()) {
               //   _formKey.currentState!.save();
-                DefaultTabController.of(context)!.animateTo(1);
+                DefaultTabController.of(context).animateTo(1);
               // }
             },
           ),
@@ -73,7 +75,7 @@ class _BranchDetailsBodyState extends State<BranchDetailsBody> {
     return CustomTextFormField(
         obscureText: true,
         textInputType: TextInputType.visiblePassword,
-        hintText: 'Confirm Password',
+        hintText: signUpConfirmPassword.tr,
         textInputAction: TextInputAction.done,
         suffixIcon: const Icon(Icons.visibility_off),
         onPressed: (newValue) => confirmPassword = newValue,
@@ -120,7 +122,7 @@ class _BranchDetailsBodyState extends State<BranchDetailsBody> {
         }
         return null;
       },
-      hintText: 'Password',
+      hintText: signUpPassword.tr,
       textInputType: TextInputType.visiblePassword,
       suffixIcon: const Icon(Icons.visibility_off),
     );
@@ -129,7 +131,7 @@ class _BranchDetailsBodyState extends State<BranchDetailsBody> {
   CustomTextFormField buildEmailField() {
     return CustomTextFormField(
       textInputType: TextInputType.emailAddress,
-      hintText: 'Email',
+      hintText: signInTextEmail.tr,
       onPressed: (value) {
         email = value;
       },
@@ -157,7 +159,7 @@ class _BranchDetailsBodyState extends State<BranchDetailsBody> {
   CustomTextFormField buildNameField() {
     return CustomTextFormField(
       textInputType: TextInputType.text,
-      hintText: 'Name',
+      hintText: signUpName.tr,
       onPressed: (value) {
         name = value;
       },
@@ -183,7 +185,7 @@ class _BranchDetailsBodyState extends State<BranchDetailsBody> {
   CustomTextFormField buildMobileField() {
     return CustomTextFormField(
       textInputType: TextInputType.phone,
-      hintText: 'Mobile No',
+      hintText: mobileNO.tr,
       onPressed: (value) {
         mobile = value;
       },
@@ -210,7 +212,7 @@ class _BranchDetailsBodyState extends State<BranchDetailsBody> {
   CustomTextFormField buildJobField() {
     return CustomTextFormField(
       textInputType: TextInputType.text,
-      hintText: 'Job',
+      hintText: job?.tr??"Job",
       suffixIcon: const Icon(Icons.arrow_drop_down),
       onPressed: (value) {
         job = value;

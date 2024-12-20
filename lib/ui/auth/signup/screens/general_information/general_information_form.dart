@@ -1,8 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart' ;
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:merchant/components/colored_custom_text.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/auth/login/login_screen.dart';
 import '../../../../../components/custom_button.dart';
 import '../../../../../components/form_error.dart';
@@ -10,6 +12,8 @@ import '../../../../../util/Constants.dart';
 import '../../../../../util/keyboard.dart';
 import '../../../../../util/size_config.dart';
 import '../../controller/signup_controller.dart';
+
+
 
 class SignUpFormGeneralInformation extends StatefulWidget {
   const SignUpFormGeneralInformation({Key? key}) : super(key: key);
@@ -101,19 +105,20 @@ class _SignUpFormGeneralInformationState
             ),
             GestureDetector(
                 onTap: () {
-                  //go to terms screen
+
                 },
-                child: const CustomRichText(
-                    text1: 'I agree to ', text2: "Terms & Privacy Policy")),
+                child:  CustomRichText(
+                    text1: iAgreeTo.tr, text2: termsAndPrivacyPolicy.tr)),
           ]),
           FormError(errors: controller.errors),
           SizedBox(height: getProportionateScreenHeight(16)),
           CustomButton(
-            text: "Next",
+            text: next.tr,
             press: () {
               // if (_formKey.currentState!.validate()) {
               //   _formKey.currentState!.save();
-              DefaultTabController.of(context).animateTo(1);
+              controller.signUp(context);
+
               // }
             },
           ),
@@ -123,10 +128,10 @@ class _SignUpFormGeneralInformationState
               KeyboardUtil.hideKeyboard(context);
               Navigator.popAndPushNamed(context, LoginScreen.routeName);
             },
-            child: const CustomRichText(
+            child:  CustomRichText(
               align: Alignment.center,
-              text1: 'Have an account?',
-              text2: ' Login',
+              text1: haveAnAccount.tr,
+              text2: signInTextBTN.tr,
             ),
           )
           , SizedBox(height: getProportionateScreenHeight(30)),

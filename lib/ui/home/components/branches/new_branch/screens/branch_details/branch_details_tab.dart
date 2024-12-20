@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/components/profile_image_widget.dart';
+import '../../../../../../../services/translation_key.dart';
 import '../../../../../../../util/Constants.dart';
 import '../../../../../../../util/size_config.dart';
+import 'package:get/get.dart';
+
 import 'body_branch_details_tab.dart';
 
 
@@ -21,7 +24,7 @@ class BranchDetailsTab extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: SizeConfig.screenHeight * 0.02),
-                const CustomText(text: 'Branch Details',align: Alignment.center,fontColor: KPrimaryColor,fontWeight: FontWeight.bold,),
+             CustomText(text: branchDetails.tr,align: Alignment.center,fontColor: KPrimaryColor,fontWeight: FontWeight.bold,),
                 SizedBox(height: SizeConfig.screenHeight * 0.02),
                 const BranchDetailsBody(),
                 SizedBox(height: SizeConfig.screenHeight * 0.08),

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:merchant/components/empty_view.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/home/components/product/components/products_data.dart';
 import 'package:merchant/ui/home/components/product/new_product/new_product_screen.dart';
-
+import 'package:get/get.dart';
 import '../../../../../components/action_button.dart';
 import '../../../../../components/custom_text.dart';
 import '../../../../../components/expandable_fab.dart';
@@ -30,8 +31,8 @@ class _ProductsBodyState extends State<ProductsBody> {
     return Scaffold(
       appBar: AppBar(
         leading: null,
-        title: const CustomText(
-          text: 'Products',
+        title:  CustomText(
+          text: productScreenTitle.tr,
           align: Alignment.center,
           fontColor: KPrimaryColor,
         ),

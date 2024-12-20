@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:get/get.dart';
 import 'package:merchant/ui/home/components/orders/order_details/order_details_screen.dart';
 import '../data/model/Order.dart';
+import '../services/localization_services.dart';
+import '../services/memory.dart';
 import '../util/Constants.dart';
 import '../util/size_config.dart';
 import 'custom_text.dart';
@@ -41,7 +44,7 @@ class _OrderCardState extends State<OrderCard> {
           children: [
             Container(
               width: getProportionateScreenWidth(double.infinity),
-              height: getProportionateScreenHeight(200),
+              height: getProportionateScreenHeight(220),
               padding: EdgeInsets.all(getProportionateScreenWidth(10)),
               decoration: BoxDecoration(
                 color: kSecondaryColor.withOpacity(0.1),
@@ -57,13 +60,13 @@ class _OrderCardState extends State<OrderCard> {
                         text: widget.order.orderNo,
                         fontSize: 23,
                        fontWeight: FontWeight.bold,
-                       align: Alignment.topLeft,),
-                      SizedBox(height: getProportionateScreenHeight(10)),
-                      CustomText(text: widget.order.clientName, fontSize: 22,fontColor: KPrimaryColor),
-                      SizedBox(height: getProportionateScreenHeight(10)),
-                      CustomText(text: widget.order.clientNo, fontSize: 18),
-                      SizedBox(height: getProportionateScreenHeight(10)),
-                      CustomText(text: widget.order.date, fontSize: 18,),
+                       align:Get.find<CacheHelper>().activeLocale == SupportedLocales.english?Alignment.topLeft:Alignment.topRight,),
+                      SizedBox(height: getProportionateScreenHeight(8)),
+                      CustomText(text: widget.order.clientName, fontSize: 22,fontColor: KPrimaryColor,align:Get.find<CacheHelper>().activeLocale == SupportedLocales.english?Alignment.topLeft:Alignment.topRight,),
+                      SizedBox(height: getProportionateScreenHeight(8)),
+                      CustomText(text: widget.order.clientNo, fontSize: 18,align:Get.find<CacheHelper>().activeLocale == SupportedLocales.english?Alignment.topLeft:Alignment.topRight,),
+                      SizedBox(height: getProportionateScreenHeight(8)),
+                      CustomText(text: widget.order.date, fontSize: 18,align:Get.find<CacheHelper>().activeLocale == SupportedLocales.english?Alignment.topLeft:Alignment.topRight,),
 
                       SizedBox(height: getProportionateScreenHeight(10)),
                       Row(

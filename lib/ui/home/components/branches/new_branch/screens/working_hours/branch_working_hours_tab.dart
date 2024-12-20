@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/ui/home/components/branches/new_branch/screens/working_hours/body_branch_working_hours_tab.dart';
-
+import 'package:get/get.dart';
+import '../../../../../../../services/translation_key.dart';
 import '../../../../../../../util/Constants.dart';
 import '../../../../../../../util/size_config.dart';
 
@@ -20,7 +21,7 @@ class BranchWorkingHoursTab extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: SizeConfig.screenHeight * 0.02),
-                const CustomText(text: 'Working Hours',align: Alignment.center,fontColor: KPrimaryColor,fontWeight: FontWeight.bold,),
+                 CustomText(text: workingHoursText.tr,align: Alignment.center,fontColor: KPrimaryColor,fontWeight: FontWeight.bold,),
                 SizedBox(height: SizeConfig.screenHeight * 0.02),// 4%
                 const BranchWorkingHoursBody(),
 

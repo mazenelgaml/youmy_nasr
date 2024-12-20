@@ -1,15 +1,15 @@
 import 'dart:io';
-
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:merchant/components/custom_text.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/auth/signup/screens/attachments/body_attachment.dart';
 import '../../../../../components/custom_button.dart';
 import '../../../../../components/custom_text_form_field.dart';
-import '../../../../../components/profile_image_widget.dart';
 import '../../../../../util/Constants.dart';
 import '../../../../../util/size_config.dart';
+import '../../controller/signup_controller.dart';
 
 class BodyAttachments extends StatefulWidget {
   const BodyAttachments({Key? key}) : super(key: key);
@@ -27,7 +27,10 @@ class _BodyAttachmentsState extends State<BodyAttachments> {
   //region events
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GetBuilder<SignupController>(
+        init: SignupController(context),
+        builder: (SignupController controller) {
+          return Scaffold(
       body: SafeArea(
         child: SizedBox(
           width: double.infinity,
@@ -38,8 +41,8 @@ class _BodyAttachmentsState extends State<BodyAttachments> {
               child: Column(
                 children: [
                   SizedBox(height: SizeConfig.screenHeight * 0.02),
-                  const CustomText(
-                    text: 'Attachments',
+                  CustomText(
+                    text: merchantAttachments.tr,
                     align: Alignment.center,
                     fontColor: KPrimaryColor,
                     fontWeight: FontWeight.bold,
@@ -62,7 +65,7 @@ class _BodyAttachmentsState extends State<BodyAttachments> {
           size: 29,
         ),
       ),
-    );
+    );});
   }
 
 //endregion
@@ -102,7 +105,10 @@ class _BottomSheetBodyState extends State<BottomSheetBody> {
   var _pickedImage = File("");
   @override
   Widget build(BuildContext context) {
-    return Padding(
+  return GetBuilder<SignupController>(
+  init: SignupController(context),
+  builder: (SignupController controller) {
+  return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: getProportionateScreenWidth(20),
           vertical: getProportionateScreenWidth(20)),
@@ -131,7 +137,7 @@ class _BottomSheetBodyState extends State<BottomSheetBody> {
                   children: [
                     CircleAvatar(
                       backgroundColor: Colors.grey,
-                      backgroundImage: getImage(_pickedImage),
+                      backgroundImage: controller.getImage(_pickedImage),
                     ),
                     Positioned(
                       right: -16,
@@ -149,7 +155,7 @@ class _BottomSheetBodyState extends State<BottomSheetBody> {
                             backgroundColor: const Color(0xFFF5F6F9),
                           ),
                           onPressed: () {
-                            _pickImage();
+                            controller.pickImage(context);
                           },
                           child: SvgPicture.asset("assets/icons/Camera.svg",
                               color: Colors.grey),
@@ -187,41 +193,9 @@ class _BottomSheetBodyState extends State<BottomSheetBody> {
           ),
         ),
       ),
-    );
-  }
-  ImageProvider getImage(File file) {
-    if (file.path.isEmpty) {
-      return const AssetImage("assets/images/logo.png");
-    } else {
-      return FileImage(file);
-    }
+    );});
   }
 
-  void _pickImage() {
-    showDialog<ImageSource>(
-      context: context,
-      builder: (context) =>
-          AlertDialog(content: const Text("Choose image source"), actions: [
-            MaterialButton(
-              child: const Text("Camera"),
-              onPressed: () => Navigator.pop(context, ImageSource.camera),
-            ),
-            MaterialButton(
-              child: const Text("Gallery"),
-              onPressed: () => Navigator.pop(context, ImageSource.gallery),
-            ),
-          ]),
-    ).then((source) async {
-      if (source != null) {
-        final pickedFile = await ImagePicker().pickImage(source: source);
-        print('SOURCE ${pickedFile!.path}');
 
-        setState(() {
-          _pickedImage=File(pickedFile.path);
-          print('_pickedImage ${_pickedImage}');
-        });
-      }
-    });
-  }
 }
 
