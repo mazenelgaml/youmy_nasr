@@ -5,8 +5,11 @@ import 'package:merchant/util/extensions.dart';
 import '../../../../../../../components/custom_button.dart';
 import '../../../../../../../components/custom_text_form_field.dart';
 import '../../../../../../../components/form_error.dart';
+import '../../../../../../../services/memory.dart';
 import '../../../../../../../util/size_config.dart';
 import 'package:get/get.dart';
+
+import '../../../controller/new_branch_controller.dart';
 
 
 class BranchDetailsBody extends StatefulWidget {
@@ -17,49 +20,37 @@ class BranchDetailsBody extends StatefulWidget {
 }
 
 class _BranchDetailsBodyState extends State<BranchDetailsBody> {
-  final _formKey = GlobalKey<FormState>();
-  String? email, name, mobile, job, password, confirmPassword;
-  bool remember = false;
-  final List<String?> errors = [];
 
-  void addError({String? error}) {
-    if (!errors.contains(error)) {
-      setState(() {
-        errors.add(error);
-      });
-    }
-  }
-
-  void removeError({String? error}) {
-    if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
-    }
-  }
 
   @override
-    Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
+  Widget build(BuildContext context) {
+    return GetBuilder(
+        init: NewBranchController(context),
+        builder: (NewBranchController controller) {
+          return Form(
+      key: controller.formKey,
       child: Column(
         children: [
           SizedBox(height: getProportionateScreenHeight(5)),
-          buildNameField(),
+          controller.buildNameField(),
           SizedBox(height: getProportionateScreenHeight(10)),
-          buildMobileField(),
+          controller.buildMobileField(),
           SizedBox(height: getProportionateScreenHeight(10)),
-          buildPasswordField(),
+          controller.buildPasswordField(),
           SizedBox(height: getProportionateScreenHeight(10)),
-          buildConfirmPasswordField(),
+          controller.buildConfirmPasswordField(),
           SizedBox(height: getProportionateScreenHeight(10)),
-          FormError(errors: errors),
+          FormError(errors: controller.errors),
           SizedBox(height: getProportionateScreenHeight(60)),
           CustomButton(
             text: next.tr,
-            press: () {
+            press: () async{
               // if (_formKey.currentState!.validate()) {
               //   _formKey.currentState!.save();
+              await Get.find<CacheHelper>().saveData(key: "Name", value: controller.merchantNameController.text.trim());
+              await Get.find<CacheHelper>().saveData(key: "mobileNumber", value: controller.mobileNumberController.text.trim());
+              await Get.find<CacheHelper>().saveData(key: "password", value: controller.passwordController.text.trim());
+              await Get.find<CacheHelper>().saveData(key: "confirmPassword", value: controller.confirmPasswordController.text.trim());
                 DefaultTabController.of(context).animateTo(1);
               // }
             },
@@ -68,171 +59,8 @@ class _BranchDetailsBodyState extends State<BranchDetailsBody> {
 
         ],
       ),
-    );
-  }
-
-  CustomTextFormField buildConfirmPasswordField() {
-    return CustomTextFormField(
-        obscureText: true,
-        textInputType: TextInputType.visiblePassword,
-        hintText: signUpConfirmPassword.tr,
-        textInputAction: TextInputAction.done,
-        suffixIcon: const Icon(Icons.visibility_off),
-        onPressed: (newValue) => confirmPassword = newValue,
-        onChange: (value) {
-          if (value.isNotEmpty) {
-            removeError(error: kConfirmPassNullError);
-          } else if (value.isNotEmpty && password == confirmPassword) {
-            removeError(error: kMatchPassError);
-          }
-          confirmPassword = value;
-        },
-        onValidate: (value) {
-          if (value!.isEmpty) {
-            addError(error: kConfirmPassNullError);
-            return "";
-          } else if ((password != value)) {
-            addError(error: kMatchPassError);
-            return "";
-          }
-          return null;
-        });
-  }
-
-  CustomTextFormField buildPasswordField() {
-    return CustomTextFormField(
-      onPressed: (value) {
-        password = value;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kPassNullError);
-        } else if (value.length >= 8) {
-          removeError(error: kShortPassError);
-        }
-        return null;
-      },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kPassNullError);
-          return "";
-        } else if (value.length < 8) {
-          addError(error: kShortPassError);
-          return "";
-        }
-        return null;
-      },
-      hintText: signUpPassword.tr,
-      textInputType: TextInputType.visiblePassword,
-      suffixIcon: const Icon(Icons.visibility_off),
-    );
-  }
-
-  CustomTextFormField buildEmailField() {
-    return CustomTextFormField(
-      textInputType: TextInputType.emailAddress,
-      hintText: signInTextEmail.tr,
-      onPressed: (value) {
-        email = value;
-      },
-      onValidate: (value) {
-        if (value.isEmpty) {
-          addError(error: kEmailNullError);
-          return "";
-        } else if (!value.toString().isValidEmail()) {
-          addError(error: kInvalidEmailError);
-          return "";
-        }
-        return null;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kEmailNullError);
-        } else if (value.toString().isValidEmail()) {
-          removeError(error: kInvalidEmailError);
-        }
-        return null;
-      },
-    );
-  }
-
-  CustomTextFormField buildNameField() {
-    return CustomTextFormField(
-      textInputType: TextInputType.text,
-      hintText: signUpName.tr,
-      onPressed: (value) {
-        name = value;
-      },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kNameNullError);
-          return "";
-        } else if (value.toString().isEmpty) {
-          addError(error: kNameNullError);
-          return "";
-        }
-        return null;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kNameNullError);
-        }
-        return null;
-      },
-    );
-  }
-
-  CustomTextFormField buildMobileField() {
-    return CustomTextFormField(
-      textInputType: TextInputType.phone,
-      hintText: mobileNO.tr,
-      onPressed: (value) {
-        mobile = value;
-      },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kMobileNullError);
-          return "";
-        } else if (value.toString().isEmpty) {
-          addError(error: kMobileNullError);
-          return "";
-        }
-        return null;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kMobileNullError);
-        }
-        return null;
-      },
-    );
+    );});
   }
 
 
-  CustomTextFormField buildJobField() {
-    return CustomTextFormField(
-      textInputType: TextInputType.text,
-      hintText: job?.tr??"Job",
-      suffixIcon: const Icon(Icons.arrow_drop_down),
-      onPressed: (value) {
-        job = value;
-      },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kJobNullError);
-          return "";
-        } else if (value.toString().isEmpty) {
-          addError(error: kJobNullError);
-          return "";
-        }
-        return null;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kJobNullError);
-        }
-        return null;
-      },
-    );
-  }
 }

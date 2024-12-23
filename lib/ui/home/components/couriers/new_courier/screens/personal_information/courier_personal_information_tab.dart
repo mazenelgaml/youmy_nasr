@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:merchant/components/custom_text.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/home/components/couriers/new_courier/screens/personal_information/body_courier_personal_information_tab.dart';
-
+import 'package:get/get.dart';
 import '../../../../../../../util/Constants.dart';
 import '../../../../../../../util/size_config.dart';
 
@@ -21,7 +22,7 @@ class PersonalInformationTab extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: SizeConfig.screenHeight * 0.02),
-                const CustomText(text: 'Personal Information',align: Alignment.center,fontColor: KPrimaryColor,fontWeight: FontWeight.bold,),
+                 CustomText(text: signUpTitle.tr,align: Alignment.center,fontColor: KPrimaryColor,fontWeight: FontWeight.bold,),
                 SizedBox(height: SizeConfig.screenHeight * 0.02),
                 const PersonalInformationBody(),
                 SizedBox(height: SizeConfig.screenHeight * 0.08),
