@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/ui/home/components/couriers/new_courier/screens/personal_information/body_courier_personal_information_tab.dart';
-
+import 'package:get/get.dart';
+import '../../../../../../../services/translation_key.dart';
 import '../../../../../../../util/Constants.dart';
 import '../../../../../../../util/size_config.dart';
 import 'body_courier_vehicle_information_tab.dart';
@@ -22,7 +23,7 @@ class VehicleInformationTab extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: SizeConfig.screenHeight * 0.02),
-                const CustomText(text: 'Vehicle Details',align: Alignment.center,fontColor: KPrimaryColor,fontWeight: FontWeight.bold,),
+                 CustomText(text: newCourierVehiclwDetails.tr,align: Alignment.center,fontColor: KPrimaryColor,fontWeight: FontWeight.bold,),
                 SizedBox(height: SizeConfig.screenHeight * 0.02),
                 const VehicleInformationBody(),
                 SizedBox(height: SizeConfig.screenHeight * 0.08),

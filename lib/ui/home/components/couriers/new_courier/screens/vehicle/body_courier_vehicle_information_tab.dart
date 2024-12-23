@@ -1,19 +1,15 @@
 import 'dart:io';
-
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:merchant/util/Constants.dart';
 import 'package:merchant/util/extensions.dart';
 import '../../../../../../../components/custom_button.dart';
-import '../../../../../../../components/custom_text.dart';
 import '../../../../../../../components/custom_text_form_field.dart';
 import '../../../../../../../components/form_error.dart';
-import '../../../../../../../components/profile_image_widget.dart';
+import '../../../../../../../services/translation_key.dart';
 import '../../../../../../../util/size_config.dart';
-
-
-
 
 class VehicleInformationBody extends StatefulWidget {
   const VehicleInformationBody({Key? key}) : super(key: key);
@@ -103,7 +99,7 @@ class _VehicleInformationBodyState extends State<VehicleInformationBody> {
           FormError(errors: errors),
           SizedBox(height: getProportionateScreenHeight(60)),
           CustomButton(
-            text: "Next",
+            text: next.tr,
             press: () {
               // if (_formKey.currentState!.validate()) {
               //   _formKey.currentState!.save();
@@ -121,7 +117,7 @@ class _VehicleInformationBodyState extends State<VehicleInformationBody> {
     return CustomTextFormField(
         obscureText: true,
         textInputType: TextInputType.visiblePassword,
-        hintText: 'Confirm Password',
+        hintText: signUpConfirmPassword.tr,
         textInputAction: TextInputAction.done,
         suffixIcon: const Icon(Icons.visibility_off),
         onPressed: (newValue) => confirmPassword = newValue,
@@ -168,7 +164,7 @@ class _VehicleInformationBodyState extends State<VehicleInformationBody> {
         }
         return null;
       },
-      hintText: 'Password',
+      hintText: signUpPassword.tr,
       textInputType: TextInputType.visiblePassword,
       suffixIcon: const Icon(Icons.visibility_off),
     );
@@ -177,7 +173,7 @@ class _VehicleInformationBodyState extends State<VehicleInformationBody> {
   CustomTextFormField buildEmailField() {
     return CustomTextFormField(
       textInputType: TextInputType.emailAddress,
-      hintText: 'Email',
+      hintText: signInTextEmail.tr,
       onPressed: (value) {
         email = value;
       },
@@ -205,7 +201,7 @@ class _VehicleInformationBodyState extends State<VehicleInformationBody> {
   CustomTextFormField buildCarTypeField() {
     return CustomTextFormField(
       textInputType: TextInputType.text,
-      hintText: 'Car Type',
+      hintText: newCourierCarType.tr,
       onPressed: (value) {
         name = value;
       },
@@ -233,7 +229,7 @@ class _VehicleInformationBodyState extends State<VehicleInformationBody> {
   CustomTextFormField buildPlateNoField() {
     return CustomTextFormField(
       textInputType: TextInputType.text,
-      hintText: 'Plate No',
+      hintText: newCourierPlateNo.tr,
       onPressed: (value) {
         name = value;
       },
@@ -261,7 +257,7 @@ class _VehicleInformationBodyState extends State<VehicleInformationBody> {
   CustomTextFormField buildModelField() {
     return CustomTextFormField(
       textInputType: TextInputType.text,
-      hintText: 'Model No',
+      hintText: newCourierModelNo.tr,
       onPressed: (value) {
         mobile = value;
       },
@@ -290,7 +286,7 @@ class _VehicleInformationBodyState extends State<VehicleInformationBody> {
     return CustomTextFormField(
       textInputType: TextInputType.text,
       textInputAction: TextInputAction.done,
-      hintText: 'Color',
+      hintText: newCourierColor.tr,
       onPressed: (value) {
         mobile = value;
       },
@@ -320,13 +316,13 @@ class _VehicleInformationBodyState extends State<VehicleInformationBody> {
     showDialog<ImageSource>(
       context: context,
       builder: (context) =>
-          AlertDialog(content: const Text("Choose image source"), actions: [
+          AlertDialog(content:  Text(chooseImageSource.tr), actions: [
             MaterialButton(
-              child: const Text("Camera"),
+              child:  Text(camera.tr),
               onPressed: () => Navigator.pop(context, ImageSource.camera),
             ),
             MaterialButton(
-              child: const Text("Gallery"),
+              child:  Text(gallery.tr),
               onPressed: () => Navigator.pop(context, ImageSource.gallery),
             ),
           ]),

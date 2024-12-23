@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,6 +10,7 @@ import '../../../../../../../components/custom_text.dart';
 import '../../../../../../../components/custom_text_form_field.dart';
 import '../../../../../../../components/form_error.dart';
 import '../../../../../../../components/profile_image_widget.dart';
+import '../../../../../../../services/translation_key.dart';
 import '../../../../../../../util/size_config.dart';
 
 final List<String> vehicleTypes = [
@@ -36,7 +37,7 @@ class _PersonalInformationBodyState extends State<PersonalInformationBody> {
   var _pickedImage = File("");
   String? email, name, mobile, job, password, confirmPassword;
   bool remember = false;
-  String _birthDateInString = 'Birth Date';
+  String _birthDateInString = newCourierBirtDate.tr;
   DateTime? _birthDate;
   final List<String?> errors = [];
 
@@ -118,7 +119,7 @@ class _PersonalInformationBodyState extends State<PersonalInformationBody> {
           FormError(errors: errors),
           SizedBox(height: getProportionateScreenHeight(20)),
           CustomButton(
-            text: "Next",
+            text: next.tr,
             press: () {
               // if (_formKey.currentState!.validate()) {
               //   _formKey.currentState!.save();
@@ -136,7 +137,7 @@ class _PersonalInformationBodyState extends State<PersonalInformationBody> {
     return CustomTextFormField(
         obscureText: true,
         textInputType: TextInputType.visiblePassword,
-        hintText: 'Confirm Password',
+        hintText: signUpConfirmPassword.tr,
         textInputAction: TextInputAction.done,
         suffixIcon: const Icon(Icons.visibility_off),
         onPressed: (newValue) => confirmPassword = newValue,
@@ -183,7 +184,7 @@ class _PersonalInformationBodyState extends State<PersonalInformationBody> {
         }
         return null;
       },
-      hintText: 'Password',
+      hintText: signUpPassword.tr,
       textInputType: TextInputType.visiblePassword,
       suffixIcon: const Icon(Icons.visibility_off),
     );
@@ -192,7 +193,7 @@ class _PersonalInformationBodyState extends State<PersonalInformationBody> {
   CustomTextFormField buildEmailField() {
     return CustomTextFormField(
       textInputType: TextInputType.emailAddress,
-      hintText: 'Email',
+      hintText: signInTextEmail.tr,
       onPressed: (value) {
         email = value;
       },
@@ -220,7 +221,7 @@ class _PersonalInformationBodyState extends State<PersonalInformationBody> {
   CustomTextFormField buildNameARField() {
     return CustomTextFormField(
       textInputType: TextInputType.text,
-      hintText: 'Name (arabic)',
+      hintText: newCourierNameArabic.tr,
       onPressed: (value) {
         name = value;
       },
@@ -248,7 +249,7 @@ class _PersonalInformationBodyState extends State<PersonalInformationBody> {
   CustomTextFormField buildNameENField() {
     return CustomTextFormField(
       textInputType: TextInputType.text,
-      hintText: 'Name (english)',
+      hintText: newCourierNameEnglish.tr,
       onPressed: (value) {
         name = value;
       },
@@ -332,7 +333,7 @@ class _PersonalInformationBodyState extends State<PersonalInformationBody> {
   CustomTextFormField buildMobileField() {
     return CustomTextFormField(
       textInputType: TextInputType.phone,
-      hintText: 'Mobile No',
+      hintText: mobileNO.tr,
       onPressed: (value) {
         mobile = value;
       },
@@ -359,8 +360,8 @@ class _PersonalInformationBodyState extends State<PersonalInformationBody> {
 
   DropdownButton<String> buildVehicleTypeField() {
     return DropdownButton(
-      hint: const CustomText(
-        text: 'Select Vehicle',
+      hint:  CustomText(
+        text: newCourierSelectVehicle.tr,
       ),
       iconSize: 40,
       isExpanded: true,
@@ -383,13 +384,13 @@ class _PersonalInformationBodyState extends State<PersonalInformationBody> {
     showDialog<ImageSource>(
       context: context,
       builder: (context) =>
-          AlertDialog(content: const Text("Choose image source"), actions: [
+          AlertDialog(content:  Text(chooseImageSource.tr), actions: [
             MaterialButton(
-              child: const Text("Camera"),
+              child:  Text(camera.tr),
               onPressed: () => Navigator.pop(context, ImageSource.camera),
             ),
             MaterialButton(
-              child: const Text("Gallery"),
+              child:  Text(gallery.tr),
               onPressed: () => Navigator.pop(context, ImageSource.gallery),
             ),
           ]),

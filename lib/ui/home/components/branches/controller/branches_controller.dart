@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../data/model/Branch.dart';
 import '../../../../../models/branches_list_model.dart';
+import '../../../../../services/localization_services.dart';
 import '../../../../../services/memory.dart';
 
 class BranchesController extends GetxController {
@@ -18,11 +19,12 @@ class BranchesController extends GetxController {
   }
 
   Future<void> BranchesLists() async {
+
     String? token = await Get.find<CacheHelper>().getData(key: "token");
     print("hello");
     final Dio dio = Dio(
       BaseOptions(
-        baseUrl: "https://apiezz.dalia-ezzat.com/api",
+        baseUrl:Get.find<CacheHelper>().getData(key: "Api"),
         validateStatus: (status) {
           return status != null && status < 500;
         },
@@ -33,11 +35,12 @@ class BranchesController extends GetxController {
 
     try {
       final response = await dio.post(
-        "/v1/branches/searchData",
+        "/api/v1/branches/searchData",
         data: {
           "search": {
-            "companyCode": 1,
-            "LangId": 2
+            "companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
+            "LangId": Get.find<CacheHelper>()
+                .activeLocale == SupportedLocales.english?2:1,
           },
           "request": 2
         },

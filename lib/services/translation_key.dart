@@ -118,7 +118,15 @@ const kmText="KM_Text";
 const leText="LE_Text";
 const locationText="Location_text";
 const jobIsRequiredText="Job_Is_Required_Text";
-
+const newCourierNameArabic="New_Courier_Name_Arabic";
+const newCourierNameEnglish="New_Courier_Name_English";
+const newCourierBirtDate="New_Courier_Birt_Date";
+const newCourierSelectVehicle="New_Courier_Select_Vehicle";
+const newCourierVehiclwDetails="NewCourierVehiclwDetails";
+const newCourierCarType="New_Courier_Car_Type";
+const newCourierPlateNo="New_Courier_Plate_No";
+const newCourierModelNo="New_Courier_Model_No";
+const newCourierColor="New_Courier_Color";
 const Api="Api";
 const ReportApi="Report_Api";
 const ShopName="Shop_Name";

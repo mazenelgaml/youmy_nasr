@@ -1,5 +1,4 @@
 import 'package:get/get_navigation/src/root/internacionalization.dart';
-import 'package:merchant/data/model/Branch.dart';
 import 'package:merchant/services/translation_key.dart';
 
 class AppTranslations extends Translations {
@@ -88,7 +87,6 @@ class AppTranslations extends Translations {
           dailyText: "Daily",
           fromText: "from",
           timeText: "AM",
-          timeText: "To",
           toTimeText: "PM",
           exceptText: "Except",
           continueText: "Continue",
@@ -111,6 +109,16 @@ class AppTranslations extends Translations {
           branch: "Branch",
           year: "year",
           merchantCountry:"select country",
+          newCourierNameArabic:"Name (arabic)",
+          newCourierNameEnglish:"Name (english)",
+          newCourierBirtDate:"Birth Date",
+          newCourierSelectVehicle:"Select Vehicle",
+          newCourierVehiclwDetails:"Vehiclw Details",
+          newCourierCarType:"Car Type",
+          newCourierPlateNo:"Plate No",
+          newCourierModelNo:"Model No",
+          newCourierColor:"Color",
+          toText:"To"
         },
         "ar": {
           branchesScreenTitle: "الفروع",
@@ -218,6 +226,17 @@ class AppTranslations extends Translations {
           branch: "الفرع",
           year: "السنة",
           merchantCountry:"اختار البلد",
+          newCourierNameArabic: "الاسم (بالعربية)",
+          newCourierNameEnglish: "الاسم (بالإنجليزية)",
+          newCourierBirtDate: "تاريخ الميلاد",
+          newCourierSelectVehicle: "اختر المركبة",
+          newCourierVehiclwDetails: "تفاصيل المركبة",
+          newCourierCarType: "نوع السيارة",
+          newCourierPlateNo: "رقم اللوحة",
+          newCourierModelNo: "رقم الطراز",
+          newCourierColor: "اللون",
+
+
         }
       };
 }
