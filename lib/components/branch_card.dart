@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:get/get.dart';
 import 'package:merchant/ui/home/components/branches/details/branch_details_screen.dart';
 import '../data/model/Branch.dart';
+import '../ui/home/components/branches/controller/branches_controller.dart';
 import '../util/Constants.dart';
 import '../util/size_config.dart';
 import 'custom_text.dart';
@@ -16,6 +18,7 @@ class BranchCard extends StatefulWidget {
     this.height = 20,
     this.aspectRatio = 1.02,
     required this.branch,
+
   }) : super(key: key);
 
   final double width, height, aspectRatio;
@@ -28,16 +31,21 @@ class BranchCard extends StatefulWidget {
 class _BranchCardState extends State<BranchCard> {
   @override
   Widget build(BuildContext context) {
+    return GetBuilder(
+        init: BranchesController(),
+    builder: (BranchesController controller) {
     return Padding(
       padding:
           EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
       child: GestureDetector(
-        onTap: () => {
+        onTap: ()  {
+          controller.productsOfBranchList(widget.branch.id??0);
+          controller.CouriersLists(widget.branch.id??0);
           Navigator.pushNamed(
             context,
             BranchDetailsScreen.routeName,
             arguments: BranchDetailsArguments(branch: widget.branch),
-          )
+          );
         },
         child: Column(
           children: [
@@ -111,6 +119,6 @@ class _BranchCardState extends State<BranchCard> {
           ],
         ),
       ),
-    );
+    );});
   }
 }

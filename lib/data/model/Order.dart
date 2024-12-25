@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:merchant/data/model/courier.dart';
 
+import '../../services/localization_services.dart';
+import '../../services/memory.dart';
 import 'Product.dart';
 
 class Order {
@@ -53,7 +57,7 @@ List<Order> demoOrders = [
     clientNo: "01568744857",
     clientName: "Mokhtar Mostafa",
     statusDescription: 'OnWay',
-    status: OrderState.ONWAY,
+    status: OrderState.InWay,
     branchId: 1,
     branchName: "Maadi - Branch",
       productList: subList
@@ -92,16 +96,20 @@ const String status =
 
 Color getStatus(OrderState status) {
   switch (status) {
+    case OrderState.InWay:
+      return Colors.yellow;
     case OrderState.DELIEVERED:
       return Colors.green;
 
-    case OrderState.ONWAY:
-      return Colors.yellow;
+    case OrderState.InProgress:
+      return Colors.greenAccent;
       break;
     case OrderState.CANCELLED:
       return Colors.red;
       break;
   }
 }
-List<String> orderStatusList=["Review","Prepare","On Way","Delivered"];
-enum OrderState { DELIEVERED, ONWAY, CANCELLED}
+List<String> orderStatusList=Get.find<CacheHelper>()
+    .activeLocale == SupportedLocales.english?["In Progress","In Way","Delivery Done","Canceled"]:
+["قيد التنفيذ","في الطريق","تم التوصيل","الغاء"];
+enum OrderState { DELIEVERED, InProgress, CANCELLED,InWay}

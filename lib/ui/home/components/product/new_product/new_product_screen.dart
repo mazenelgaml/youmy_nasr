@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:merchant/ui/home/components/product/new_product/components/body.dart';
-
+import 'package:get/get.dart';
 import '../../../../../components/custom_text.dart';
+import '../../../../../services/translation_key.dart';
 import '../../../../../util/Constants.dart';
 
 class NewProductScreen extends StatefulWidget {
-  const NewProductScreen({Key? key}) : super(key: key);
+  final int id;
+  const NewProductScreen({Key? key, required this.id}) : super(key: key);
   static var routeName = "/new_product";
 
   @override
@@ -18,8 +20,8 @@ class _NewProductScreenState extends State<NewProductScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const CustomText(
-          text: 'Create New Product',
+        title:  CustomText(
+          text: createNewProduct.tr,
           align: Alignment.center,
           fontColor: KPrimaryColor,
         ),
@@ -28,7 +30,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
             onTap: () => Navigator.pop(context),
             child: const Icon(Icons.arrow_back)),
       ),
-      body: const Body(),
+      body:  Body( id: widget.id,),
     );
   }
 }

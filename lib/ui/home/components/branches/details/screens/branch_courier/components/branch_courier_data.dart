@@ -1,11 +1,13 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../../../../../../components/courier_card.dart';
 import '../../../../../../../../data/model/courier.dart';
 import '../../../../../../../../util/size_config.dart';
 import '../../../../../orders/components/body.dart';
+import '../../../../controller/branches_controller.dart';
 
 class BranchCourierData extends StatefulWidget {
   const BranchCourierData({Key? key}) : super(key: key);
@@ -17,7 +19,10 @@ class BranchCourierData extends StatefulWidget {
 class _BranchCourierDataState extends State<BranchCourierData> {
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return GetBuilder(
+        init: BranchesController(),
+    builder: (BranchesController controller) {
+    return  Column(
       children: [
         Padding(
             padding:
@@ -27,12 +32,12 @@ class _BranchCourierDataState extends State<BranchCourierData> {
         SizedBox(height: getProportionateScreenWidth(20)),
         SingleChildScrollView(
           scrollDirection: Axis.vertical,
-          child: Column(
+          child:controller.isLoading.value? CircularProgressIndicator():Column(
             children: [
               ...List.generate(
-                demoCouriers.length,
+                controller.couriersD.length,
                     (index) {
-                  return CourierCard(courier: demoCouriers[index]);// here by default width and height is 0
+                  return CourierCard(courier: controller.couriersD[index]);// here by default width and height is 0
                 },
               ),
               SizedBox(width: getProportionateScreenWidth(20)),
@@ -40,6 +45,6 @@ class _BranchCourierDataState extends State<BranchCourierData> {
           ),
         )
       ],
-    );
+    );});
   }
 }

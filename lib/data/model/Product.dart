@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'Order.dart';
 
 class Product {
-  final int id, quantity;
+  final String id;
+  int quantity;
   final String title, description;
   final List<String> images;
   final List<Color> colors;
@@ -29,7 +30,7 @@ class Product {
 
 List<Product> demoProducts = [
   Product(
-    id: 1,
+    id: "1",
     images: [
       "assets/images/logo.png",
       "assets/images/branch.png",
@@ -50,7 +51,7 @@ List<Product> demoProducts = [
     isActive: true,
   ),
   Product(
-    id: 2,
+    id: "2",
     images: [
       "assets/images/logo.png",
     ],
@@ -68,7 +69,7 @@ List<Product> demoProducts = [
     isActive: false,
   ),
   Product(
-    id: 3,
+    id: "3",
     images: ["assets/images/mobile.png"],
     colors: [
       Color(0xFFF6625E),
@@ -84,7 +85,7 @@ List<Product> demoProducts = [
     isActive: false,
   ),
   Product(
-    id: 4,
+    id: "4",
     images: ["assets/images/logo.png", "assets/images/mobile.png"],
     colors: [
       Color(0xFFF6625E),
@@ -100,7 +101,7 @@ List<Product> demoProducts = [
     isActive: true,
   ),
   Product(
-    id: 1,
+    id: "1",
     images: [
       "assets/images/logo.png",
       "assets/images/branch.png",
@@ -121,7 +122,7 @@ List<Product> demoProducts = [
     isActive: true,
   ),
   Product(
-    id: 2,
+    id: '2',
     images: [
       "assets/images/logo.png",
     ],
@@ -139,7 +140,7 @@ List<Product> demoProducts = [
     isActive: true,
   ),
   Product(
-    id: 3,
+    id: '3',
     images: ["assets/images/mobile.png"],
     colors: [
       Color(0xFFF6625E),
@@ -155,7 +156,7 @@ List<Product> demoProducts = [
     isActive: true,
   ),
   Product(
-    id: 4,
+    id: '4',
     images: ["assets/images/logo.png", "assets/images/mobile.png"],
     colors: [
       Color(0xFFF6625E),
@@ -171,7 +172,7 @@ List<Product> demoProducts = [
     isActive: true,
   ),
   Product(
-    id: 1,
+    id: '1',
     images: [
       "assets/images/logo.png",
       "assets/images/branch.png",
@@ -192,7 +193,7 @@ List<Product> demoProducts = [
     isActive: true,
   ),
   Product(
-    id: 2,
+    id: '2',
     images: [
       "assets/images/logo.png",
     ],
@@ -210,7 +211,7 @@ List<Product> demoProducts = [
     isActive: true,
   ),
   Product(
-    id: 3,
+    id: '3',
     images: ["assets/images/mobile.png"],
     colors: [
       Color(0xFFF6625E),
@@ -226,7 +227,7 @@ List<Product> demoProducts = [
     isActive: true,
   ),
   Product(
-    id: 4,
+    id: '4',
     images: ["assets/images/logo.png", "assets/images/mobile.png"],
     colors: [
       Color(0xFFF6625E),
@@ -242,7 +243,7 @@ List<Product> demoProducts = [
     isActive: true,
   ),
   Product(
-    id: 1,
+    id: '1',
     images: [
       "assets/images/logo.png",
       "assets/images/branch.png",
@@ -263,7 +264,7 @@ List<Product> demoProducts = [
     isActive: true,
   ),
   Product(
-    id: 2,
+    id: '2',
     images: [
       "assets/images/logo.png",
     ],
@@ -281,7 +282,7 @@ List<Product> demoProducts = [
     isActive: true,
   ),
   Product(
-    id: 3,
+    id: '3',
     images: ["assets/images/mobile.png"],
     colors: [
       Color(0xFFF6625E),
@@ -297,7 +298,7 @@ List<Product> demoProducts = [
     isActive: true,
   ),
   Product(
-    id: 4,
+    id: '4',
     images: ["assets/images/logo.png", "assets/images/mobile.png"],
     colors: [
       Color(0xFFF6625E),

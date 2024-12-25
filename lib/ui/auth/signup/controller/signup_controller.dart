@@ -9,7 +9,9 @@ import 'package:merchant/ui/home/home_screen.dart';
 import 'package:merchant/util/extensions.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../../components/custom_text_form_field.dart';
+import '../../../../models/branches_login_model.dart';
 import '../../../../models/cities_list_model.dart' as model;
+import '../../../../models/company_types_list_model.dart';
 import '../../../../models/coutry_list_model.dart';
 import '../../../../models/job_List_model.dart';
 import '../../../../models/region_list_model.dart';
@@ -25,6 +27,10 @@ class SignupController extends GetxController {
   List<String>? selectCountry=[];
   var selectedCity = merchantSelectCity.tr;
   var selectedCountry = merchantCountry.tr;
+  var selectedCompanyTypes = merchantType.tr;
+  List<String>? selectCompanyTypes=[];
+  List<CompanyType>? companyTypesName=[];
+  String? companyTypesCode;
   int? countryCode;
   int? cityCode;
   int? regionCode;
@@ -42,7 +48,6 @@ class SignupController extends GetxController {
   TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController locationController = TextEditingController();
   TextEditingController merchantNameController = TextEditingController();
-  TextEditingController typeController = TextEditingController();
   TextEditingController summaryController = TextEditingController();
   TextEditingController streetController = TextEditingController();
   TextEditingController buildingController = TextEditingController();
@@ -59,6 +64,8 @@ SignupController( this.context);
       getCurrentLocation(context);
     });
     await getCurrentLocation(context);
+    await getBranches();
+    await PostCompanyTypesLists();
 
   }
   Future<void> checkLocationPermission() async {
@@ -243,33 +250,6 @@ SignupController( this.context);
       onChange: (value) {
         if (value.isNotEmpty) {
           removeError(error: kMerchantNameNullError);
-        }
-        return null;
-      },
-    );
-  }
-  CustomTextFormField buildTypeField() {
-    return CustomTextFormField(
-      controller:typeController,
-      textInputType: TextInputType.text,
-      hintText: merchantType.tr,
-      suffixIcon: const Icon(Icons.arrow_drop_down),
-      onPressed: (value) {
-        type = value;
-      },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kMerchantTypeNullError);
-          return "";
-        } else if (value.toString().isEmpty) {
-          addError(error: kMerchantTypeNullError);
-          return "";
-        }
-        return null;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kMerchantTypeNullError);
         }
         return null;
       },
@@ -504,6 +484,53 @@ SignupController( this.context);
       },
     );
   }
+  bool isLoading=true;
+  List<String>? branchesLogin;
+  List<BranchesLogin>? branchesList;
+  String _selectedBranch = '';
+  String get selectedBranch => _selectedBranch;
+  set selectedBranch(String? value) {
+    if (_selectedBranch != value) {
+      _selectedBranch = value ?? '';
+      update(); // Trigger UI update
+    }
+  }
+  Future<void> getBranches() async {
+    isLoading=true;
+    print("ho");
+    final Dio dio = Dio(BaseOptions(
+      baseUrl:Get.find<CacheHelper>().getData(key: "Api"),
+      validateStatus: (status) {
+        return status != null && status < 500;
+      },
+    ));
+
+    try {
+      final response = await dio.post(
+        "/api/v1/branches/loginsearch",
+        data: {
+          "search": {
+            "companyCode":Get.find<CacheHelper>().getData(key: "companyCode"),
+          }
+        },
+      );
+
+      if (response.statusCode == 200) {
+        BranchesLoginModel branchesLoginModel = BranchesLoginModel.fromJson(response.data);
+        branchesList=branchesLoginModel.data;
+        branchesLogin = branchesList?.map((branch) => Get.find<CacheHelper>()
+            .activeLocale == SupportedLocales.english ?branch.branchNameEng ?? '':branch.branchNameAra??"").toList() ?? [];
+        update();
+        branchesLogin=branchesLogin?.toSet().toList();
+        print(branchesList);
+        print(branchesLogin);
+        isLoading=false;
+        update();
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
   void pickImage(BuildContext context) {
     showDialog<ImageSource>(
       context: context,
@@ -656,6 +683,96 @@ SignupController( this.context);
       },
     );
   }
+  ListTile buildCompanyTypesField() {
+
+    return ListTile(
+      title: Text(selectedCompanyTypes ?? 'Select Type'),
+      trailing: Icon(Icons.arrow_drop_down,size: 40,),
+      onTap: () async {
+        await PostCountryLists();
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text(merchantType.tr),
+              content: SingleChildScrollView(
+                child: ListTileTheme(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
+                  minLeadingWidth: 40.0, // Set minimum leading width
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: selectCompanyTypes?.map((country) {
+                      return ListTile(
+                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
+                        title: Text(country),
+                        onTap: () {
+                          selectedCompanyTypes = country;
+                          companyTypesCode=companyTypesName?.firstWhere((companyType) => companyType.companyTypeName == selectedCompanyTypes).companyTypeCode;
+                          Navigator.pop(context); // Close the dialog
+                          update(); // Update the UI
+                        },
+                      );
+                    }).toList() ?? [],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+  Future<void> PostCompanyTypesLists() async {
+    print("hello");
+    final Dio dio = Dio(
+      BaseOptions(
+        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
+        validateStatus: (status) {
+          return status != null && status < 500;
+        },
+      ),
+    );
+    try {
+      final response = await dio.post(
+        "/api/v1/companyTypes/searchData",
+        data: {
+          "search": {
+            "LangId": Get.find<CacheHelper>()
+                .activeLocale == SupportedLocales.english?2:1,
+          }
+
+        },
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: "token")}"
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        print("aaaaaaaaaaaaaaa");
+        // Successful response
+        print(response.data,);
+        CompanyTypesListModel companyTypesListModel = CompanyTypesListModel.fromJson(response.data);
+        companyTypesName = companyTypesListModel.data;
+        print(companyTypesName);// Save full job data if needed
+        selectCompanyTypes = companyTypesName?.map((companyType) => companyType.companyTypeName ?? '').toList() ?? [];
+        update();
+        print(selectCompanyTypes);
+        update();// Extract only job names
+      } else {
+        // Error handling for failed response
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(content: Text('Failed to load company types')),
+        );
+      }
+    } catch (e) {
+      // Handle any errors that occur during the API call
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(content: Text('Error occurred while connecting to the API')),
+      );
+    }update();
+  }
   Future<void> PostCityLists() async {
      countryCode = countriesName?.firstWhere((country) => country.countryName == selectedCountry).id;
     print("hello");
@@ -761,6 +878,7 @@ SignupController( this.context);
     }update();
   }
   Future<void> signUp(BuildContext context) async {
+    int? branchCode = branchesList?.firstWhere((branch) => branch.branchNameAra==selectedBranch ||branch.branchNameEng == selectedBranch).branchCode;
     await Get.find<CacheHelper>().saveData(key: "mobileNo", value: mobileNumberController.text.trim());
     print(Get.find<CacheHelper>().getData(key: "year"));
     print(Get.find<CacheHelper>().getData(key: "companyCode"));
@@ -768,8 +886,7 @@ SignupController( this.context);
     print(passwordController.text);
     print(mobileNumberController.text);
     print(nameController.text);
-    print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
-
+    print(branchCode);
     int? jobCode = jobList?.firstWhere((job) => job.jobName == selectedJob).id;
     print(jobCode);
 
@@ -785,9 +902,9 @@ SignupController( this.context);
         "/api/v1/vendors/merchantCreate",
         data: {
           "companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
-          "branchCode": 2,
+          "branchCode": branchCode,
           "year": Get.find<CacheHelper>().getData(key: "year"),
-          "vendorcode": "445588",
+          "vendorcode": "444888",
           "vendorNameEng": nameController.text.trim(),
           "vendorNameAra": nameController.text.trim(),
           "email": emailController.text.trim(),
@@ -908,9 +1025,9 @@ SignupController( this.context);
           "descriptionEng": Get.find<CacheHelper>().getData(key: "merchantName"),
           "companyNameAra": Get.find<CacheHelper>().getData(key: "merchantName"),
           "companyNameEng": Get.find<CacheHelper>().getData(key: "merchantName"),
-          "companyTypeCode": "1",
+          "companyTypeCode": companyTypesCode,
           "mobile1": "${Get.find<CacheHelper>().getData(key: "mobileNo")}",
-          "mobile2": "11",
+          "mobile2":"${Get.find<CacheHelper>().getData(key: "mobileNo")}",
           "address": locationController.text.trim(),
           "tel1": "11",
           "tel2": "11",

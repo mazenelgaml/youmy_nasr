@@ -4,12 +4,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import '../../../../../data/model/courier.dart';
 import '../../../../../models/couriers_model.dart';
+import '../../../../../services/localization_services.dart';
 import '../../../../../services/memory.dart';
 import '../../../../../util/Constants.dart';
 
 class CouriersController extends GetxController {
   List<CouriersDetails> couriersNames = [];
-  List<Courier>couriersD=[];
+  List<Courier> couriersD = [];
   var isLoading = false.obs; // Track loading state
 
   @override
@@ -18,6 +19,7 @@ class CouriersController extends GetxController {
     await CacheHelper.init();
     await CouriersLists(); // Fetch job data when the controller initializes
   }
+
   void showToast(String message) {
     Fluttertoast.showToast(
         msg: message,
@@ -28,12 +30,13 @@ class CouriersController extends GetxController {
         textColor: KPrimaryColor,
         fontSize: 16.0);
   }
+
   Future<void> CouriersLists() async {
+    couriersNames=[];
     String? token = await Get.find<CacheHelper>().getData(key: "token");
-    print("hello");
     final Dio dio = Dio(
       BaseOptions(
-        baseUrl: "https://apiezz.dalia-ezzat.com/api",
+        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
         validateStatus: (status) {
           return status != null && status < 500;
         },
@@ -44,35 +47,33 @@ class CouriersController extends GetxController {
 
     try {
       final response = await dio.post(
-        "/v1/salesmans/searchData",
+        "/api/v1/employees/search",
         data: {
-          "search": {
-            "companyCode": 1,
-            "branchCode": 1,
-            "LangId": 2
-          },
+          "search": {"companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
+            "branchCode": Get.find<CacheHelper>().getData(key: "branch"),
+            "LangId": Get.find<CacheHelper>()
+                .activeLocale == SupportedLocales.english?2:1,},
           "request": 2
         },
-        options: Options(
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer ${token}"
-            }
-        ),
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${token}"
+        }),
       );
 
       if (response.statusCode == 200) {
         // Successful response
-        CouriesListModel couriesListModel = CouriesListModel.fromJson(response.data);
+        CouriesListModel couriesListModel =
+            CouriesListModel.fromJson(response.data);
         couriersNames = couriesListModel.data ?? [];
         couriersD = couriersNames.map((courierData) {
           return Courier(
               id: courierData.id,
-              name: courierData.salesManName,
-              mobile: courierData.mobile1,
-              isActive:true
-          );
-        }).toList() ;
+              name: Get.find<CacheHelper>()
+                  .activeLocale == SupportedLocales.english?courierData.empNameEng:courierData.empNameAra,
+              mobile: courierData.mobile,
+              isActive: true);
+        }).toList();
         print(couriersD);
         print(couriersNames); // Save full job data if needed
       } else {
@@ -92,12 +93,13 @@ class CouriersController extends GetxController {
 
     update(); // Update UI
   }
-  Future<void> CouriersDelete() async {
+
+  Future<void> CouriersDelete(int empId) async {
     String? token = await Get.find<CacheHelper>().getData(key: "token");
     print("hello");
     final Dio dio = Dio(
       BaseOptions(
-        baseUrl: "https://apiezz.dalia-ezzat.com/api",
+        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
         validateStatus: (status) {
           return status != null && status < 500;
         },
@@ -107,42 +109,21 @@ class CouriersController extends GetxController {
     isLoading.value = true; // Start loading
 
     try {
-      final response = await dio.post(
-        "/v1/salesmans/searchData",
-        data: {
-          "search": {
-            "companyCode": 1,
-            "branchCode": 1,
-            "LangId": 2
-          },
-          "request": 2
-        },
-        options: Options(
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer ${token}"
-            }
-        ),
+      final response = await dio.delete(
+        "/api/v1/employees/$empId",
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${token}"
+        }),
       );
 
       if (response.statusCode == 200) {
-        // Successful response
-        CouriesListModel couriesListModel = CouriesListModel.fromJson(response.data);
-        couriersNames = couriesListModel.data ?? [];
-        couriersD = couriersNames.map((courierData) {
-          return Courier(
-              id: courierData.id,
-              name: courierData.salesManName,
-              mobile: courierData.mobile1,
-              isActive:true
-          );
-        }).toList() ;
-        print(couriersD);
-        print(couriersNames); // Save full job data if needed
+      int id=response.data;
+      print(id);// Save full job data if needed
       } else {
         // Error handling for failed response
         ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('Failed to load jobs')),
+          SnackBar(content: Text('Failed to delete couriers')),
         );
       }
     } catch (e) {

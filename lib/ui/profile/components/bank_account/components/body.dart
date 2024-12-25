@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:get/get.dart';
+
+import 'package:merchant/components/courier_card.dart';
 import 'package:merchant/components/form_error.dart';
 import 'package:merchant/util/keyboard.dart';
 import '../../../../../components/custom_button.dart';
 import '../../../../../components/custom_text.dart';
 import '../../../../../components/custom_text_form_field.dart';
+import '../../../../../services/localization_services.dart';
+import '../../../../../services/memory.dart';
+import '../../../../../services/translation_key.dart';
 import '../../../../../util/Constants.dart';
 import '../../../../../util/size_config.dart';
 import '../../../profile_controller/profile_controller.dart';
@@ -60,9 +65,11 @@ class _BodyState extends State<Body> {
                 child: Column(
                   children: [
                     SizedBox(height: getProportionateScreenHeight(20)),
-                    const CustomText(
-                      text: 'Add Bank Account',
+                     CustomText(
+                      text:addBankAccountTitle.tr,
                       fontSize: 25,
+                       align: Get.find<CacheHelper>()
+                           .activeLocale == SupportedLocales.english?Alignment.topLeft:Alignment.topRight,
                     ),
                     SizedBox(height: getProportionateScreenHeight(20)),
                     controller.buildAccountOwnerNameField(),
@@ -76,13 +83,17 @@ class _BodyState extends State<Body> {
                     FormError(errors:  controller.errors),
                     SizedBox(height: getProportionateScreenHeight(40)),
                     CustomButton(
-                      text: "Save",
+                      text: accountSave.tr,
                       press: () {
                         if ( controller.formKey.currentState!.validate()) {
                           controller.formKey.currentState!.save();
                           // if all are valid then go to success screen
                           KeyboardUtil.hideKeyboard(context);
                           controller.AddBankAccount(context);
+                          controller.isLoading.value=true;
+                          controller.getBankAccounts();
+                          controller.isLoading.value=false;
+                          controller.update();
                         }
                       },
                     ),

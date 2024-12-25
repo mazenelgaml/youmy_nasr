@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:merchant/ui/home/components/product/new_product/new_product_screen.dart';
 
 
@@ -38,7 +39,7 @@ class Body extends StatelessWidget {
                     child: CustomButton(
                       text: "Edit",
                       press: () {
-                        Navigator.pushNamed(context, NewProductScreen.routeName);
+                        Get.to(()=> NewProductScreen( id: int.parse(product.id),));
                       },
 
                     ),

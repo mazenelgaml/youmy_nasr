@@ -14,6 +14,7 @@ class CustomText extends StatelessWidget {
   final String fontFamily;
   final FontWeight fontWeight;
   final int maxLine;
+  final TextOverflow? over;
 
   const CustomText(
       {Key? key,
@@ -23,7 +24,8 @@ class CustomText extends StatelessWidget {
       this.fontSize = 18.0,
       this.fontWeight = FontWeight.normal,
       this.fontFamily = 'Roboto Regular',
-      this.maxLine=1})
+      this.maxLine=1,
+      this.over})
       : super(key: key);
 
   @override
@@ -32,6 +34,7 @@ class CustomText extends StatelessWidget {
         alignment: align,
         child: Text(
           text,
+          overflow:over,
           maxLines: 1,
           textAlign:Get.find<CacheHelper>()
             .activeLocale == SupportedLocales.english ?TextAlign.left:TextAlign.right

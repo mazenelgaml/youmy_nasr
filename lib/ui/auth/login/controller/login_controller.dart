@@ -337,7 +337,7 @@ bool isLoading=true;
     }
   }
   Future<void> signInBranches(BuildContext context) async {
-    int? branchCode = branchesList?.firstWhere((branch) => branch.branchNameAra==selectedBranch ||branch.branchNameEng == selectedBranch).companyCode;
+    int? branchCode = branchesList?.firstWhere((branch) => branch.branchNameAra==selectedBranch ||branch.branchNameEng == selectedBranch).branchCode;
     final Dio dio = Dio(BaseOptions(
       baseUrl:Get.find<CacheHelper>().getData(key: "Api"),
       validateStatus: (status) {
@@ -451,7 +451,7 @@ bool isLoading=true;
         branchesLogin = branchesList?.map((branch) => Get.find<CacheHelper>()
             .activeLocale == SupportedLocales.english ?branch.branchNameEng ?? '':branch.branchNameAra??"").toList() ?? [];
         update();
-
+       branchesLogin=branchesLogin?.toSet().toList();
         print(branchesList);
         print(branchesLogin);
         isLoading=false;
