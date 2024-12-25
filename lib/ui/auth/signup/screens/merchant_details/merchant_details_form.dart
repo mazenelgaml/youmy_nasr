@@ -36,7 +36,7 @@ class _SignUpFormMerchantDetailsState extends State<SignUpFormMerchantDetails> {
           SizedBox(height: getProportionateScreenHeight(10)),
     controller.buildNameMerchantField(),
           SizedBox(height: getProportionateScreenHeight(10)),
-    controller.buildTypeField(),
+    controller.buildCompanyTypesField(),
           SizedBox(height: getProportionateScreenHeight(10)),
     controller.buildSummaryField(),
           SizedBox(height: getProportionateScreenHeight(120)),

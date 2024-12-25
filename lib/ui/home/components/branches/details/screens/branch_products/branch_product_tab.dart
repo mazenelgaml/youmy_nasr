@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
+import 'package:merchant/services/translation_key.dart';
+import 'package:get/get.dart';
 import '../../../../../../../components/action_button.dart';
 import '../../../../../../../components/custom_text.dart';
 import '../../../../../../../components/expandable_fab.dart';
@@ -12,6 +13,7 @@ import '../../../../product/filter/filter_screen.dart';
 import '../../../../product/new_product/new_product_screen.dart';
 import '../../../../product/search/search_screen.dart';
 import '../../../../product/show_all_branches/product_branches_filter_screen.dart';
+import '../../../controller/branches_controller.dart';
 
 class BranchProductsScreen extends StatefulWidget {
   const BranchProductsScreen({Key? key}) : super(key: key);
@@ -25,12 +27,14 @@ class _BranchProductsScreenState extends State<BranchProductsScreen> {
   bool isGridView = true;
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
+    return GetBuilder(
+        init: BranchesController(),
+        builder: (BranchesController controller) {
+          return Scaffold(
       appBar: AppBar(
         leading: null,
-        title: const CustomText(
-          text: 'Products',
+        title:  CustomText(
+          text: productScreenTitle.tr,
           align: Alignment.center,
           fontColor: KPrimaryColor,
         ),
@@ -131,7 +135,7 @@ class _BranchProductsScreenState extends State<BranchProductsScreen> {
           ),
         ],
       ),
-    );
+    );});
   }
 
   void _showToast(String message) {
@@ -159,7 +163,7 @@ class _BranchProductsScreenState extends State<BranchProductsScreen> {
   void _showAction(BuildContext context, int index) {
     switch (index) {
       case 1: // add
-        Navigator.pushNamed(context, NewProductScreen.routeName);
+        Get.to(()=> NewProductScreen( id: 0,));
         break;
       case 2: // search
         Navigator.pushNamed(context, SearchScreen.routeName);
@@ -172,31 +176,35 @@ class _BranchProductsScreenState extends State<BranchProductsScreen> {
   }
 
   Widget returnProductViewBody(bool isGridView)
+
   {
     this.isGridView=isGridView;
-    return isGridView
+     return GetBuilder(
+        init: BranchesController(),
+    builder: (BranchesController controller) {
+  return isGridView
         ? GridView.count(
         shrinkWrap: true,
         crossAxisCount: 2,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
         padding: const EdgeInsets.all(8),
-        childAspectRatio: 1,
-        children: demoProducts
+        childAspectRatio: 1.2,
+        children:controller.productsD
             .map((product) => ProductCard1(product: product))
             .toList())
         :
     ListView.builder(
       padding: const EdgeInsets.all(8),
-      itemCount: demoProducts.length,
+      itemCount: controller.productsD.length,
       itemBuilder: (context, index) => Padding(
         padding: EdgeInsets.symmetric(vertical: 10),
         child: Dismissible(
-          key: Key(demoProducts[index].id.toString()),
+          key: Key(controller.productsD[index].id.toString()),
           direction: DismissDirection.endToStart,
           onDismissed: (direction) {
             setState(() {
-              demoProducts.removeAt(index);
+              controller.productsD.removeAt(index);
             });
           },
           background: Container(
@@ -206,10 +214,10 @@ class _BranchProductsScreenState extends State<BranchProductsScreen> {
               borderRadius: BorderRadius.circular(15),
             ),
           ),
-          child: ProductCard1(product: demoProducts[index]),
+          child: ProductCard1(product: controller.productsD[index]),
         ),
       ),
-    );
+    );});
   }
 
 

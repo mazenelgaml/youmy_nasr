@@ -322,7 +322,7 @@ _getStatusIcon(OrderState status) {
         Icons.done,
         color: KActiveColor,
       );
-    case OrderState.ONWAY:
+    case OrderState.InWay:
       return const Icon(
         Icons.train,
         color: accentColor,

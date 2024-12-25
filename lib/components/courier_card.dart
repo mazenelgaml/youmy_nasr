@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:merchant/components/action_button.dart';
+import 'package:merchant/ui/home/components/couriers/controller/couriers_controller.dart';
 import 'package:merchant/ui/home/components/couriers/new_courier/new_courier_screen.dart';
 import '../data/model/courier.dart';
+import '../services/localization_services.dart';
+import '../services/memory.dart';
 import '../util/Constants.dart';
 import '../util/size_config.dart';
 import 'custom_text.dart';
@@ -26,6 +30,9 @@ class CourierCard extends StatefulWidget {
 class _CourierCardState extends State<CourierCard> {
   @override
   Widget build(BuildContext context) {
+    return GetBuilder<CouriersController>(
+        init: CouriersController(),
+    builder: (CouriersController controller) {
     return Padding(
       padding:
       EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
@@ -36,7 +43,7 @@ class _CourierCardState extends State<CourierCard> {
         child: Column(
           children: [
             Container(
-              width: getProportionateScreenWidth(double.infinity),
+              width: MediaQuery.of(context).size.width,
               height: getProportionateScreenHeight(170),
               padding: EdgeInsets.all(getProportionateScreenWidth(10)),
               decoration: BoxDecoration(
@@ -58,10 +65,15 @@ class _CourierCardState extends State<CourierCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          CustomText(
-                            text: widget.courier.name??"",
-                            fontSize: 23,
-                            align: Alignment.topLeft,),
+                          SizedBox(
+                          width:MediaQuery.of(context).size.width-172,
+                            child: CustomText(
+                              over: TextOverflow.ellipsis,
+                              text: widget.courier.name??"",
+                              fontSize: 23,
+                              align: Get.find<CacheHelper>()
+                                  .activeLocale == SupportedLocales.english?Alignment.topLeft:Alignment.topRight,),
+                          ),
                           SizedBox(height: getProportionateScreenHeight(10)),
                           CustomText(text: widget.courier.mobile??"", fontSize: 18),
                           SizedBox(height: getProportionateScreenHeight(20)),
@@ -75,7 +87,11 @@ class _CourierCardState extends State<CourierCard> {
                                   size: 30,
                                 ),
                                 onTap: () {
-                                  _displayDialog(context,'Alert','Do you want to delete  ${widget.courier.name} courier?!');
+                                  _displayDialog(context,'Alert','Do you want to delete  ${widget.courier.name} courier?!',(){
+                                    controller.CouriersDelete(widget.courier.id??0);
+                                    controller.CouriersLists();
+                                    Navigator.pop(context);
+                                  });
                                 },
                               ),
                               SizedBox(
@@ -106,7 +122,7 @@ class _CourierCardState extends State<CourierCard> {
                                 ),
                                 onTap: () {
                                   var activeStatus=widget.courier.isActive?'InActive':'Active';
-                                  _displayDialog(context,'Alert','Do you want to $activeStatus ${widget.courier.name??""} courier?!');
+                                  _displayDialog(context,'Alert','Do you want to $activeStatus ${widget.courier.name??""} courier?!',(){});
                                 },
                               ),
                             ],
@@ -121,12 +137,12 @@ class _CourierCardState extends State<CourierCard> {
           ],
         ),
       ),
-    );
+    );});
   }
 }
 
 
-_displayDialog(BuildContext context, String title, String message) async {
+_displayDialog(BuildContext context, String title, String message, Function? Function() onTap) async {
   showDialog(
       context: context,
       builder: (context) {
@@ -142,7 +158,7 @@ _displayDialog(BuildContext context, String title, String message) async {
             actions: [
               MaterialButton(
                   child: const Text("OK"),
-                  onPressed: () => Navigator.pop(context)),
+                  onPressed: onTap),
               MaterialButton(
                   child: const Text("Cancel"),
                   onPressed: () => Navigator.pop(context))

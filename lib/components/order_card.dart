@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:merchant/ui/home/components/orders/order_details/order_details_screen.dart';
 import '../data/model/Order.dart';
@@ -31,7 +29,7 @@ class _OrderCardState extends State<OrderCard> {
   Widget build(BuildContext context) {
     return Padding(
       padding:
-          EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
+      EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
       child: GestureDetector(
         onTap: () => {
           Navigator.pushNamed(
@@ -51,39 +49,65 @@ class _OrderCardState extends State<OrderCard> {
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Hero(
-                  tag: widget.order.id.toString(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      CustomText(
-                        text: widget.order.orderNo,
-                        fontSize: 23,
-                       fontWeight: FontWeight.bold,
-                       align:Get.find<CacheHelper>().activeLocale == SupportedLocales.english?Alignment.topLeft:Alignment.topRight,),
-                      SizedBox(height: getProportionateScreenHeight(8)),
-                      CustomText(text: widget.order.clientName, fontSize: 22,fontColor: KPrimaryColor,align:Get.find<CacheHelper>().activeLocale == SupportedLocales.english?Alignment.topLeft:Alignment.topRight,),
-                      SizedBox(height: getProportionateScreenHeight(8)),
-                      CustomText(text: widget.order.clientNo, fontSize: 18,align:Get.find<CacheHelper>().activeLocale == SupportedLocales.english?Alignment.topLeft:Alignment.topRight,),
-                      SizedBox(height: getProportionateScreenHeight(8)),
-                      CustomText(text: widget.order.date, fontSize: 18,align:Get.find<CacheHelper>().activeLocale == SupportedLocales.english?Alignment.topLeft:Alignment.topRight,),
-
-                      SizedBox(height: getProportionateScreenHeight(10)),
-                      Row(
-                        children: [
-                          _getStatusIcon(widget.order.status),
-                          SizedBox(width: getProportionateScreenWidth(4),),
-                          CustomText(
-                            text: widget.order.statusDescription,
-                            fontColor: getStatus(widget.order.status),
-                            fontSize: 21,
-                            align: Alignment.bottomRight,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: getProportionateScreenHeight(10)),
-                    ],
-                  )),
+                tag: widget.order.id.toString(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    CustomText(
+                      text: widget.order.orderNo,
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold,
+                      align: Get.find<CacheHelper>().activeLocale ==
+                          SupportedLocales.english
+                          ? Alignment.topLeft
+                          : Alignment.topRight,
+                    ),
+                    SizedBox(height: getProportionateScreenHeight(8)),
+                    CustomText(
+                      text: widget.order.clientName,
+                      fontSize: 22,
+                      fontColor: KPrimaryColor,
+                      align: Get.find<CacheHelper>().activeLocale ==
+                          SupportedLocales.english
+                          ? Alignment.topLeft
+                          : Alignment.topRight,
+                    ),
+                    SizedBox(height: getProportionateScreenHeight(8)),
+                    CustomText(
+                      text: widget.order.clientNo,
+                      fontSize: 18,
+                      align: Get.find<CacheHelper>().activeLocale ==
+                          SupportedLocales.english
+                          ? Alignment.topLeft
+                          : Alignment.topRight,
+                    ),
+                    SizedBox(height: getProportionateScreenHeight(8)),
+                    CustomText(
+                      text: widget.order.date,
+                      fontSize: 18,
+                      align: Get.find<CacheHelper>().activeLocale ==
+                          SupportedLocales.english
+                          ? Alignment.topLeft
+                          : Alignment.topRight,
+                    ),
+                    SizedBox(height: getProportionateScreenHeight(10)),
+                    Row(
+                      children: [
+                        _getStatusIcon(widget.order.status),
+                        SizedBox(width: getProportionateScreenWidth(4)),
+                        CustomText(
+                          text: widget.order.statusDescription,
+                          fontColor: getStatus(widget.order.status),
+                          fontSize: 21,
+                          align: Alignment.bottomRight,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: getProportionateScreenHeight(10)),
+                  ],
+                ),
+              ),
             ),
             const SizedBox(height: 10),
           ],
@@ -91,22 +115,19 @@ class _OrderCardState extends State<OrderCard> {
       ),
     );
   }
-}
 
-
-
-_getStatusIcon(OrderState status)
-{
-  switch(status)
-  {
-
+  Widget _getStatusIcon(OrderState status) {
+    switch (status) {
       case OrderState.DELIEVERED:
-        // IconData(),
-        return Icon(Icons.done,color: KActiveColor,);
-      case OrderState.ONWAY:
-        return Icon(Icons.train,color: accentColor,);
+        return Icon(Icons.done, color: KActiveColor);
+      case OrderState.InWay:
+        return Icon(Icons.train, color: accentColor);
       case OrderState.CANCELLED:
-        return Icon(Icons.cancel,color: KInActiveColor,);
-
+        return Icon(Icons.cancel, color: KInActiveColor);
+      case OrderState.InProgress: // Add a default icon for "In Progress"
+        return Icon(Icons.hourglass_empty, color: Colors.orange);
+      default:
+        return Icon(Icons.error, color: Colors.red); // Fallback for unexpected cases
     }
+  }
 }

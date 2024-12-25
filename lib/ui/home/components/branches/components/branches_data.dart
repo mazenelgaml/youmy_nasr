@@ -24,7 +24,8 @@ class BranchesData extends StatelessWidget {
         SizedBox(height: getProportionateScreenWidth(20)),
         SingleChildScrollView(
           scrollDirection: Axis.vertical,
-          child: Column(
+          child: controller.isLoading.value // إذا كانت البيانات لم تُجلب بعد، أظهر شاشة التحميل
+              ? Center(child: CircularProgressIndicator()) :Column(
             children: [
               ...List.generate(
                 controller.branchesNames?.length??0,

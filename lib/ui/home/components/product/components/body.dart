@@ -162,7 +162,7 @@ void handleClick(String value) {
 void _showAction(BuildContext context, int index) {
   switch (index) {
     case 1: // add
-      Navigator.pushNamed(context, NewProductScreen.routeName);
+      Get.to(()=> NewProductScreen( id: 0,));
       break;
     case 2: // search
       Navigator.pushNamed(context, SearchScreen.routeName);

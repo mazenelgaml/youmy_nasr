@@ -67,7 +67,8 @@ class _CouriersDataState extends State<CouriersData> {
 
         SingleChildScrollView(
           scrollDirection: Axis.vertical,
-          child: Column(
+          child: controller.isLoading.value // إذا كانت البيانات لم تُجلب بعد، أظهر شاشة التحميل
+              ? Center(child: CircularProgressIndicator()) :Column(
             children: [
               ...List.generate(
                 controller.couriersD.length,

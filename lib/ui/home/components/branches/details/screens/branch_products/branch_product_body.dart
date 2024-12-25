@@ -1,7 +1,8 @@
 
 import 'package:flutter/material.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/home/components/branches/details/screens/branch_products/branch_product_data.dart';
-
+import 'package:get/get.dart';
 import '../../../../../../../components/custom_text.dart';
 import '../../../../../../../util/Constants.dart';
 import '../../../../../../../util/size_config.dart';
@@ -21,7 +22,7 @@ class Body extends StatelessWidget {
             children: [
               SizedBox(height: getProportionateScreenWidth(10)),
               CustomText(
-                text: 'Products',
+                text: productScreenTitle.tr,
                 align: Alignment.center,
                 fontColor: KPrimaryColor,
                 fontWeight: FontWeight.bold,
@@ -36,7 +37,7 @@ class Body extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: KPrimaryColor,
         onPressed: () {
-          Navigator.pushNamed(context, NewProductScreen.routeName);
+          Get.to(()=> NewProductScreen( id: 0,));
         },
         child: const Icon(
           Icons.add,

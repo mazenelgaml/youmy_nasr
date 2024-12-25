@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/components/product_card.dart';
 import 'package:merchant/data/model/Product.dart';
 import 'package:merchant/util/Constants.dart';
 
 import '../../../../../util/size_config.dart';
+import '../controller/products_controller.dart';
 
 class ProductsData extends StatefulWidget {
   bool isGridView = true;
@@ -19,29 +21,34 @@ class ProductsData extends StatefulWidget {
 class _ProductsDataState extends State<ProductsData> {
   @override
   Widget build(BuildContext context) {
-    return widget.isGridView
-        ? GridView.count(
+    return GetBuilder<ProductsController>(
+        init: ProductsController(context),
+    builder: (ProductsController controller) {
+    return controller.isLoading.value // إذا كانت البيانات لم تُجلب بعد، أظهر شاشة التحميل
+        ? Center(child: CircularProgressIndicator()) :widget.isGridView
+        ?controller.isLoading.value // إذا كانت البيانات لم تُجلب بعد، أظهر شاشة التحميل
+        ? Center(child: CircularProgressIndicator()) : GridView.count(
             shrinkWrap: true,
             crossAxisCount: 2,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
             padding: const EdgeInsets.all(8),
-            childAspectRatio: 1,
-            children: demoProducts
+            childAspectRatio: 1.1,
+            children: controller.productsD
                 .map((product) => ProductCard1(product: product))
                 .toList())
         :
     ListView.builder(
-      padding: const EdgeInsets.all(8),
-            itemCount: demoProducts.length,
+      padding: const EdgeInsets.only(left: 5,right: 5,top: 8,bottom: 15),
+            itemCount: controller.productsD.length,
             itemBuilder: (context, index) => Padding(
               padding: EdgeInsets.symmetric(vertical: 10),
               child: Dismissible(
-                key: Key(demoProducts[index].id.toString()),
+                key: Key(controller.productsD[index].id.toString()),
                 direction: DismissDirection.endToStart,
                 onDismissed: (direction) {
                   setState(() {
-                    demoProducts.removeAt(index);
+                    controller.productsD.removeAt(index);
                   });
                 },
                 background: Container(
@@ -51,9 +58,9 @@ class _ProductsDataState extends State<ProductsData> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-                child: ProductCard1(product: demoProducts[index]),
+                child: ProductCard1(product: controller.productsD[index]),
               ),
             ),
-          );
+          );});
   }
 }

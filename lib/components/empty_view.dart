@@ -5,7 +5,7 @@ import 'package:merchant/util/Constants.dart';
 import '../../../../../util/size_config.dart';
 
 class EmptyView extends StatelessWidget {
-  const EmptyView({Key? key}) : super(key: key);
+  const EmptyView({Key? key, required String message}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

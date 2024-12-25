@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:merchant/components/action_button.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/ui/home/components/product/comments/comments_screen.dart';
@@ -7,6 +8,7 @@ import 'package:merchant/util/CustomAlertDialog.dart';
 import 'package:merchant/util/size_config.dart';
 
 import '../data/model/Product.dart';
+import '../ui/home/components/product/controller/products_controller.dart';
 import 'components/body.dart';
 import 'components/custom_app_bar.dart';
 
@@ -17,8 +19,12 @@ class DetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ProductDetailsArguments agrs =
-        ModalRoute.of(context)!.settings.arguments as ProductDetailsArguments;
-    return Scaffold(
+    ModalRoute.of(context)!.settings.arguments as ProductDetailsArguments;
+    return GetBuilder<ProductsController>(
+
+        init: ProductsController(context),
+        builder: (ProductsController controller) {
+          return Scaffold(
       backgroundColor: KBackground,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -34,7 +40,11 @@ class DetailsScreen extends StatelessWidget {
               color: KInActiveColor,
               onPressed: () {
                 _displayDialog(
-                    context, 'Alert', 'Do you want to delete this product?!');
+                    context, 'Alert', 'Do you want to delete this product?!',(){
+                  controller.productDelete(agrs.product.id);
+                  controller.productsLists();
+                      Navigator.pop(context);
+                });
               },
             ),
           ),
@@ -57,10 +67,10 @@ class DetailsScreen extends StatelessWidget {
         ],
       ),
       body: Body(product: agrs.product),
-    );
+    );});
   }
 
-  _displayDialog(BuildContext context, String title, String message) async {
+  _displayDialog(BuildContext context, String title, String message,Function? Function() onTap) async {
     showDialog(
         context: context,
         builder: (context) {
@@ -76,7 +86,7 @@ class DetailsScreen extends StatelessWidget {
               actions: [
                 MaterialButton(
                     child: const Text("OK"),
-                    onPressed: () => Navigator.pop(context)),
+                    onPressed: onTap ),
                 MaterialButton(
                     child: const Text("Cancel"),
                     onPressed: () => Navigator.pop(context))

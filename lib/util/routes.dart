@@ -51,7 +51,7 @@ final Map<String, WidgetBuilder> routes = {
   SecurityScreen.routeName: (context) => const SecurityScreen(),
   ReportScreen.routeName: (context) => const ReportScreen(),
   BankAccountScreen.routeName: (context) => const BankAccountScreen(),
-  NewProductScreen.routeName: (context) => const NewProductScreen(),
+  NewProductScreen.routeName: (context) => const NewProductScreen(id:0),
   ProductBranchesFilterScreen.routeName: (context) =>
       const ProductBranchesFilterScreen(),
   NewOfferScreen.routeName: (context) => const NewOfferScreen(),

@@ -9,7 +9,11 @@ import '../../../../models/error_model.dart';
 import '../../../../models/login_model.dart';
 import '../../../../services/memory.dart';
 import '../../../../util/Constants.dart';
+import '../../../models/add_bank_account_error_model.dart';
+import '../../../models/bank_accounts_list_model.dart';
 import '../../../models/respone_bank_error.dart';
+import '../../../services/localization_services.dart';
+import '../../../services/translation_key.dart';
 
 
 class ProfileController extends GetxController{
@@ -17,10 +21,13 @@ class ProfileController extends GetxController{
   TextEditingController bankNameController =TextEditingController();
   TextEditingController branchNameController =TextEditingController();
   TextEditingController accountNumberrController =TextEditingController();
-
+  List<BankAccount> bankAccounts = [];
+  // List of job names to show in the dropdown
+  var isLoading = false.obs;
   Future<void> onInit() async {
     super.onInit();
     await CacheHelper.init();
+    await  getBankAccounts();
   }
 
   final String TAG = "Add Bank Account ";
@@ -52,7 +59,7 @@ class ProfileController extends GetxController{
     return CustomTextFormField(
       controller:ownerNameController ,
       textInputType: TextInputType.text,
-      hintText: 'Account Owner Name',
+      hintText: accountOwnerNameF.tr,
       onPressed: (value) {
         accountOwnerName = value;
       },
@@ -79,7 +86,7 @@ class ProfileController extends GetxController{
     return CustomTextFormField(
       controller: bankNameController,
       textInputType: TextInputType.text,
-      hintText: 'Bank Name',
+      hintText: bankNameF.tr,
       onPressed: (value) {
         bankName = value;
       },
@@ -106,7 +113,7 @@ class ProfileController extends GetxController{
     return CustomTextFormField(
       controller: branchNameController,
       textInputType: TextInputType.text,
-      hintText: 'Branch Name',
+      hintText: accountBranchNameF.tr,
       onPressed: (value) {
         branchName = value;
       },
@@ -133,7 +140,7 @@ class ProfileController extends GetxController{
     return CustomTextFormField(
       controller: accountNumberrController,
       textInputType: TextInputType.text,
-      hintText: 'Account Number',
+      hintText: accountNumber.tr,
       onPressed: (value) {
         accountOwner = value;
       },
@@ -157,10 +164,12 @@ class ProfileController extends GetxController{
   }
 
   Future<void> AddBankAccount(BuildContext context) async {
+    print(Get.find<CacheHelper>().getData(key: "branchCode"));
+    print(Get.find<CacheHelper>().getData(key: "companyCode"));
     String? token = await Get.find<CacheHelper>().getData(key: "token");
     final Dio dio = Dio(
       BaseOptions(
-        baseUrl: "https://apiezz.dalia-ezzat.com/api",
+        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
         validateStatus: (status) {
           return status != null && status < 500;
           // Process any status code < 500 without throwing exceptions
@@ -170,13 +179,13 @@ class ProfileController extends GetxController{
 
     try {
       final response = await dio.post(
-        "/v1/vendorbankaccounts",
+        "/api/v1/vendorbankaccounts",
           data: {
-            "companyCode": 1,
-            "branchCode": 1,
+            "companyCode":Get.find<CacheHelper>().getData(key: "companyCode"),
+            "branchCode": Get.find<CacheHelper>().getData(key: "branchCode"),
             "descriptionAra": "xxx",
             "descriptionEng": "rrr",
-            "vendorCode": "1",
+            "vendorCode": "111",
             "bankAccountName": ownerNameController.text.trim(),
             "bankCode": bankNameController.text.trim(),
             "bankBranchCode": branchNameController.text.trim(),
@@ -213,7 +222,7 @@ class ProfileController extends GetxController{
 
       } else {
         // Handle error responses (e.g., 401, 400, etc.)
-        ResponseBankErrorModel responseModel = ResponseBankErrorModel.fromJson(response.data);
+        AddBankAccountErrorModel responseModel = AddBankAccountErrorModel.fromJson(response.data);
 
         // Access the 'bankAccountNumber' list from the 'errors' object and join the errors
         String errorMessage = responseModel.errors?.bankAccountNumber?.join(", ") ?? "An error occurred";
@@ -257,6 +266,61 @@ class ProfileController extends GetxController{
       );
       print("Error: $e");
     }
+  }
+  Future<void> getBankAccounts() async {
+    bankAccounts = [];
+    String? token = await Get.find<CacheHelper>().getData(key: "token");
+    print("hello");
+    final Dio dio = Dio(
+      BaseOptions(
+        baseUrl:Get.find<CacheHelper>().getData(key: "Api"),
+        validateStatus: (status) {
+          return status != null && status < 500;
+        },
+      ),
+    );
+
+    isLoading.value = true; // Start loading
+
+    try {
+      final response = await dio.post(
+        "/api/v1/vendorbankaccounts/searchData",
+        data: {
+          "search": {
+            "companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
+            "LangId": Get.find<CacheHelper>()
+                .activeLocale == SupportedLocales.english?2:1,
+          },
+        },
+        options: Options(
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer ${token}"
+            }
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        // Successful response
+        BankAccountsListModel branchesListModel = BankAccountsListModel.fromJson(response.data);
+        bankAccounts = branchesListModel.data ?? [];
+        print(bankAccounts); // Save full job data if needed
+      } else {
+        // Error handling for failed response
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(content: Text('Failed to load bank accounts')),
+        );
+      }
+    } catch (e) {
+      // Handle any errors that occur during the API call
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(content: Text('Error occurred while connecting to the API')),
+      );
+    } finally {
+      isLoading.value = false; // Stop loading
+    }
+
+    update(); // Update UI
   }
 
 

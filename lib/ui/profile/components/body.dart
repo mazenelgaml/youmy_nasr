@@ -10,6 +10,7 @@ import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/auth/login/login_screen.dart';
 import 'package:merchant/ui/auth/signup/signup_screen.dart';
 import 'package:merchant/ui/profile/components/bank_account/bank_account_screen.dart';
+import 'package:merchant/ui/profile/components/bank_account/bank_accounts_inserted_screen.dart';
 import 'package:merchant/ui/profile/components/reports/reports_screen.dart';
 import 'package:merchant/ui/profile/components/security/security_screen.dart';
 import 'package:share_plus/share_plus.dart';
@@ -107,7 +108,7 @@ class _BodyState extends State<Body> {
             ProfileMenu(
               text: bankAccountInformation.tr,
               icon: Icons.wallet_travel,
-              press: () {Navigator.pushNamed(context, BankAccountScreen.routeName);},
+              press: () {Get.to(()=>BankAccountsInsertedScreen());},
             ),
             ProfileMenu(
               text: language.tr,
