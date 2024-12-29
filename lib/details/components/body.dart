@@ -21,6 +21,7 @@ class Body extends StatelessWidget {
     return SafeArea(
       child: ListView(
         children: [
+
           SizedBox(height: getProportionateScreenHeight(2),),
           ProductImages(product: product),
           TopRoundedContainer(
