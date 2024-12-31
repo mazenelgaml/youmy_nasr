@@ -127,7 +127,7 @@ class _BranchWorkingHoursBodyState extends State<BranchWorkingHoursBody> {
             child: Row(
               children: [
                 ...List.generate(
-                  demoProducts.length,
+                  9,
                       (index) {
                     if (demoProducts[index].isActive) {
                       return WorkingHourCard(product: demoProducts[index]);
@@ -149,7 +149,7 @@ class _BranchWorkingHoursBodyState extends State<BranchWorkingHoursBody> {
               //   _formKey.currentState!.save();
               await Get.find<CacheHelper>().saveData(key: "from", value: controller.fromHour);
               await Get.find<CacheHelper>().saveData(key: "to", value: controller.toHour);
-              DefaultTabController.of(context)!.animateTo(3);
+              DefaultTabController.of(context)!.animateTo(2);
               // }
             },
           ),

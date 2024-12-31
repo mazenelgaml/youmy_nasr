@@ -213,8 +213,8 @@ class BranchesController extends GetxController {
           return Courier(
               id: courierData.id,
               name: Get.find<CacheHelper>()
-                  .activeLocale == SupportedLocales.english?courierData.empNameEng:courierData.empNameAra,
-              mobile: courierData.mobile,
+                  .activeLocale == SupportedLocales.english?courierData.salesManNameEng:courierData.salesManNameAra,
+              mobile: courierData.mobile1,
               isActive: true);
         }).toList();
         print(couriersD);
@@ -222,7 +222,7 @@ class BranchesController extends GetxController {
       } else {
         // Error handling for failed response
         ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('Failed to load jobs')),
+          SnackBar(content: Text('Failed to load couriers')),
         );
       }
     } catch (e) {

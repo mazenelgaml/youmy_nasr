@@ -1,39 +1,28 @@
-
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:merchant/models/cities_list_model.dart';
 import 'package:merchant/util/extensions.dart';
-import 'package:path/path.dart';
 import '../../../../../components/custom_text_form_field.dart';
 import '../../../../../models/cities_list_model.dart' as model;
-
 import '../../../../../models/coutry_list_model.dart';
-import '../../../../../models/days_list_model.dart';
-import '../../../../../models/payment_types_list_model.dart';
 import '../../../../../models/region_list_model.dart';
-import '../../../../../models/sign_up_error_model.dart';
 import '../../../../../services/localization_services.dart';
 import '../../../../../services/memory.dart';
 import '../../../../../services/translation_key.dart';
 import '../../../../../util/Constants.dart';
-import '../branches_screen.dart';
 
-class NewBranchController extends GetxController {
+
+class NewCourierController extends GetxController {
 // List of job names to show in the dropdown
-  NewBranchController( this.context);
+  NewCourierController( this.context);
   BuildContext context;
   String? name, type, summary, address, workingHours, paymentTypes;
   bool daily = false;
   final List<String?> errors = [];
-  final List<int> hoursList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-   List<DaysList>? daysName=[];
-   List<String>selectDay=[];
-  List<PaymentType>? paymentName=[];
-  int fromHour = 1, toHour = 1;
+
   final formKey = GlobalKey<FormState>();
   String? email, mobile, job, password, confirmPassword;
   bool remember = false;
@@ -67,8 +56,8 @@ class NewBranchController extends GetxController {
   }
   CustomTextFormField buildStreetField() {
     return CustomTextFormField(
-        controller: streetController,
-        hintText: merchantStreet.tr,
+      controller: streetController,
+      hintText: merchantStreet.tr,
       onPressed: (value) {
         name = value;
       },
@@ -265,52 +254,98 @@ class NewBranchController extends GetxController {
       },
     );
   }
-  CustomTextFormField buildJobField() {
+  CustomTextFormField buildBuildingField() {
     return CustomTextFormField(
-      textInputType: TextInputType.text,
-      hintText: job?.tr??"Job",
-      suffixIcon: const Icon(Icons.arrow_drop_down),
+      controller: buildingController,
+      hintText: merchantBuilding.tr,
       onPressed: (value) {
-        job = value;
+        name = value;
       },
       onValidate: (value) {
         if (value!.isEmpty) {
-          addError(error: kJobNullError);
+          addError(error: kNameNullError);
           return "";
         } else if (value.toString().isEmpty) {
-          addError(error: kJobNullError);
+          addError(error: kNameNullError);
           return "";
         }
         return null;
       },
       onChange: (value) {
         if (value.isNotEmpty) {
-          removeError(error: kJobNullError);
+          removeError(error: kNameNullError);
+        }
+        return null;
+      },);
+  }
+  CustomTextFormField buildFlatField() {
+    return CustomTextFormField(
+      controller: apartmentController,
+      hintText: merchantFlat.tr,
+      textInputAction: TextInputAction.done,
+      onPressed: (value) {
+        name = value;
+      },
+      onValidate: (value) {
+        if (value!.isEmpty) {
+          addError(error: kNameNullError);
+          return "";
+        } else if (value.toString().isEmpty) {
+          addError(error: kNameNullError);
+          return "";
         }
         return null;
       },
-    );
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kNameNullError);
+        }
+        return null;
+      },);
+  }
+  CustomTextFormField buildFloorField() {
+    return CustomTextFormField(
+      controller: floorController,
+      hintText: merchantFloor.tr,
+      textInputAction: TextInputAction.next,
+      onPressed: (value) {
+        name = value;
+      },
+      onValidate: (value) {
+        if (value!.isEmpty) {
+          addError(error: kNameNullError);
+          return "";
+        } else if (value.toString().isEmpty) {
+          addError(error: kNameNullError);
+          return "";
+        }
+        return null;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kNameNullError);
+        }
+        return null;
+      },);
   }
   void addError({String? error}) {
     if (!errors.contains(error)) {
 
-        errors.add(error);
-        update();
+      errors.add(error);
+      update();
     }
   }
   void removeError({String? error}) {
     if (errors.contains(error)) {
 
-        errors.remove(error);
-   update();
+      errors.remove(error);
+      update();
     }
   }
   List<String>? selectCity=[];
   List<String>? selectCountry=[];
   var selectedCity = merchantSelectCity.tr;
   var selectedCountry = merchantCountry.tr;
-  int? dayCode;
-  int? paymentCode;
   int? countryCode;
   int? cityCode;
   int? regionCode;
@@ -330,8 +365,6 @@ class NewBranchController extends GetxController {
   TextEditingController buildingController = TextEditingController();
   TextEditingController floorController = TextEditingController();
   TextEditingController apartmentController = TextEditingController();
-  TextEditingController timeFromController = TextEditingController();
-  TextEditingController   timeToController = TextEditingController();
   ListTile buildRegionField() {
     return ListTile(
       title: Text(selectedRegion ?? 'Select region'),
@@ -610,346 +643,15 @@ class NewBranchController extends GetxController {
       );
     }update();
   }
-  Future<void> PostDaysLists() async {
-    print("hello");
-    final Dio dio = Dio(
-      BaseOptions(
-        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
-        validateStatus: (status) {
-          return status != null && status < 500;
-        },
-      ),
-    );
-    try {
-      final response = await dio.post(
-        "/api/v1/weekDays/searchData",
-        data: {
-          "search": {
-            "LangId": Get.find<CacheHelper>()
-                .activeLocale == SupportedLocales.english?2:1,
-          }
-
-        },
-        options: Options(
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: "token")}"
-          },
-        ),
-      );
-      if (response.statusCode == 200) {
-        print("aaaaaaaaaaaaaaa");
-        // Successful response
-        print(response.data,);
-        DaysListModel daysListModel = DaysListModel.fromJson(response.data);
-        daysName = daysListModel.data;
- // Save full job data if needed
-        selectDay = daysName?.map((day) => day.name ?? '').toList() ?? [];
-        update();
-        print(selectDay);
-        update();// Extract only job names
-      } else {
-        // Error handling for failed response
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('Failed to load days')),
-        );
-      }
-    } catch (e) {
-      // Handle any errors that occur during the API call
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(content: Text('Error occurred while connecting to the API')),
-      );
-    }update();
-  }
   @override
   Future<void> onInit() async {
     super.onInit();
     await CacheHelper.init();
     await getCurrentLocation(context);
-   await PostCountryLists();
-   await PostDaysLists();
-   await PostPaymentLists();
+    await PostCountryLists();
+
 
     // Fetch job data when the controller initializes
   }
-  CustomTextFormField buildBuildingField() {
-    return CustomTextFormField(
-        controller: buildingController,
-        hintText: merchantBuilding.tr,
-      onPressed: (value) {
-        name = value;
-      },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kNameNullError);
-          return "";
-        } else if (value.toString().isEmpty) {
-          addError(error: kNameNullError);
-          return "";
-        }
-        return null;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kNameNullError);
-        }
-        return null;
-      },);
-  }
-  CustomTextFormField buildFlatField() {
-    return CustomTextFormField(
-        controller: apartmentController,
-        hintText: merchantFlat.tr,
-        textInputAction: TextInputAction.done,
-      onPressed: (value) {
-        name = value;
-      },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kNameNullError);
-          return "";
-        } else if (value.toString().isEmpty) {
-          addError(error: kNameNullError);
-          return "";
-        }
-        return null;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kNameNullError);
-        }
-        return null;
-      },);
-  }
-  CustomTextFormField buildFloorField() {
-    return CustomTextFormField(
-        controller: floorController,
-        hintText: merchantFloor.tr,
-        textInputAction: TextInputAction.next,
-      onPressed: (value) {
-        name = value;
-      },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kNameNullError);
-          return "";
-        } else if (value.toString().isEmpty) {
-          addError(error: kNameNullError);
-          return "";
-        }
-        return null;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kNameNullError);
-        }
-        return null;
-      },);
-  }
-  var selectPayment = <String>[].obs;
-  var selectedPaymentMethods = <String, bool>{}.obs;
-  List<String> selectedPayments=[];
-  // Fetch payment methods from API
-  Future<void> PostPaymentLists() async {
-    print("Fetching Payment Methods...");
-    final Dio dio = Dio(
-      BaseOptions(
-        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
-        validateStatus: (status) {
-          return status != null && status < 500;
-        },
-      ),
-    );
 
-    try {
-      final response = await dio.post(
-        "/api/v1/paymentMethods/searchData",
-        data: {
-          "search": {
-            "LangId": Get.find<CacheHelper>().activeLocale == SupportedLocales.english ? 2 : 1,
-          },
-        },
-        options: Options(
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: 'token')}",
-          },
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        print("API Response: ${response.data}");
-        PaymentTypeListModel paymentListModel = PaymentTypeListModel.fromJson(response.data);
-        var paymentMethods = paymentListModel.data ?? [];
-        paymentName=paymentListModel.data??[];
-        selectPayment.value = paymentMethods.map((payment) => payment.paymentMethodName ?? '').toList();
-
-        // Initialize selected states
-        for (var payment in selectPayment) {
-          selectedPaymentMethods[payment] = false; // Set all to false initially
-        }
-        update();
-        print(selectPayment);
-      } else {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('Failed to load payment methods')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(content: Text('Error occurred while connecting to the API')),
-      );
-    }
-  }
-
-  // Toggle payment method state
-  void togglePaymentMethod(String paymentMethod) {
-    if (selectedPaymentMethods.containsKey(paymentMethod)) {
-      selectedPaymentMethods[paymentMethod] = !selectedPaymentMethods[paymentMethod]!;
-    } else {
-      selectedPaymentMethods[paymentMethod] = true;
-    }
-    update();
-  }
-
-  Future<void> createBranch(BuildContext context) async {
-    final Dio dio = Dio(BaseOptions(
-      baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
-      validateStatus: (status) {
-        return status != null && status <= 500;
-      },
-    ));
-
-    try {
-      var companyCode = Get.find<CacheHelper>().getData(key: "companyCode");
-      var name = Get.find<CacheHelper>().getData(key: "Name");
-      var mobileNumber = Get.find<CacheHelper>().getData(key: "mobileNumber");
-      var token = Get.find<CacheHelper>().getData(key: "token");
-
-      List<WorkingHour> workingHours = getWorkingHours();
-      if (workingHours == null || workingHours.isEmpty) {
-        throw Exception("Working hours are not available.");
-      }
-
-      List<Map<String, dynamic>> storeWorkDayList = workingHours.map((workingHour) {
-        String fromTime = "${workingHour.fromHour.toString().padLeft(2, '0')}:00:00";
-        String toTime = "${workingHour.toHour.toString().padLeft(2, '0')}:00:00";
-        return {
-          "companyCode": companyCode,
-          "dayCode": getDayCode(workingHour.title),
-          "fromTime": fromTime,
-          "toTime": toTime,
-        };
-      }).toList();
-
-      List<Map<String, dynamic>> storePaymentMethodList = [];
-      selectedPayments.forEach((paymentMethod) {
-        var paymentInfo;
-        if (paymentName != null) {
-          paymentInfo = paymentName?.firstWhere(
-                (payment) => payment.paymentMethodName == paymentMethod,
-            orElse: () => PaymentType(paymentMethodName: "Default", paymentMethodCode: "0"),
-          );
-
-          if (paymentInfo != null && paymentInfo.paymentMethodCode != "0") {
-            storePaymentMethodList.add({
-              "companyCode": companyCode,
-              "paymentMethodCode": "${paymentInfo.paymentMethodCode}",
-            });
-          } else {
-            print("No matching payment method found for: $paymentMethod");
-          }
-        }
-      });
-
-      var requestBody = {
-        "id": 0,
-        "companyCode": companyCode,
-        "descriptionAra": "uu",
-        "descriptionEng": "uu",
-        "companyNameAra": name,
-        "companyNameEng": name,
-        "companyTypeCode": "1",
-        "mobile1": "$mobileNumber",
-        "mobile2": "$mobileNumber",
-        "address": "${locationController.text.trim()}",
-        "tel1": "11",
-        "tel2": "11",
-        "fax1": "11",
-        "countryID": countryCode,
-        "cityCode": cityCode,
-        "zoneCode": regionCode,
-        "street": streetController.text.trim(),
-        "building": buildingController.text.trim(),
-        "apartment": apartmentController.text.trim(),
-        "floor": floorController.text.trim(),
-        "latitude": "${latitude}",
-        "longitude": "${longitude}",
-        "addressOnMap": "${locationController.text.trim()}",
-        "storePaymentMethodList": storePaymentMethodList,
-        "storeWorkDayList": storeWorkDayList,
-      };
-
-      print(requestBody);
-
-      final response = await dio.post("/api/v1/companies",
-          data: requestBody,
-        options: Options(
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: 'token')}",
-          },
-        ), );
-
-      if (response.statusCode == 200) {
-        Get.back();
-      } else {
-        print('Failed to create branch');
-      }
-    } catch (e) {
-      print('Error: $e');
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(content: Text('Error occurred while creating the branch: $e')),
-      );
-    }
-  }
-
-
-
-
-
-  int getDayCode(String day) {
-    switch (day.toLowerCase()) {
-      case "sunday":
-        return 1;
-      case "monday":
-        return 2;
-      case "tuesday":
-        return 3;
-      case "wednesday":
-        return 4;
-      case "thursday":
-        return 5;
-      case "friday":
-        return 6;
-      case "saturday":
-        return 7;
-      default:
-        return 0; // Default or unknown day
-    }
-  }
-  List<WorkingHour> getWorkingHours() {
-    return [
-      WorkingHour(title: "Monday", fromHour: 9, toHour: 17),
-      WorkingHour(title: "Tuesday", fromHour: 9, toHour: 17),
-      // Add other working hours as needed
-    ];
-  }
-}
-class WorkingHour {
-  final String title;
-  final int fromHour;
-  final int toHour;
-
-  WorkingHour({required this.title, required this.fromHour, required this.toHour});
 }

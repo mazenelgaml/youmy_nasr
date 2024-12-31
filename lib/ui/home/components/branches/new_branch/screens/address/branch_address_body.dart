@@ -59,6 +59,7 @@ class _BranchAddressBodyState extends State<BranchAddressBody> {
                   press: () {
                     KeyboardUtil.hideKeyboard(context);
                     controller.createBranch(context);
+                    Get.delete<NewBranchController>();
 
                   },
                 ),

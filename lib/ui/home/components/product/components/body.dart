@@ -3,7 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:merchant/components/empty_view.dart';
 import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/home/components/product/components/products_data.dart';
-import 'package:merchant/ui/home/components/product/new_product/new_product_screen.dart';
+
 import 'package:get/get.dart';
 import '../../../../../components/action_button.dart';
 import '../../../../../components/custom_text.dart';
@@ -12,8 +12,10 @@ import '../../../../../util/Constants.dart';
 import '../../../../../util/size_config.dart';
 import '../../../home_screen.dart';
 import '../filter/filter_screen.dart';
+import '../new_product/new_product_screen.dart';
 import '../search/search_screen.dart';
 import '../show_all_branches/product_branches_filter_screen.dart';
+import '../update_product/update_product_screen.dart';
 
 bool haveData = true;
 
@@ -110,7 +112,7 @@ class _ProductsBodyState extends State<ProductsBody> {
         children: [
           ActionButton(
             onPressed: () {
-              _showAction(context, 1); // add
+             Get.to(()=>NewProductScreen()); // add
             },
             icon: const Icon(
               Icons.add,
@@ -162,7 +164,7 @@ void handleClick(String value) {
 void _showAction(BuildContext context, int index) {
   switch (index) {
     case 1: // add
-      Get.to(()=> NewProductScreen( id: 0,));
+      Get.to(()=> UpdateProductScreen( id: 0,));
       break;
     case 2: // search
       Navigator.pushNamed(context, SearchScreen.routeName);

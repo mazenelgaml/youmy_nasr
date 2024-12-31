@@ -6,7 +6,8 @@ import 'package:get/get.dart';
 import '../../../../../../../components/custom_text.dart';
 import '../../../../../../../util/Constants.dart';
 import '../../../../../../../util/size_config.dart';
-import '../../../../product/new_product/new_product_screen.dart';
+
+import '../../../../product/update_product/update_product_screen.dart';
 
 bool haveData = true;
 
@@ -37,7 +38,7 @@ class Body extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: KPrimaryColor,
         onPressed: () {
-          Get.to(()=> NewProductScreen( id: 0,));
+          Get.to(()=> UpdateProductScreen( id: 0,));
         },
         child: const Icon(
           Icons.add,

@@ -136,6 +136,13 @@ class AppTranslations extends Translations {
           productUnitF:"Unit Name",
           productPriceF:"Product Price",
           productPriceAfterDiscountF:"Price After Discount",
+          selectVehicleF:"Select Vehicle",
+          carF:"Car",
+          motorBikeF:"Motorbike",
+          bikeF:"Bike",
+          otherF:"Other",
+          updateCourier:"Update Courier",
+          submit:"Submit",
         },
         "ar": {
           branchesScreenTitle: "الفروع",
@@ -268,7 +275,14 @@ class AppTranslations extends Translations {
           descriptionF: "الوصف",
           productUnitF: "اسم الوحدة",
           productPriceF: "سعر المنتج",
-          productPriceAfterDiscountF: "السعر بعد الخصم"
+          productPriceAfterDiscountF: "السعر بعد الخصم",
+          selectVehicleF: "اختر وسيلة النقل",
+          carF: "سيارة",
+          motorBikeF: "دراجة نارية",
+          bikeF: "دراجة",
+          otherF: "أخرى",
+          updateCourier: "تحديث المندوب",
+          submit:"تاكيد",
 
         }
       };

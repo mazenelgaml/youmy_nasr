@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:merchant/ui/home/components/product/new_product/new_product_screen.dart';
+
 
 
 import '../../components/custom_button.dart';
 import '../../data/model/Product.dart';
+import '../../ui/home/components/product/update_product/update_product_screen.dart';
 import '../../util/size_config.dart';
 import 'color_dots.dart';
 import 'product_description.dart';
@@ -39,7 +40,7 @@ class Body extends StatelessWidget {
                     child: CustomButton(
                       text: "Edit",
                       press: () {
-                        Get.to(()=> NewProductScreen( id: int.parse(product.id),));
+                        Get.to(()=> UpdateProductScreen( id: int.parse(product.id),));
                       },
 
                     ),

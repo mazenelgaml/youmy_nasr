@@ -3,10 +3,11 @@ import '../../../../../../../components/custom_button.dart';
 import '../../../../../../../components/custom_text.dart';
 import '../../../../../../../components/custom_text_form_field.dart';
 import '../../../../../../../components/form_error.dart';
+import '../../../../../../../services/translation_key.dart';
 import '../../../../../../../util/keyboard.dart';
 import '../../../../../../../util/size_config.dart';
 import '../../../../../home_screen.dart';
-
+import 'package:get/get.dart';
 
 class CourierAddressBody extends StatefulWidget {
   const CourierAddressBody({Key? key}) : super(key: key);
@@ -16,7 +17,7 @@ class CourierAddressBody extends StatefulWidget {
 }
 
 class _CourierAddressBodyState extends State<CourierAddressBody> {
-  //region variables
+
   final List<String> cities = [
     "Select City",
     "Cairo",
@@ -27,7 +28,6 @@ class _CourierAddressBodyState extends State<CourierAddressBody> {
     "Suiez",
     "Phayioum"
   ];
-
   final List<String> regions = [
     "Select Region",
     "Maddi",
@@ -38,7 +38,6 @@ class _CourierAddressBodyState extends State<CourierAddressBody> {
     "Nasr City",
     "Hadayek Helwan"
   ];
-
   final _formKey = GlobalKey<FormState>();
   String? name, type, summary, address, workingHours, paymentTypes;
   bool cash = false, visa = false, credit = false;
@@ -46,9 +45,6 @@ class _CourierAddressBodyState extends State<CourierAddressBody> {
   var selectedCity = "Select City";
   var selectedRegion = "Select Region";
 
-  //endregion
-
-  //region helper functions
 
   void addError({String? error}) {
     if (!errors.contains(error)) {
@@ -67,7 +63,7 @@ class _CourierAddressBodyState extends State<CourierAddressBody> {
   }
   CustomTextFormField buildLocationOnMapField() {
     return CustomTextFormField(
-      hintText: 'Location on map',
+      hintText: locationText.tr,
       suffixIcon: const Icon(Icons.location_on),
       readOnly: true,
       onPressed: () {},

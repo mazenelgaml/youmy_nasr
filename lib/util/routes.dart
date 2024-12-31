@@ -27,7 +27,8 @@ import 'package:merchant/ui/splash/splash_screen.dart';
 import '../ui/auth/confirm_verification/confirm_verification_screen.dart';
 import '../ui/home/components/orders/client_location/location_screen.dart';
 import '../ui/home/components/product/filter/filter_screen.dart';
-import '../ui/home/components/product/new_product/new_product_screen.dart';
+
+import '../ui/home/components/product/update_product/update_product_screen.dart';
 import '../ui/profile/notification/notification_details/notification_details_screen.dart';
 
 // We use name route
@@ -51,7 +52,7 @@ final Map<String, WidgetBuilder> routes = {
   SecurityScreen.routeName: (context) => const SecurityScreen(),
   ReportScreen.routeName: (context) => const ReportScreen(),
   BankAccountScreen.routeName: (context) => const BankAccountScreen(),
-  NewProductScreen.routeName: (context) => const NewProductScreen(id:0),
+  UpdateProductScreen.routeName: (context) => const UpdateProductScreen(id:0),
   ProductBranchesFilterScreen.routeName: (context) =>
       const ProductBranchesFilterScreen(),
   NewOfferScreen.routeName: (context) => const NewOfferScreen(),

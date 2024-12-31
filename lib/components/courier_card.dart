@@ -7,6 +7,7 @@ import 'package:merchant/ui/home/components/couriers/new_courier/new_courier_scr
 import '../data/model/courier.dart';
 import '../services/localization_services.dart';
 import '../services/memory.dart';
+import '../ui/home/components/couriers/update_courier.dart';
 import '../util/Constants.dart';
 import '../util/size_config.dart';
 import 'custom_text.dart';
@@ -104,7 +105,7 @@ class _CourierCardState extends State<CourierCard> {
                                   size: 30,
                                 ),
                                 onTap: () {
-                                  Navigator.pushNamed(context, NewCourierScreen.routeName);
+                                  Get.to(()=>UpdateCourier(courierId:widget.courier.id??0));
                                 },
                               ),
                               SizedBox(

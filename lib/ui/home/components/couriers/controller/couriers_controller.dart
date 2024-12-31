@@ -4,14 +4,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import '../../../../../data/model/courier.dart';
 import '../../../../../models/couriers_model.dart';
+import '../../../../../models/sign_up_error_model.dart';
 import '../../../../../services/localization_services.dart';
 import '../../../../../services/memory.dart';
 import '../../../../../util/Constants.dart';
-
 class CouriersController extends GetxController {
   List<CouriersDetails> couriersNames = [];
   List<Courier> couriersD = [];
-  var isLoading = false.obs; // Track loading state
+  var isLoading = false.obs;
 
   @override
   Future<void> onInit() async {
@@ -19,7 +19,6 @@ class CouriersController extends GetxController {
     await CacheHelper.init();
     await CouriersLists(); // Fetch job data when the controller initializes
   }
-
   void showToast(String message) {
     Fluttertoast.showToast(
         msg: message,
@@ -30,7 +29,6 @@ class CouriersController extends GetxController {
         textColor: KPrimaryColor,
         fontSize: 16.0);
   }
-
   Future<void> CouriersLists() async {
     couriersNames=[];
     String? token = await Get.find<CacheHelper>().getData(key: "token");
@@ -47,7 +45,7 @@ class CouriersController extends GetxController {
 
     try {
       final response = await dio.post(
-        "/api/v1/employees/search",
+        "/api/v1/salesMans/searchData",
         data: {
           "search": {"companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
             "branchCode": Get.find<CacheHelper>().getData(key: "branch"),
@@ -70,8 +68,8 @@ class CouriersController extends GetxController {
           return Courier(
               id: courierData.id,
               name: Get.find<CacheHelper>()
-                  .activeLocale == SupportedLocales.english?courierData.empNameEng:courierData.empNameAra,
-              mobile: courierData.mobile,
+                  .activeLocale == SupportedLocales.english?courierData.salesManNameEng:courierData.salesManNameAra,
+              mobile: courierData.mobile1,
               isActive: true);
         }).toList();
         print(couriersD);
@@ -93,7 +91,6 @@ class CouriersController extends GetxController {
 
     update(); // Update UI
   }
-
   Future<void> CouriersDelete(int empId) async {
     String? token = await Get.find<CacheHelper>().getData(key: "token");
     print("hello");
@@ -110,7 +107,7 @@ class CouriersController extends GetxController {
 
     try {
       final response = await dio.delete(
-        "/api/v1/employees/$empId",
+        "/api/v1/salesMans/$empId",
         options: Options(headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer ${token}"
@@ -137,4 +134,5 @@ class CouriersController extends GetxController {
 
     update(); // Update UI
   }
+
 }

@@ -14,11 +14,11 @@ import '../../../../../../../services/translation_key.dart';
 import '../../../../../../../util/size_config.dart';
 
 final List<String> vehicleTypes = [
-  "Select Vehicle",
-  "Car",
-  "Motorbike",
-  "Bike",
-  "Other"
+  selectVehicleF.tr,
+  carF.tr,
+  motorBikeF.tr,
+  bikeF.tr,
+  otherF.tr
 ];
 
 

@@ -10,9 +10,10 @@ import '../../../../../../../data/model/Product.dart';
 import '../../../../../../../util/Constants.dart';
 import '../../../../../../../util/size_config.dart';
 import '../../../../product/filter/filter_screen.dart';
-import '../../../../product/new_product/new_product_screen.dart';
+
 import '../../../../product/search/search_screen.dart';
 import '../../../../product/show_all_branches/product_branches_filter_screen.dart';
+import '../../../../product/update_product/update_product_screen.dart';
 import '../../../controller/branches_controller.dart';
 
 class BranchProductsScreen extends StatefulWidget {
@@ -163,7 +164,7 @@ class _BranchProductsScreenState extends State<BranchProductsScreen> {
   void _showAction(BuildContext context, int index) {
     switch (index) {
       case 1: // add
-        Get.to(()=> NewProductScreen( id: 0,));
+        Get.to(()=> UpdateProductScreen( id: 0,));
         break;
       case 2: // search
         Navigator.pushNamed(context, SearchScreen.routeName);

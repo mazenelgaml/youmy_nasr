@@ -152,6 +152,8 @@ class StartScreen extends StatelessWidget {
                                 controller.formKey.currentState!.save();
                                 KeyboardUtil.hideKeyboard(context);
                                 controller.signIn(context);
+                                controller.emailController.clear();
+                                controller.passwordController.clear();
                               }
                             },
                           ),

@@ -4,6 +4,7 @@ import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/data/model/Branch.dart';
 import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/home/components/branches/components/branches_data.dart';
+import 'package:merchant/ui/home/components/branches/controller/new_branch_controller.dart';
 import 'package:merchant/ui/home/components/branches/new_branch/new_branch_screen.dart';
 import 'package:merchant/util/Constants.dart';
 
@@ -39,6 +40,7 @@ class BranchesScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: KPrimaryColor,
         onPressed: () {
+          Get.put(NewBranchController(context));
           Navigator.pushNamed(context, NewBranchScreen.routeName);
         },
         child: const Icon(
