@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:merchant/components/action_button.dart';
-import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/ui/home/components/product/comments/comments_screen.dart';
 import 'package:merchant/util/Constants.dart';
-import 'package:merchant/util/CustomAlertDialog.dart';
 import 'package:merchant/util/size_config.dart';
-
 import '../data/model/Product.dart';
+import '../services/localization_services.dart';
+import '../services/memory.dart';
 import '../ui/home/components/product/controller/products_controller.dart';
 import 'components/body.dart';
-import 'components/custom_app_bar.dart';
 
 class DetailsScreen extends StatelessWidget {
   const DetailsScreen({Key? key}) : super(key: key);
@@ -21,7 +19,6 @@ class DetailsScreen extends StatelessWidget {
     final ProductDetailsArguments agrs =
     ModalRoute.of(context)!.settings.arguments as ProductDetailsArguments;
     return GetBuilder<ProductsController>(
-
         init: ProductsController(context),
         builder: (ProductsController controller) {
           return Scaffold(
@@ -32,7 +29,6 @@ class DetailsScreen extends StatelessWidget {
             onTap: () => Navigator.pop(context),
             child: const Icon(Icons.arrow_back)),
         actions: [
-
           Container(
             margin: EdgeInsets.only(right: getProportionateScreenWidth(10)),
             child: ActionButton(
@@ -40,7 +36,9 @@ class DetailsScreen extends StatelessWidget {
               color: KInActiveColor,
               onPressed: () {
                 _displayDialog(
-                    context, 'Alert', 'Do you want to delete this product?!',(){
+                    context, Get.find<CacheHelper>()
+                    .activeLocale == SupportedLocales.english?'Alert':"تنبيه", Get.find<CacheHelper>()
+                    .activeLocale == SupportedLocales.english?'Do you want to delete this product?!':"هل تريد مسح هذا المنتج",(){
                   controller.productDelete(agrs.product.id);
                   controller.productsLists();
                       Navigator.pop(context);
@@ -59,6 +57,8 @@ class DetailsScreen extends StatelessWidget {
             ),
             onPressed: () {
               Navigator.pushNamed(context,CommentsScreen.routeName);
+              int? code=int.tryParse(agrs.product.id);
+              controller.commentsOfProductList( agrs.product.itemCode??"" , agrs.product.branchCode??0);
             },
           ),
           SizedBox(
@@ -85,10 +85,12 @@ class DetailsScreen extends StatelessWidget {
               content: Text(message),
               actions: [
                 MaterialButton(
-                    child: const Text("OK"),
+                    child: Text(Get.find<CacheHelper>()
+                        .activeLocale == SupportedLocales.english?"OK":"حسنًا"),
                     onPressed: onTap ),
                 MaterialButton(
-                    child: const Text("Cancel"),
+                    child: Text(Get.find<CacheHelper>()
+                        .activeLocale == SupportedLocales.english?"Cancel":"إلغاء""Cancel"),
                     onPressed: () => Navigator.pop(context))
               ]);
         });

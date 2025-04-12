@@ -5,6 +5,10 @@ import 'package:get/get.dart';
 
 import '../../components/custom_button.dart';
 import '../../data/model/Product.dart';
+import '../../services/localization_services.dart';
+import '../../services/memory.dart';
+import '../../ui/home/components/branches/controller/branches_controller.dart';
+import '../../ui/home/components/product/controller/products_controller.dart';
 import '../../ui/home/components/product/update_product/update_product_screen.dart';
 import '../../util/size_config.dart';
 import 'color_dots.dart';
@@ -19,17 +23,20 @@ class Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return GetBuilder(
+        init: ProductsController(context),
+    builder: (ProductsController controller) {
     return SafeArea(
-      child: ListView(
+      child:controller.isLoading.value?CircularProgressIndicator(): ListView(
         children: [
           SizedBox(height: getProportionateScreenHeight(2),),
-          ProductImages(product: product),
+          ProductImages(product: controller.productDetailsD[0]),
           TopRoundedContainer(
             color: Colors.white,
             child: Column(
               children: [
                 ProductDescription(
-                  product: product,
+                  product: controller.productDetailsD[0]??product,
                   pressOnSeeMore: () {},
                 ),
                 SizedBox(height: getProportionateScreenHeight(80),),
@@ -38,7 +45,8 @@ class Body extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: CustomButton(
-                      text: "Edit",
+                      text: Get.find<CacheHelper>()
+                          .activeLocale == SupportedLocales.english?"Edit":"تعديل",
                       press: () {
                         Get.to(()=> UpdateProductScreen( id: int.parse(product.id),));
                       },
@@ -51,6 +59,6 @@ class Body extends StatelessWidget {
           ),
         ],
       ),
-    );
+    );});
   }
 }

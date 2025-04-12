@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:merchant/data/model/Product.dart';
 import '../../../../../components/custom_text_form_field.dart';
+import '../../../../../models/product_classifications_list_model.dart';
+import '../../../../../models/products_brands_list_model.dart';
 import '../../../../../models/products_groups_list_model.dart';
 import '../../../../../models/products_list_model.dart';
 import '../../../../../models/products_types_list_model.dart';
@@ -15,11 +17,14 @@ import '../../../../../services/localization_services.dart';
 import '../../../../../services/memory.dart';
 import '../../../../../services/translation_key.dart';
 import '../../../../../util/Constants.dart';
-import '../../../../../util/size_config.dart';
+import 'dart:convert';
+
 class NewProductController extends GetxController {
   final String TAG = "Add New Product ";
   String? productName, factoryName, description, uml, price, priceAfterDiscount;
   final formKey = GlobalKey<FormState>();
+  String selectedProductClassification=selectProductClass.tr;
+  String selectedProductBrand=selectProductBrand.tr;
   List<String?> errors = [];
   final List<String> uomList = [
     "Select Unit",
@@ -34,41 +39,41 @@ class NewProductController extends GetxController {
   TextEditingController descriptionController=TextEditingController();
   TextEditingController umlController=TextEditingController();
   TextEditingController priceController=TextEditingController();
+  TextEditingController productCodeController=TextEditingController();
   TextEditingController priceAfterDiscountController=TextEditingController();
   final List<String> categoriesList=["All"];
   var selectedUnit = "Select Unit";
   int selectedImage = 0;
-  var _pickedImage = File("");
+  var pickedImage = File("");
 int?productGroup;
-String selectedProductGroup="product groups";
   ListTile buildProductGroupField() {
     return ListTile(
-      title: Text(selectedProductGroup ?? 'product groups'),
-      trailing: Icon(Icons.arrow_drop_down,size: 40,),
+      title: Text(selectedGroup),
+      trailing: const Icon(Icons.arrow_drop_down,size: 40,),
       onTap: () async {
         showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text('Select Country'),
+              title: Text(selectedGroup),
               content: SingleChildScrollView(
                 child: ListTileTheme(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
                   minLeadingWidth: 40.0, // Set minimum leading width
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: productsGroupsD?.map((country) {
+                    children: productsGroupsD.map((country) {
                       return ListTile(
-                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
+                        leading: const Icon(Icons.location_on, size: 24.0), // Adjust icon size
                         title: Text(country),
                         onTap: () async{
-                          selectedProductGroup = country;
+                          selectedGroup = country;
                           Navigator.pop(context); // Close the dialog
                           update();
                           // Update the UI
                         },
                       );
-                    }).toList() ?? [],
+                    }).toList(),
                   ),
                 ),
               ),
@@ -78,49 +83,106 @@ String selectedProductGroup="product groups";
       },
     );
   }
-//endregion
-  GestureDetector buildSmallProductPreview(int index) {
-    return GestureDetector(
-      onTap: () {
-
-        selectedImage = index;
-        update();
+  final List<String> productImages = [];
+  ListTile buildProductclassificationField() {
+    return ListTile(
+      title: Text(selectedProductClassification),
+      trailing: const Icon(Icons.arrow_drop_down,size: 40,),
+      onTap: () async {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text(selectedProductClassification),
+              content: SingleChildScrollView(
+                child: ListTileTheme(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
+                  minLeadingWidth: 40.0, // Set minimum leading width
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: productsClassificationsD.map((selectedClass) {
+                      return ListTile(
+                        leading: const Icon(Icons.location_on, size: 24.0), // Adjust icon size
+                        title: Text(selectedClass),
+                        onTap: () async{
+                          selectedProductClassification = selectedClass;
+                          Navigator.pop(context); // Close the dialog
+                          update();
+                          // Update the UI
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
       },
-      child:  SizedBox(
-        width: getProportionateScreenWidth(70),
-        height: getProportionateScreenHeight(70),
-        child: CircleAvatar(
-          backgroundColor: Colors.grey,
-          backgroundImage: getImage(_pickedImage),
-        ),
-      ),
     );
   }
-  void pickImage() {
-    showDialog<ImageSource>(
-      context: context,
-      builder: (context) =>
-          AlertDialog(content: const Text("Choose image source"), actions: [
-            MaterialButton(
-              child: const Text("Camera"),
-              onPressed: () => Navigator.pop(context, ImageSource.camera),
-            ),
-            MaterialButton(
-              child: const Text("Gallery"),
-              onPressed: () => Navigator.pop(context, ImageSource.gallery),
-            ),
-          ]),
-    ).then((source) async {
-      if (source != null) {
-        final pickedFile = await ImagePicker().pickImage(source: source);
-        print('SOURCE ${pickedFile!.path}');
-
-
-        _pickedImage = File(pickedFile.path);
-        print('_pickedImage ${_pickedImage}');
-        update();
-      }
-    });
+  ListTile buildProductBrandField() {
+    return ListTile(
+      title: Text(selectedProductBrand),
+      trailing: const Icon(Icons.arrow_drop_down,size: 40,),
+      onTap: () async {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text(selectedProductBrand),
+              content: SingleChildScrollView(
+                child: ListTileTheme(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
+                  minLeadingWidth: 40.0, // Set minimum leading width
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: productsBrandsD.map((selectedBrand) {
+                      return ListTile(
+                        leading: const Icon(Icons.location_on, size: 24.0), // Adjust icon size
+                        title: Text(selectedBrand),
+                        onTap: () async{
+                          selectedProductBrand = selectedBrand;
+                          Navigator.pop(context); // Close the dialog
+                          update();
+                          // Update the UI
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+  void pickImage() async {
+    final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      productImages.add(pickedImage.path);
+      update(); // Update the UI
+    }
+  }
+  void removeImage() {
+    if (productImages.isNotEmpty) {
+      productImages.removeLast();
+      update(); // Update the UI
+    }
+  }
+  Widget buildSmallProductPreview(int index) {
+    if (index < productImages.length) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: CircleAvatar(
+          radius: 30, // Adjust the size of the circle
+          backgroundImage: FileImage(File(productImages[index])),
+          backgroundColor: Colors.grey.shade200, // Optional: Fallback color
+        ),
+      );
+    }
+    return Container();
   }
   ImageProvider getImage(File file) {
     if (file.path.isEmpty) {
@@ -129,7 +191,6 @@ String selectedProductGroup="product groups";
       return FileImage(file);
     }
   }
-  //region helper functions
   void addError({String? error}) {
     if (!errors.contains(error)) {
 
@@ -148,19 +209,17 @@ String selectedProductGroup="product groups";
     return CustomTextFormField(
       controller: productNameController,
       textInputType: TextInputType.text,
-      hintText: productNameF.tr,
+      hintText: createProductNameEng.tr,
       onPressed: (value) {
         productName = value;
       },
       onValidate: (value) {
         if (value!.isEmpty) {
           addError(error: kPProductNameNullError);
-          return "";
-        } else if (value
-            .toString()
-            .isEmpty) {
+          return "Product Name cannot be empty";
+        } else if (value.toString().isEmpty) {
           addError(error: kPProductNameNullError);
-          return "";
+          return "Product Name cannot be empty";
         }
         return null;
       },
@@ -172,23 +231,21 @@ String selectedProductGroup="product groups";
       },
     );
   }
-  CustomTextFormField buildFactoryNameField() {
+  CustomTextFormField buildProductNameAraField() {
     return CustomTextFormField(
-      controller: factoryNameController,
+      controller: productNameAraController,
       textInputType: TextInputType.text,
-      hintText: factoryNameF.tr,
+      hintText: createProductNameAra.tr,
       onPressed: (value) {
         factoryName = value;
       },
       onValidate: (value) {
         if (value!.isEmpty) {
           addError(error: kPFactoryNameNullError);
-          return "";
-        } else if (value
-            .toString()
-            .isEmpty) {
+          return "Factory Name cannot be empty";
+        } else if (value.toString().isEmpty) {
           addError(error: kPFactoryNameNullError);
-          return "";
+          return "Factory Name cannot be empty";
         }
         return null;
       },
@@ -204,19 +261,17 @@ String selectedProductGroup="product groups";
     return CustomTextFormField(
       controller: descriptionController,
       textInputType: TextInputType.text,
-      hintText:descriptionF.tr,
+      hintText: descriptionF.tr,
       onPressed: (value) {
         description = value;
       },
       onValidate: (value) {
         if (value!.isEmpty) {
           addError(error: kPDescriptionNullError);
-          return "";
-        } else if (value
-            .toString()
-            .isEmpty) {
+          return "Description cannot be empty";
+        } else if (value.toString().isEmpty) {
           addError(error: kPDescriptionNullError);
-          return "";
+          return "Description cannot be empty";
         }
         return null;
       },
@@ -239,18 +294,95 @@ String selectedProductGroup="product groups";
       onValidate: (value) {
         if (value!.isEmpty) {
           addError(error: kPDescriptionNullError);
-          return "";
-        } else if (value
-            .toString()
-            .isEmpty) {
+          return "UOM cannot be empty";
+        } else if (value.toString().isEmpty) {
           addError(error: kPDescriptionNullError);
-          return "";
+          return "UOM cannot be empty";
         }
         return null;
       },
       onChange: (value) {
         if (value.isNotEmpty) {
           removeError(error: kPDescriptionNullError);
+        }
+        return null;
+      },
+    );
+  }
+  CustomTextFormField buildPriceField() {
+    return CustomTextFormField(
+      controller: priceController,
+      textInputType: TextInputType.number,
+      hintText: productPriceF.tr,
+      onPressed: (value) {
+        price = value;
+      },
+      onValidate: (value) {
+        if (value!.isEmpty) {
+          addError(error: kPPriceNullError);
+          return "Price cannot be empty";
+        } else if (value.toString().isEmpty) {
+          addError(error: kPPriceNullError);
+          return "Price cannot be empty";
+        }
+        return null;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kPPriceNullError);
+        }
+        return null;
+      },
+    );
+  }
+  CustomTextFormField buildProductCodeField() {
+    return CustomTextFormField(
+      controller: productCodeController,
+      textInputType: TextInputType.number,
+      hintText: productCode.tr,
+      onPressed: (value) {
+        price = value;
+      },
+      onValidate: (value) {
+        if (value!.isEmpty) {
+          addError(error: kPPriceNullError);
+          return "Product Code cannot be empty";
+        } else if (value.toString().isEmpty) {
+          addError(error: kPPriceNullError);
+          return "Product Code cannot be empty";
+        }
+        return null;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kPPriceNullError);
+        }
+        return null;
+      },
+    );
+  }
+  CustomTextFormField buildPriceAfterDiscountField() {
+    return CustomTextFormField(
+      controller: priceAfterDiscountController,
+      textInputType: TextInputType.number,
+      textInputAction: TextInputAction.done,
+      hintText: productPriceAfterDiscountF.tr,
+      onPressed: (value) {
+        priceAfterDiscount = value;
+      },
+      onValidate: (value) {
+        if (value!.isEmpty) {
+          addError(error: kPPriceAfterDiscountNullError);
+          return "Price After Discount cannot be empty";
+        } else if (value.toString().isEmpty) {
+          addError(error: kPPriceAfterDiscountNullError);
+          return "Price After Discount cannot be empty";
+        }
+        return null;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kPPriceAfterDiscountNullError);
         }
         return null;
       },
@@ -279,81 +411,30 @@ String selectedProductGroup="product groups";
   //     },
   //   );
   // }
-  CustomTextFormField buildPriceField() {
-    return CustomTextFormField(
-      controller: priceController,
-      textInputType: TextInputType.number,
-      hintText: productPriceF.tr,
-      onPressed: (value) {
-        price = value;
-      },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kPPriceNullError);
-          return "";
-        } else if (value
-            .toString()
-            .isEmpty) {
-          addError(error: kPPriceNullError);
-          return "";
-        }
-        return null;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kPPriceNullError);
-        }
-        return null;
-      },
-    );
-  }
-  CustomTextFormField buildPriceAfterDiscountField() {
-    return CustomTextFormField(
-      controller: priceAfterDiscountController,
-      textInputType: TextInputType.number,
-      textInputAction: TextInputAction.done,
-      hintText: productPriceAfterDiscountF.tr,
-      onPressed: (value) {
-        priceAfterDiscount = value;
-      },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kPPriceAfterDiscountNullError);
-          return "";
-        } else if (value
-            .toString()
-            .isEmpty) {
-          addError(error: kPPriceAfterDiscountNullError);
-          return "";
-        }
-        return null;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kPPriceAfterDiscountNullError);
-        }
-        return null;
-      },
-    );
-  }
   BuildContext context;
   NewProductController(this.context);
   List<ProductDetails> productsNames = [];
   List<Product> productsD = [];
   List<ProductGroups> productsGroupsNames = [];
   List<String> productsGroupsD = [];
+  List<ProductsClassifications> productsClassificationsNames = [];
+  List<String> productsClassificationsD = [];
+  List<ProductsBrands> productsBrandsNames = [];
+  List<String> productsBrandsD = [];
   List<ProductDetails> allProductsNames = [];
   List<Product> allProductsD = [];
   var isLoading = false.obs;
   var selectedCategory = productCategory.tr;
+  var selectedBrand = selectProductBrand.tr;
+  var selectedGroup= selectProductGroup.tr;
   List<String>? selectCategory=[];
   List<ProductsTypes>? categoryName=[];
   String? categoryCode;
   ListTile buildCategoryField() {
 
     return ListTile(
-      title: Text(selectedCategory ?? 'Select category'),
-      trailing: Icon(Icons.arrow_drop_down,size: 40,),
+      title: Text(selectedCategory),
+      trailing: const Icon(Icons.arrow_drop_down,size: 40,),
       onTap: () async {
         showDialog(
           context: context,
@@ -362,13 +443,13 @@ String selectedProductGroup="product groups";
               title: Text(merchantType.tr),
               content: SingleChildScrollView(
                 child: ListTileTheme(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
                   minLeadingWidth: 40.0, // Set minimum leading width
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: selectCategory?.map((category) {
+                    children: productsGroupsD.map((category) {
                       return ListTile(
-                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
+                        leading: const Icon(Icons.propane_tank, size: 24.0), // Adjust icon size
                         title: Text(category),
                         onTap: () {
                           selectedCategory = category;
@@ -376,7 +457,7 @@ String selectedProductGroup="product groups";
                           update(); // Update the UI
                         },
                       );
-                    }).toList() ?? [],
+                    }).toList() ,
                   ),
                 ),
               ),
@@ -386,63 +467,68 @@ String selectedProductGroup="product groups";
       },
     );
   }
-  Future<void> PostCategories() async {
-    print("hello");
-    final Dio dio = Dio(
-      BaseOptions(
-        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
-        validateStatus: (status) {
-          return status != null && status < 500;
-        },
-      ),
-    );
-    try {
-      final response = await dio.post(
-        "/api/v1/itemtypes/searchData",
-        data: {
-          "search": {
-            "LangId": Get.find<CacheHelper>()
-                .activeLocale == SupportedLocales.english?2:1,
-          }
-
-        },
-        options: Options(
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: "token")}"
-          },
-        ),
-      );
-      if (response.statusCode == 200) {
-        print("aaaaaaaaaaaaaaa");
-        // Successful response
-        print(response.data,);
-        ProductsTypesListModel productsTypesListModel = ProductsTypesListModel.fromJson(response.data);
-        categoryName = productsTypesListModel.data;
-        print(categoryName);// Save full job data if needed
-        selectCategory = categoryName?.map((category) => category.itemTypeName?? '').toList() ?? [];
-        update();
-        print(selectCategory);
-        update();// Extract only job names
-      } else {
-        // Error handling for failed response
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('Failed to load company types')),
-        );
-      }
-    } catch (e) {
-      // Handle any errors that occur during the API call
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(content: Text('Error occurred while connecting to the API')),
-      );
-    }update();
-  }
+  // Future<void> postCategories() async {
+  //   isLoading=true.obs;
+  //   print("hello");
+  //   final Dio dio = Dio(
+  //     BaseOptions(
+  //       baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
+  //       validateStatus: (status) {
+  //         return status != null && status < 500;
+  //       },
+  //     ),
+  //   );
+  //   try {
+  //     final response = await dio.post(
+  //       "/api/v1/itemtypes/searchData",
+  //       data: {
+  //         "search": {
+  //           "LangId": Get.find<CacheHelper>()
+  //               .activeLocale == SupportedLocales.english?2:1,
+  //         }
+  //
+  //       },
+  //       options: Options(
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: "token")}"
+  //         },
+  //       ),
+  //     );
+  //     if (response.statusCode == 200) {
+  //       print("aaaaaaaaaaaaaaa");
+  //       // Successful response
+  //       print(response.data,);
+  //       ProductsTypesListModel productsTypesListModel = ProductsTypesListModel.fromJson(response.data);
+  //       categoryName = productsTypesListModel.data;
+  //       print(categoryName);// Save full job data if needed
+  //       selectCategory = categoryName?.map((category) => category.itemTypeName?? '').toList() ?? [];
+  //       print(selectCategory);
+  //       // Extract only job names
+  //     } else {
+  //       // Error handling for failed response
+  //       ScaffoldMessenger.of(Get.context!).showSnackBar(
+  //         const SnackBar(content: Text('Failed to load company types')),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     // Handle any errors that occur during the API call
+  //     ScaffoldMessenger.of(Get.context!).showSnackBar(
+  //       const SnackBar(content: Text('Error occurred while connecting to the API')),
+  //     );
+  //   }
+  //   isLoading=false.obs;
+  //   update();
+  // }
   @override
   Future<void> onInit() async {
     super.onInit();
     await CacheHelper.init();
-    await productsLists();
-    await PostCategories();// Fetch job data when the controller initializes
+    // await productsLists();
+    // await postCategories();
+    await productsGroupsList();
+    await productsClassificationsList();
+    await productsBrandsList();
   }
   void showToast(String message) {
     Fluttertoast.showToast(
@@ -455,8 +541,10 @@ String selectedProductGroup="product groups";
         fontSize: 16.0);
   }
   Future<void> productsLists() async {
-    isLoading=true.obs;
     productsNames=[];
+    productsD=[];
+    isLoading.value=true;
+    update();
     String? token = await Get.find<CacheHelper>().getData(key: "token");
     final Dio dio = Dio(
       BaseOptions(
@@ -481,7 +569,7 @@ String selectedProductGroup="product groups";
         },
         options: Options(headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer ${token}"
+          "Authorization": "Bearer $token"
         }),
       );
 
@@ -493,7 +581,7 @@ String selectedProductGroup="product groups";
         productsD = productsNames.map((productData) {
           return Product(
               images:["assets/images/logo.png"],
-              id: productData.id.toString()??"",
+              id: productData.id.toString(),
               rating: 3,
               isActive: true,  colors: [Colors.transparent], title: Get.find<CacheHelper>()
               .activeLocale == SupportedLocales.english? productData.itemNameEng??"":productData.itemNameAra??"",
@@ -504,16 +592,15 @@ String selectedProductGroup="product groups";
       } else {
         // Error handling for failed response
         ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('Failed to load products')),
+          const SnackBar(content: Text('Failed to load products')),
         );
       }
     } catch (e) {
       // Handle any errors that occur during the API call
       ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(content: Text('Error occurred while connecting to the API')),
+        const SnackBar(content: Text('Error occurred while connecting to the API')),
       );
     } finally {
-      isLoading=false.obs;
       isLoading.value = false;
       update();// Stop loading
     }
@@ -523,6 +610,7 @@ String selectedProductGroup="product groups";
   Future<void> productsGroupsList() async {
     isLoading=true.obs;
     productsNames=[];
+    productsD=[];
     String? token = await Get.find<CacheHelper>().getData(key: "token");
     final Dio dio = Dio(
       BaseOptions(
@@ -537,16 +625,16 @@ String selectedProductGroup="product groups";
     try {
       final response = await dio.post(
         "/api/v1/itemgroups/search",
-        data: {
-          {
-            "keyword": "",
-            "pageNumber": 0,
-            "pageSize": 0
+        data:{
+          "search":{
+
+            "langId":Get.find<CacheHelper>()
+                .activeLocale == SupportedLocales.english?2:1
           }
         },
         options: Options(headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer ${token}"
+          "Authorization": "Bearer $token"
         }),
       );
 
@@ -555,20 +643,140 @@ String selectedProductGroup="product groups";
         ProductsGroupsListModel couriesListModel =
         ProductsGroupsListModel.fromJson(response.data);
         productsGroupsNames = couriesListModel.data ?? [];
-        productsGroupsD = productsGroupsNames?.map((productGroupName) => Get.find<CacheHelper>()
-            .activeLocale == SupportedLocales.english?productGroupName.itemGroupNameEng??"":productGroupName.itemGroupNameAra ?? '').toList() ?? [];
-        print(productsD);
-        print(productsNames); // Save full job data if needed
+        productsGroupsD = productsGroupsNames.map((productGroupName) => Get.find<CacheHelper>()
+            .activeLocale == SupportedLocales.english?productGroupName.itemGroupNameEng??"":productGroupName.itemGroupNameAra ?? '').toList();
+        print(productsGroupsNames);
+        print(productsGroupsD); // Save full job data if needed
       } else {
         // Error handling for failed response
         ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('Failed to load products')),
+          const SnackBar(content: Text('Failed to load products')),
         );
       }
     } catch (e) {
       // Handle any errors that occur during the API call
+      print(e);
       ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(content: Text('Error occurred while connecting to the API')),
+        const SnackBar(content: Text('Error occurred while connecting to the API')),
+      );
+    } finally {
+      isLoading=false.obs;
+      isLoading.value = false;
+      update();// Stop loading
+    }
+
+    update(); // Update UI
+  }
+  Future<void> productsClassificationsList() async {
+    isLoading=true.obs;
+    productsNames=[];
+    productsD=[];
+    String? token = await Get.find<CacheHelper>().getData(key: "token");
+    final Dio dio = Dio(
+      BaseOptions(
+        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
+        validateStatus: (status) {
+          return status != null && status < 500;
+        },
+      ),
+    );
+    // Start loading
+
+    try {
+      final response = await dio.post(
+        "/api/v1/itemclassifications/searchData",
+        data:{
+          "search":{
+
+            "langId":Get.find<CacheHelper>()
+                .activeLocale == SupportedLocales.english?2:1
+          }
+        },
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Successful response
+        ProductsClassificationsListModel productsCalssificationsListModel =
+        ProductsClassificationsListModel.fromJson(response.data);
+        productsClassificationsNames = productsCalssificationsListModel.data ?? [];
+        productsClassificationsD = productsClassificationsNames.map((productGroupName) => productGroupName.itemClassName??"").toList();
+        print(productsGroupsNames);
+        print(productsGroupsD); // Save full job data if needed
+      } else {
+        // Error handling for failed response
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(content: Text('Failed to load products')),
+        );
+      }
+    } catch (e) {
+      // Handle any errors that occur during the API call
+      print(e);
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(content: Text('Error occurred while connecting to the API')),
+      );
+    } finally {
+      isLoading=false.obs;
+      isLoading.value = false;
+      update();// Stop loading
+    }
+
+    update(); // Update UI
+  }
+  Future<void> productsBrandsList() async {
+    isLoading=true.obs;
+    productsNames=[];
+    productsD=[];
+    String? token = await Get.find<CacheHelper>().getData(key: "token");
+    final Dio dio = Dio(
+      BaseOptions(
+        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
+        validateStatus: (status) {
+          return status != null && status < 500;
+        },
+      ),
+    );
+    // Start loading
+
+    try {
+      final response = await dio.post(
+        "/api/v1/itembrands/search",
+        data:{
+          "search":{
+
+            "langId":Get.find<CacheHelper>()
+                .activeLocale == SupportedLocales.english?2:1
+          }
+        },
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Successful response
+        ProductsBrandsListModel productsBrandsListModel =
+        ProductsBrandsListModel.fromJson(response.data);
+        productsBrandsNames = productsBrandsListModel.data?? [];
+        productsBrandsD = productsBrandsNames.map((productBrandName) => Get.find<CacheHelper>()
+            .activeLocale == SupportedLocales.english?productBrandName.itemBrandNameEng??"":productBrandName.itemBrandNameAra??"").toList();
+        print(productsBrandsNames);
+        print(productsBrandsD); // Save full job data if needed
+      } else {
+        // Error handling for failed response
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(content: Text('Failed to load products')),
+        );
+      }
+    } catch (e) {
+      // Handle any errors that occur during the API call
+      print(e);
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(content: Text('Error occurred while connecting to the API')),
       );
     } finally {
       isLoading=false.obs;
@@ -603,7 +811,7 @@ String selectedProductGroup="product groups";
         },
         options: Options(headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer ${token}"
+          "Authorization": "Bearer $token"
         }),
       );
 
@@ -624,13 +832,13 @@ String selectedProductGroup="product groups";
       } else {
         // Error handling for failed response
         ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('Failed to load products')),
+          const SnackBar(content: Text('Failed to load products')),
         );
       }
     } catch (e) {
       // Handle any errors that occur during the API call
       ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(content: Text('Error occurred while connecting to the API')),
+        const SnackBar(content: Text('Error occurred while connecting to the API')),
       );
     } finally {
       isLoading=false.obs;
@@ -659,7 +867,7 @@ String selectedProductGroup="product groups";
         "/api/v1/items/$productId",
         options: Options(headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer ${token}"
+          "Authorization": "Bearer $token"
         }),
       );
 
@@ -669,95 +877,134 @@ String selectedProductGroup="product groups";
       } else {
         // Error handling for failed response
         ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('Failed to delete product')),
+          const SnackBar(content: Text('Failed to delete product')),
         );
       }
     } catch (e) {
       // Handle any errors that occur during the API call
       ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(content: Text('Error occurred while connecting to the API')),
+        const SnackBar(content: Text('Error occurred while connecting to the API')),
       );
     } finally {
       isLoading.value = false; // Stop loading
     }
 
-    update(); // Update UI
+    update();
   }
-  Future<void> CreateProduct(BuildContext context) async {
-int productGroupCode=productsGroupsNames.firstWhere((group) => group.itemGroupNameAra==selectedProductGroup||group.itemGroupNameEng==selectedProductGroup).id??0;
-    final Dio dio = Dio(BaseOptions(
-      baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
-      validateStatus: (status) {
-        return status != null && status <= 500;
-      },
-    ));
+  Future<void> createProduct(BuildContext context) async {
+    int productGroupCode = productsGroupsNames
+        .firstWhere((group) =>
+    group.itemGroupNameAra == selectedGroup ||
+        group.itemGroupNameEng == selectedGroup)
+        .id ??
+        0;
+    int productClassCode = productsClassificationsNames
+        .firstWhere((group) =>
+    group.itemClassName == selectedProductClassification)
+        .id ??
+        0;
+    int productBrandCode = productsBrandsNames
+        .firstWhere((brand) =>
+    Get.find<CacheHelper>().activeLocale == SupportedLocales.english
+        ? brand.itemBrandNameEng == selectedProductBrand
+        : brand.itemBrandNameAra == selectedProductBrand)
+        .id ??
+        0;
+
+    final Dio dio = Dio(
+      BaseOptions(
+        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
+        validateStatus: (status) {
+          return status != null && status <= 500;
+        },
+      ),
+    );
 
     try {
-      final response = await dio.put(
-        "/api/v1/items",
-        data:{
+      // Encode images to Base64
+      List<String> base64Images = productImages.map((imagePath) {
+        final bytes = File(imagePath).readAsBytesSync();
+        return base64Encode(bytes);
+      }).toList();
 
-          "companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
-          "branchCode": Get.find<CacheHelper>().getData(key: "branchCode"),
-          "itemCode": "000124",
-          "itemNameAra": productNameController.text.trim(),
-          "itemNameEng": productNameAraController.text.trim(),
-          "itemGroupCode": "${productGroupCode}",
-          "itemClassCode": "1",
-          "itemBrandCode": "1",
-          "defaultSellPrice": priceController.text.trim(),
-          "price1": priceAfterDiscountController.text.trim(),
-          "price2": priceAfterDiscountController.text.trim(),
-          "price3": priceAfterDiscountController.text.trim(),
-          "productImageName": "string",
-          "productImageExtension": "string",
-          "productImageData": "baseData"
-        },
+      // Prepare request body
+      final requestBody = {
+        "companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
+        "branchCode": Get.find<CacheHelper>().getData(key: "branchCode"),
+        "itemCode": productCodeController.text.trim(),
+        "itemNameAra": productNameAraController.text.trim(),
+        "itemNameEng": productNameController.text.trim(),
+        "itemGroupCode": "$productGroupCode",
+        "itemClassCode": "$productClassCode",
+        "itemBrandCode": "$productBrandCode",
+        "defaultSellPrice": priceController.text.trim(),
+        "price1": priceAfterDiscountController.text.trim(),
+        "price2": priceAfterDiscountController.text.trim(),
+        "price3": priceAfterDiscountController.text.trim(),
+        "productImageName": "string", // Update this with proper image names if needed
+        "productImageExtension": "jpg", // Update this based on actual extensions
+        "productImageData": base64Images.isNotEmpty ? base64Images.first : "",
+        "request": {}, // Add required fields as per API documentation
+      };
+
+      // Print the request body for debugging
+      print("Request Body: ${jsonEncode(requestBody)}");
+
+      final response = await dio.post(
+        "/api/v1/items", // Updated API endpoint
+        data: requestBody,
         options: Options(
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: "token")}"
+            "Authorization":
+            "Bearer ${Get.find<CacheHelper>().getData(key: "token")}"
           },
         ),
       );
+
+      // Log the raw response data and status code for debugging
+      print("Response Status Code: ${response.statusCode}");
+      print("Raw Response Data: ${response.data}");
+      print("Response Headers: ${response.headers}");
+
+      // Handle the response
       if (response.statusCode == 200) {
-        print("ttttttttttttttttttttttttttt");
-        int?code=response.data;
+        if (response.data != null) {
+          if (response.data is int) {
+            print("Product created successfully with code: ${response.data}");
+            int code = response.data;
+            print("Code: $code");
+          } else {
+            print("Unexpected data format: ${response.data}");
+          }
+        } else {
+          print("Empty response from API.");
+        }
+
+        // Refresh product lists
         await productsLists();
         Get.back();
-
       } else {
-        // Log the entire response for debugging
-        print("Response Data: ${response.data}");
+        // Handle errors
+        SignUpErrorModel responseModel =
+        SignUpErrorModel.fromJson(response.data);
 
-        // Handle error model
-        SignUpErrorModel responseModel = SignUpErrorModel.fromJson(response.data);
+        String errorMessage = responseModel.messages?.isNotEmpty == true
+            ? responseModel.messages!.join(", ")
+            : "An error occurred, but no detailed message was provided.";
 
-        // Use messages if available
-        String errorMessage = "An error occurred, but no detailed message was provided.";
-
-        // Check if messages are available and not empty
-        if (responseModel.messages?.isNotEmpty == true) {
-          errorMessage = responseModel.messages!.join(", ");
-        }
-        // Check if vendorCode errors are available and not empty
-        else if (responseModel.errors?.vendorCode?.isNotEmpty == true) {
-          errorMessage = responseModel.errors!.vendorCode!.join(", ");
-        }
-
-        print("Messages: ${responseModel.messages}");
-        print("VendorCode Errors: ${responseModel.errors?.vendorCode}");
+        print("Error messages: $errorMessage");
 
         // Show error dialog
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("Error"),
+              title: const Text("Error"),
               content: Text(errorMessage),
               actions: [
                 TextButton(
-                  child: Text("OK"),
+                  child: const Text("OK"),
                   onPressed: () {
                     Get.back();
                   },
@@ -768,16 +1015,17 @@ int productGroupCode=productsGroupsNames.firstWhere((group) => group.itemGroupNa
         );
       }
     } catch (e) {
-      // Catch and log unexpected errors
+      print("Error: $e");
+
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Error"),
+            title: const Text("Error"),
             content: Text("An unexpected error occurred: $e"),
             actions: [
               TextButton(
-                child: Text("OK"),
+                child: const Text("OK"),
                 onPressed: () {
                   Get.back();
                 },
@@ -786,7 +1034,6 @@ int productGroupCode=productsGroupsNames.firstWhere((group) => group.itemGroupNa
           );
         },
       );
-      print("Error: $e");
     }
   }
 }

@@ -5,11 +5,13 @@ import 'package:merchant/ui/home/components/branches/new_branch/screens/delivery
 import 'package:get/get.dart';
 import '../../../../../../../components/custom_button.dart';
 import '../../../../../../../components/custom_text_form_field.dart';
+import '../../../../../../../data/model/Delivery.dart';
 import '../../../../../../../util/Constants.dart';
 import '../../../../../../../util/size_config.dart';
-
+import '../../../controller/new_branch_controller.dart';
+List<Delivery> demoDeliveries =[];
 class BranchDeliveryFeesTab extends StatefulWidget {
-  const BranchDeliveryFeesTab({Key? key}) : super(key: key);
+  const BranchDeliveryFeesTab({super.key});
 
   @override
   State<BranchDeliveryFeesTab> createState() => _BranchDeliveryFeesTabState();
@@ -77,7 +79,7 @@ class _BranchDeliveryFeesTabState extends State<BranchDeliveryFeesTab> {
 }
 
 class BottomSheetBody extends StatefulWidget {
-  const BottomSheetBody({Key? key}) : super(key: key);
+  const BottomSheetBody({super.key});
 
   @override
   State<BottomSheetBody> createState() => _BottomSheetBodyState();
@@ -86,7 +88,10 @@ class BottomSheetBody extends StatefulWidget {
 class _BottomSheetBodyState extends State<BottomSheetBody> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return GetBuilder(
+        init: NewBranchController(context),
+    builder: (NewBranchController controller) {
+    return  Padding(
       padding: EdgeInsets.symmetric(
           horizontal: getProportionateScreenWidth(20),
           vertical: getProportionateScreenWidth(20)),
@@ -108,6 +113,7 @@ class _BottomSheetBodyState extends State<BottomSheetBody> {
               SizedBox(height: getProportionateScreenWidth(20))
               ,
               CustomTextFormField(
+                controller: controller.distanceFromController,
                 hintText: fromText.tr,
                 textInputType: TextInputType.number,
                 onPressed: () {},
@@ -116,6 +122,7 @@ class _BottomSheetBodyState extends State<BottomSheetBody> {
               ),
               SizedBox(height: getProportionateScreenHeight(20)),
               CustomTextFormField(
+                controller: controller.distanceToController,
                   hintText: toText.tr,
                   textInputType: TextInputType.number,
                   textInputAction: TextInputAction.done,
@@ -124,6 +131,7 @@ class _BottomSheetBodyState extends State<BottomSheetBody> {
                   onValidate: () {}),
               SizedBox(height: getProportionateScreenHeight(40)),
               CustomTextFormField(
+                controller: controller.distanceTCostController,
                   hintText: costText.tr,
                   textInputType: TextInputType.number,
                   textInputAction: TextInputAction.done,
@@ -132,15 +140,25 @@ class _BottomSheetBodyState extends State<BottomSheetBody> {
                   onValidate: () {}),
               SizedBox(height: getProportionateScreenHeight(40)),
               CustomButton(
-                text: Create.tr,
-                press: () => {Navigator.pop(context)},
+                text: create.tr,
+                press: ()  async{
+                  controller.postDeliveryFees();
+                  Delivery newDelivery=Delivery(
+                      id:DateTime.now().millisecondsSinceEpoch,
+                      title: "Delivery Cost",
+                      from: double.parse(controller.distanceFromController.text.trim()),
+                      to: double.parse(controller.distanceToController.text.trim()),
+                      cost: double.parse(controller.distanceTCostController.text.trim()));
+                  demoDeliveries.add(newDelivery);
+
+                },
               ),
               SizedBox(height: getProportionateScreenHeight(40)),
             ],
           ),
         ),
       ),
-    );
+    );});
   }
 
 }

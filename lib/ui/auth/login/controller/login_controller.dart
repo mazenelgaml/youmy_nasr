@@ -1,15 +1,14 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:merchant/models/company_list_model.dart';
 import 'package:merchant/services/translation_key.dart';
-import 'package:merchant/util/extensions.dart';
-
+import 'package:merchant/models/about_us_model.dart' as us;
 import '../../../../components/custom_text_form_field.dart';
 import '../../../../models/branches_login_model.dart';
 import '../../../../models/error_model.dart';
 import '../../../../models/login_model.dart';
+import '../../../../models/privacy_model.dart' as p;
 import '../../../../services/localization_services.dart';
 import '../../../../services/memory.dart';
 import '../../../../util/Constants.dart';
@@ -19,94 +18,115 @@ import '../login_screen.dart';
 class LoginController extends GetxController {
   final String TAG = "LOG IN: ";
 bool isLoading=true;
-  final formKey = GlobalKey<FormState>();
+  bool _isObscure = true;
+  final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
+
   List<Company>? companyList;
   String? email, password,api,reportApi;
   List<String>? companyLogin;
   List<String?> errors = [];
-
   List<String>? branchesLogin;
   List<BranchesLogin>? branchesList;
   bool showSettingsFields = false;
-
+  List<us.Datum> aboutUs = [];
+  List<p.Datum> privacy = [];
   void toggleSettingsFields() {
 
     showSettingsFields = !showSettingsFields;
     update(); // Trigger UI update
   }
-
-  // Helper functions for managing errors
   void addError({String? error}) {
     if (!errors.contains(error)) {
       errors.add(error!);
       update();
     }
   }
-
   void removeError({String? error}) {
     if (errors.contains(error)) {
       errors.remove(error);
       update();
     }
   }
-
-  CustomTextFormField buildPasswordField() {
-    return CustomTextFormField(
-      controller: passwordController,
-      onPressed: (value) {
-        password = value;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kPassNullError);
-        } else if (value.length >= 8) {
-          removeError(error: kShortPassError);
-        }
-        return null;
-      },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kPassNullError);
-          return "";
-        } else if (value.length < 8) {
-          addError(error: kShortPassError);
-          return "";
-        }
-        return null;
-      },
-      hintText: signInTextPass.tr,
-      textInputType: TextInputType.visiblePassword,
-      textInputAction: TextInputAction.done,
-      suffixIcon: const Icon(Icons.visibility_off),
-    );
-  }
-
   CustomTextFormField buildEmailField() {
     return CustomTextFormField(
       controller: emailController,
       textInputType: TextInputType.emailAddress,
       hintText: signInTextEmail.tr,
       onPressed: (value) {
-        email = value;
+        emailController.text = value;
+      },
+      onChange: (value) {
+        // if (value.isNotEmpty) {
+        //   removeError(error: kEmailNullError); // Remove empty email error
+        // }
+        // if (value.isValidEmail()) {
+        //   removeError(error: kInvalidEmailError); // Remove invalid email error
+        // }
       },
       onValidate: (value) {
-        if (value.isEmpty) {
-          addError(error: kEmailNullError);
-          return "";
-        } else if (value.toString().isValidEmail()) {
-          addError(error: kInvalidEmailError);
-          return "";
-        }
+        // if (value == null || value.isEmpty) {
+        //   addError(error: kEmailNullError); // Add error if email is empty
+        //   return "Email cannot be empty";
+        // }
+        // if (!value.isValidEmail()) {
+        //   addError(error: kInvalidEmailError); // Add error if email is invalid
+        //   return "Enter a valid email address";
+        // }
         return null;
+      },
+    );
+  }
+  bool isPasswordVisible = true;
+
+  // Getter to access the visibility state
+  bool get isPasswordVisiblee => isPasswordVisible;
+
+  // Method to toggle visibility
+  void togglePasswordVisibility() {
+    isPasswordVisible = !isPasswordVisible;
+    update();  // Notify listeners to rebuild
+  }
+  CustomTextFormField buildPasswordField() {
+    return CustomTextFormField(
+      controller: passwordController,
+      onPressed: (value) {
+        passwordController.text = value;
       },
       onChange: (value) {
         if (value.isNotEmpty) {
-          removeError(error: kEmailNullError);
-        } else if (value.toString().isValidEmail()) {
-          removeError(error: kInvalidEmailError);
+          removeError(error: kPassNullError); // Remove empty password error
+        }
+        if (value.length >= 8) {
+          removeError(error: kShortPassError); // Remove short password error
+        }
+        update(); // Ensure UI updates after change
+      },
+      onValidate: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kPassNullError); // Add error if password is empty
+          return "Password cannot be empty";
+        }
+        if (value.length < 8) {
+          addError(error: kShortPassError); // Add error if password is too short
+          return "Password must be at least 8 characters long";
         }
         return null;
       },
+      hintText: signInTextPass.tr,
+      textInputType: TextInputType.visiblePassword,
+      textInputAction: TextInputAction.done,
+      obscureText: _isObscure, // Correctly access the visibility state
+      suffixIcon: IconButton(
+        icon: Icon(
+          _isObscure ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+          color: Colors.grey,
+        ),
+        onPressed: () {
+
+            _isObscure = !_isObscure;
+         update();
+        },
+      ),
     );
   }
   CustomTextFormField buildApiField() {
@@ -118,18 +138,19 @@ bool isLoading=true;
         api = value;
       },
       onChange: (value) {
-        // Handle API changes here
+        if (value.isNotEmpty) {
+          removeError(error: "API cannot be empty");
+        }
       },
       onValidate: (value) {
-        if (value!.isEmpty) {
+        if (value == null || value.isEmpty) {
           addError(error: "API cannot be empty");
-          return "API is required";
+          return "API field is required";
         }
         return null;
       },
     );
   }
-
   CustomTextFormField buildReportApiField() {
     return CustomTextFormField(
       controller: reportApiController,
@@ -142,18 +163,16 @@ bool isLoading=true;
         if (value.isNotEmpty) {
           removeError(error: "Report API cannot be empty");
         }
-        // Additional validation or logic here
       },
       onValidate: (value) {
-        if (value!.isEmpty) {
+        if (value == null || value.isEmpty) {
           addError(error: "Report API cannot be empty");
-          return "Report API is required";
+          return "Report API field is required";
         }
         return null;
       },
     );
   }
-
   TextEditingController apiController = TextEditingController();
   TextEditingController reportApiController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -187,11 +206,121 @@ bool isLoading=true;
     }
   }
 
+  @override
   Future<void> onInit() async {
     super.onInit();
     await CacheHelper.init();
-    await getCompany();
     await getBranches();
+    await getCompany();
+    await getAboutUs();
+
+  }
+
+  Future<void> getAboutUs() async {
+    aboutUs = [];
+    String? token = await Get.find<CacheHelper>().getData(key: "token");
+    print("hello");
+    final Dio dio = Dio(
+      BaseOptions(
+        baseUrl:Get.find<CacheHelper>().getData(key: "Api"),
+        validateStatus: (status) {
+          return status != null && status < 500;
+        },
+      ),
+    );
+
+    isLoading = true; // Start loading
+
+    try {
+      final response = await dio.post(
+        "/api/v1/contentManagementAboutUs/search",
+        data: {
+          "search": {
+            "companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
+          },
+        },
+        options: Options(
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer ${token}"
+            }
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        // Successful response
+        us.AboutUsModel aboutUsModel = us.AboutUsModel.fromJson(response.data);
+        aboutUs = aboutUsModel.data ?? [];
+        print(aboutUs); // Save full job data if needed
+      } else {
+        // Error handling for failed response
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(content: Text('Failed to load about us')),
+        );
+      }
+    } catch (e) {
+      // Handle any errors that occur during the API call
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(content: Text('Error occurred while connecting to the API')),
+      );
+    } finally {
+      isLoading = false; // Stop loading
+    }
+
+    update(); // Update UI
+  }
+  Future<void> getPrivacy() async {
+    aboutUs = [];
+    String? token = await Get.find<CacheHelper>().getData(key: "token");
+    print("hello");
+    final Dio dio = Dio(
+      BaseOptions(
+        baseUrl:Get.find<CacheHelper>().getData(key: "Api"),
+        validateStatus: (status) {
+          return status != null && status < 500;
+        },
+      ),
+    );
+
+    isLoading = true; // Start loading
+
+    try {
+      final response = await dio.post(
+        "/api/v1/privacies/search",
+        data: {
+          "search": {
+            "companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
+          },
+        },
+        options: Options(
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer ${token}"
+            }
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        // Successful response
+        p.PrivacyModel aprivacyModel = p.PrivacyModel.fromJson(response.data);
+        privacy = aprivacyModel.data ?? [];
+        print(privacy); // Save full job data if needed
+      } else {
+        // Error handling for failed response
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(content: Text('Failed to load about us')),
+        );
+      }
+    } catch (e) {
+      // Handle any errors that occur during the API call
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(content: Text('Error occurred while connecting to the API')),
+      );
+    } finally {
+      isLoading = false; // Stop loading
+    }
+
+    update(); // Update UI
   }
   Future<void> getCompany() async {
     isLoading=true;
@@ -208,7 +337,8 @@ bool isLoading=true;
         "/v1/companies/loginsearch",
         data: {
           "search":{
-            "langId":1
+            "langId":Get.find<CacheHelper>()
+                .activeLocale == SupportedLocales.english ?2:1
           }
         },
       );
@@ -216,6 +346,7 @@ bool isLoading=true;
       if (response.statusCode == 200) {
         CompanyListModel companyListModel = CompanyListModel.fromJson(response.data);
         companyList=companyListModel.data;
+        print(companyList);
         companyLogin = companyList?.map((company) => Get.find<CacheHelper>()
             .activeLocale == SupportedLocales.english ?company.companyNameEng ?? '':company.companyNameAra??"").toList() ?? [];
         print(companyLogin);
@@ -256,8 +387,8 @@ bool isLoading=true;
         await Get.find<CacheHelper>().saveData(key: "companyCode", value: companyCode);
         await Get.find<CacheHelper>().saveData(key: "companyName", value: merchantName);
         await Get.find<CacheHelper>().saveData(key: "year", value: yearController.text.trim());
-
-        if (loginModel.isHasPermission==true) {
+        Get.to(()=>LoginScreen());
+        if (loginModel.isHasPermission==false||loginModel.isHasPermission==true) {
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -307,7 +438,7 @@ bool isLoading=true;
                 TextButton(
                   child: Text("OK"),
                   onPressed: () {
-                    Get.back();
+                    Navigator.pop(context);
                   },
                 ),
               ],
@@ -326,7 +457,7 @@ bool isLoading=true;
               TextButton(
                 child: Text("OK"),
                 onPressed: () {
-                  Get.back();
+                  Navigator.pop(context);
                 },
               ),
             ],
@@ -362,7 +493,7 @@ bool isLoading=true;
         await Get.find<CacheHelper>().saveData(key: "token", value: "${loginModel.token}");
 
         await Get.find<CacheHelper>().saveData(key: "branchCode", value: branchCode);
-        if (loginModel.isHasPermission==true) {
+        if (loginModel.isHasPermission==false||loginModel.isHasPermission==true) {
           Get.offAllNamed(HomeScreen.routeName);
         } else {
           showDialog(

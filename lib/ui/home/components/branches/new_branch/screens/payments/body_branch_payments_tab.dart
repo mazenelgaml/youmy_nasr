@@ -36,7 +36,7 @@ class _BranchPaymentBodyState extends State<BranchPaymentBody> {
       init: NewBranchController(context),
       builder: (controller) {
         return Form(
-          key: controller.formKey,
+          key: controller.formKey3,
           child: Column(
             children: [
               SizedBox(height: getProportionateScreenHeight(10)),
@@ -91,7 +91,8 @@ class _BranchPaymentBodyState extends State<BranchPaymentBody> {
                   // Optionally show a message or use the selected payments elsewhere
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("Selected Payment Methods: ${controller.selectedPayments}")),
-                  );
+
+                  );DefaultTabController.of(context).animateTo(4);
                 },
               ),
               SizedBox(height: getProportionateScreenHeight(30)),

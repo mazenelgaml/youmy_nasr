@@ -32,37 +32,35 @@ class _CouriersDataState extends State<CouriersData> {
               EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20))
         ),
         SizedBox(height: getProportionateScreenWidth(10)),
-        Wrap(
-          spacing: 8,
-          runSpacing: 4,
-          children: [
-            "Maadi",
-            "Helwan",
-            "Tahrir",
-            "H-Kopa",
-            "New Cairo",
-            "All"
-          ]
-              .map((String name) => GestureDetector(
-            child: Chip(
-              avatar: CircleAvatar(
-                child: Text(name.substring(0, 1)),
+        Padding(
+          padding: const EdgeInsets.only(left: 3,right: 3,bottom:10),
+          child: Wrap(
+            spacing: 4,
+            runSpacing: 5,
+            children: controller.branches
+                .map((String name) => GestureDetector(
+              child: Chip(
+                avatar: CircleAvatar(
+                  child: Text(name.substring(0, 1)),
+                ),
+                label: Text(
+                  name,
+                ),
               ),
-              label: Text(
-                name,
-              ),
-            ),
-            onTap: () {
+              onTap: () async{
 
-              if(name=="All")
-              {
-                Navigator.pushNamed(context, ProductBranchesFilterScreen.routeName);
-              }
-              else
-                controller.showToast("$name is Pressed");
-            },
-          ))
-              .toList(),
+                if(name=="All")
+                {
+                  Navigator.pushNamed(context, ProductBranchesFilterScreen.routeName);
+                }
+                else{
+                  int branchCode=  controller.branchesNames?.firstWhere((branch) => branch.branchName == name).branchCode??0;
+                  await controller.CouriersListsOfBranch(branchCode);
+                }
+              },
+            ))
+                .toList(),
+          ),
         ),
 
         SingleChildScrollView(

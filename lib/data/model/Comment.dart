@@ -1,7 +1,8 @@
 
 class Comment {
   final int id;
-  final String username,text, date;
+  final String username,text;
+  final String? date;
 
 
 

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:merchant/components/custom_text_form_field.dart';
 import 'package:merchant/components/order_card.dart';
 import 'package:merchant/data/model/Order.dart';
+import 'package:merchant/services/translation_key.dart';
 import '../../../../../../components/custom_text.dart';
 import '../../../../../../util/keyboard.dart';
+import '../../controller/orders_controller.dart';
 
 class Body extends StatefulWidget {
   const Body({Key? key}) : super(key: key);
@@ -14,78 +17,31 @@ class Body extends StatefulWidget {
 
 class _BodyState extends State<Body> {
   List<Order> _orders = [];
-  final List<String> searchOptions = [
-    "Select Search Type",
-    "Order No",
-    "Client No",
-    "Client Name",
-  ];
-  var selectedOption= "Select Search Type";
-   SearchOption searchoption=SearchOption.ORDER_NO;
+
 
 
   @override
-  initState() {
-    _orders = demoOrders;
-    super.initState();
-  }
-
-  void _runFilter(String enteredKeyword,SearchOption searchOption) {
-    List<Order> results = [];
-    if (enteredKeyword.isEmpty) {
-      results = demoOrders;
-    }
-    else {
-      switch(searchOption)
-      {
-        case SearchOption.ORDER_NO :
-          results = demoOrders
-              .where((order) => order.orderNo
-              .toLowerCase()
-              .contains(enteredKeyword.toLowerCase()))
-              .toList();
-          break;
-        case SearchOption.CLIENT_NO:
-          results = demoOrders
-              .where((order) => order.clientNo
-              .toLowerCase()
-              .contains(enteredKeyword.toLowerCase()))
-              .toList();
-          break;
-          case SearchOption.CLIENT_NAME:
-          results = demoOrders
-              .where((order) => order.clientName
-              .toLowerCase()
-              .contains(enteredKeyword.toLowerCase()))
-              .toList();
-          break;
 
 
-      }
-
-    }
-
-    // Refresh the UI
-    setState(() {
-      _orders = results;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return GetBuilder(
+        init: OrdersController(),
+        builder: (OrdersController controller) {
+          return SingleChildScrollView(
       child: Column(
         children: [
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              child: buildSearchField()
+              child: controller.buildSearchField()
           ),
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: TextField(
-                onChanged: (value) => _runFilter(value,searchoption),
+                onChanged: (value) => controller.runFilter(value,controller.searchoption),
                 decoration: InputDecoration(
-                  hintText: "Enter data ...",
+                  hintText: searchHintText.tr,
                   suffixIcon: IconButton(
                     onPressed: () => {KeyboardUtil.hideKeyboard(context)},
                     icon: Icon(Icons.search),
@@ -93,51 +49,18 @@ class _BodyState extends State<Body> {
                 ),
               )),
           ...List.generate(
-            _orders.length,
+            controller.filteredOrders.length,
                 (index) {
-              return OrderCard(order: _orders[index]);// here by default width and height is 0
+              return OrderCard(order: controller.filteredOrders[index]);// here by default width and height is 0
             },
           ),
 
         ],
       ),
-    );
+    );});
   }
 
-  DropdownButton<String> buildSearchField() {
-    return DropdownButton(
-      hint: const CustomText(
-        text: 'Select Search Type',
-      ),
-      iconSize: 40,
-      isExpanded: true,
-      value: selectedOption,
-      items: searchOptions.map((String option) {
-        return DropdownMenuItem<String>(
-          child: Text(option),
-          value: option,
-        );
-      }).toList(),
-      onChanged: (value) {
-        setState(() {
-          selectedOption = value.toString();
-          switch(selectedOption)
-          {
-            case  "Order No":
-              searchoption=SearchOption.ORDER_NO;
-              break;
-            case  "Client No":
-              searchoption=SearchOption.CLIENT_NO;
-              break;
-            case "Client Name":
-              searchoption=SearchOption.CLIENT_NAME;
-              break;
 
-          }
-        });
-      },
-    );
-  }
 
 
 }

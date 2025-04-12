@@ -38,9 +38,9 @@ class _CourierCardState extends State<CourierCard> {
       padding:
       EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
       child: GestureDetector(
-        onTap: () => {
-          Navigator.pushNamed(context, NewCourierScreen.routeName)
-        },
+        // onTap: () => {
+        //   Navigator.pushNamed(context, NewCourierScreen.routeName)
+        // },
         child: Column(
           children: [
             Container(
@@ -122,9 +122,21 @@ class _CourierCardState extends State<CourierCard> {
                                   size: 30,
                                 ),
                                 onTap: () {
-                                  var activeStatus=widget.courier.isActive?'InActive':'Active';
-                                  _displayDialog(context,'Alert','Do you want to $activeStatus ${widget.courier.name??""} courier?!',(){});
+                                  var activeStatus = widget.courier.isActive ? 'InActive' : 'Active';
+                                  _displayDialog(
+                                    context,
+                                    'Alert',
+                                    'Do you want to $activeStatus ${widget.courier.name ?? ""} courier?!',
+                                        () {
+                                      controller.toggleCourierStatus(
+                                        widget.courier.id ?? 0,
+                                        widget.courier.isActive,
+                                      );
+                                      Navigator.pop(context);
+                                    },
+                                  );
                                 },
+
                               ),
                             ],
                           ),

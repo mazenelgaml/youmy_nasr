@@ -49,11 +49,11 @@ class _WorkingHourCardState extends State<WorkingHourCard> {
           child: SizedBox(
             width: getProportionateScreenWidth(widget.width),
             child: GestureDetector(
-              onTap: () => Navigator.pushNamed(
-                context,
-                DetailsScreen.routeName,
-                arguments: ProductDetailsArguments(product: widget.product),
-              ),
+              // onTap: () => Navigator.pushNamed(
+              //   context,
+              //   DetailsScreen.routeName,
+              //   arguments: ProductDetailsArguments(product: widget.product),
+              // ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

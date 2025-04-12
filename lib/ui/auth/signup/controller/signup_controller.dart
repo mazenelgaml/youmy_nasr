@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -7,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:merchant/ui/home/home_screen.dart';
 import 'package:merchant/util/extensions.dart';
+import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../../components/custom_text_form_field.dart';
 import '../../../../models/branches_login_model.dart';
@@ -66,6 +69,7 @@ SignupController( this.context);
     await getCurrentLocation(context);
     await getBranches();
     await PostCompanyTypesLists();
+    await PostCountryLists();
 
   }
   Future<void> checkLocationPermission() async {
@@ -79,7 +83,7 @@ SignupController( this.context);
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("يرجى تفعيل خدمة الموقع")),
+        const SnackBar(content: Text("يرجى تفعيل خدمة الموقع")),
       );
       return;
     }
@@ -89,7 +93,7 @@ SignupController( this.context);
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("تم رفض الإذن")),
+          const SnackBar(content: Text("تم رفض الإذن")),
         );
         return;
       }
@@ -97,7 +101,7 @@ SignupController( this.context);
 
     if (permission == LocationPermission.deniedForever) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("تم رفض الإذن بشكل دائم")),
+        const SnackBar(content: Text("تم رفض الإذن بشكل دائم")),
       );
       return;
     }
@@ -144,47 +148,44 @@ SignupController( this.context);
     );
   }
   final formKey = GlobalKey<FormState>();
+  final formKey1 = GlobalKey<FormState>();
+  final formKey2 = GlobalKey<FormState>();
+  final formKey3 = GlobalKey<FormState>();
   var pickedImage = File("");
   String? nameMerchant, type, summary, address, workingHours, paymentTypes;
   bool cash = false, visa = false, credit = false;
-
+  String? floor;
+  String? flat;
+  String? building;
+  String? street;
   String? email, name, mobile, job, password, confirmPassword;
   bool remember = false;
   final List<String?> errors = [];
    String? selectedJob;
-  void addError({String? error}) {
-    if (!errors.contains(error)) {
-      errors.add(error);
-      update();
-    }
-  }
-  void removeError({String? error}) {
-    if (errors.contains(error)) {
-      errors.remove(error);
-      update();
-    }
-  }
   CustomTextFormField buildPaymentTypesField() {
     return CustomTextFormField(
-        obscureText: true,
-        hintText: paymentTypes?.tr??"",
-        textInputAction: TextInputAction.done,
-        onPressed: (newValue) => paymentTypes = newValue,
-        onChange: (value) {
-          if (value.isNotEmpty) {
-            removeError(error: kMerchantPaymentTypesNullError);
-          }
-        },
-        onValidate: (value) {
-          if (value!.isEmpty) {
-            addError(error: kMerchantPaymentTypesNullError);
-            return "";
-          }
-          return null;
-        });
+      obscureText: true,
+      hintText: paymentTypes?.tr ?? "",
+      textInputAction: TextInputAction.done,
+      onPressed: (newValue) => paymentTypes = newValue,
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kMerchantPaymentTypesNullError);
+        }
+      },
+      onValidate: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kMerchantPaymentTypesNullError);
+          return "";
+        }
+        return null;
+      },
+    );
   }
   CustomTextFormField buildWorkingHoursField() {
     return CustomTextFormField(
+      hintText: workingHours?.tr ?? "",
+      textInputAction: TextInputAction.next,
       onPressed: (value) {
         workingHours = value;
       },
@@ -192,17 +193,14 @@ SignupController( this.context);
         if (value.isNotEmpty) {
           removeError(error: kMerchantWorkingHoursNullError);
         }
-        return null;
       },
       onValidate: (value) {
-        if (value!.isEmpty) {
+        if (value == null || value.isEmpty) {
           addError(error: kMerchantWorkingHoursNullError);
           return "";
         }
         return null;
       },
-      hintText: workingHours?.tr??"",
-      textInputAction: TextInputAction.next,
     );
   }
   CustomTextFormField buildAddressField() {
@@ -212,18 +210,15 @@ SignupController( this.context);
       onPressed: (value) {
         address = value;
       },
-      onValidate: (value) {
-        if (value.isEmpty) {
-          addError(error: kAddressNullError);
-          return "";
-        }
-        return null;
-      },
       onChange: (value) {
         if (value.isNotEmpty) {
           removeError(error: kAddressNullError);
-        } else if (value.toString().isValidEmail()) {
-          removeError(error: kAddressNullError);
+        }
+      },
+      onValidate: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kAddressNullError);
+          return "";
         }
         return null;
       },
@@ -237,19 +232,15 @@ SignupController( this.context);
       onPressed: (value) {
         nameMerchant = value;
       },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kMerchantNameNullError);
-          return "";
-        } else if (value.toString().isEmpty) {
-          addError(error: kMerchantNameNullError);
-          return "";
-        }
-        return null;
-      },
       onChange: (value) {
         if (value.isNotEmpty) {
           removeError(error: kMerchantNameNullError);
+        }
+      },
+      onValidate: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kMerchantNameNullError);
+          return "";
         }
         return null;
       },
@@ -263,105 +254,273 @@ SignupController( this.context);
       onPressed: (value) {
         summary = value;
       },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kMerchantSummaryNullError);
-          return "";
-        } else if (value.toString().isEmpty) {
-          addError(error: kMerchantSummaryNullError);
-          return "";
-        }
-        return null;
-      },
       onChange: (value) {
         if (value.isNotEmpty) {
           removeError(error: kMerchantSummaryNullError);
         }
-        return null;
-      },
-    );
-  }
-  CustomTextFormField buildConfirmPasswordField() {
-    return CustomTextFormField(
-      controller: passwordController,
-      obscureText: true,
-      textInputType: TextInputType.visiblePassword,
-      hintText: signUpConfirmPassword.tr,
-      textInputAction: TextInputAction.done,
-      suffixIcon: const Icon(Icons.visibility_off),
-      onPressed: (newValue) => confirmPassword = newValue,
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kConfirmPassNullError);
-        } else if (value.isNotEmpty && password == confirmPassword) {
-          removeError(error: kMatchPassError);
-        }
-        confirmPassword = value;
       },
       onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kConfirmPassNullError);
-          return "";
-        } else if ((password != value)) {
-          addError(error: kMatchPassError);
+        if (value == null || value.isEmpty) {
+          addError(error: kMerchantSummaryNullError);
           return "";
         }
         return null;
       },
     );
   }
+  bool _isPasswordVisible = false;
+  bool _isObscure = true;
+  bool _isObscureC = true;
   CustomTextFormField buildPasswordField() {
     return CustomTextFormField(
       controller: passwordController,
       onPressed: (value) {
-        password = value;
+        passwordController.text = value;
       },
       onChange: (value) {
         if (value.isNotEmpty) {
-          removeError(error: kPassNullError);
-        } else if (value.length >= 8) {
-          removeError(error: kShortPassError);
+          removeError(error: kPassNullError); // Remove empty password error
         }
-        return null;
+        if (value.length >= 8) {
+          removeError(error: kShortPassError); // Remove short password error
+        }
+        update(); // Ensure UI updates after change
       },
       onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kPassNullError);
-          return "";
-        } else if (value.length < 8) {
-          addError(error: kShortPassError);
-          return "";
+        if (value == null || value.isEmpty) {
+          addError(error: kPassNullError); // Add error if password is empty
+          return "Password cannot be empty";
+        }
+        if (value.length < 8) {
+          addError(error: kShortPassError); // Add error if password is too short
+          return "Password must be at least 8 characters long";
         }
         return null;
       },
-      hintText: signUpPassword.tr,
+      hintText: signInTextPass.tr,
       textInputType: TextInputType.visiblePassword,
-      suffixIcon: const Icon(Icons.visibility_off),
+      textInputAction: TextInputAction.done,
+      obscureText: _isObscure, // Correctly access the visibility state
+      suffixIcon: IconButton(
+        icon: Icon(
+          _isObscure ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+          color: Colors.grey,
+        ),
+        onPressed: () {
+
+          _isObscure = !_isObscure;
+          update();
+        },
+      ),
     );
+  }
+  CustomTextFormField buildConfirmPasswordField() {
+    return CustomTextFormField(
+      controller: confirmPasswordController,
+      textInputType: TextInputType.visiblePassword,
+      hintText: signUpConfirmPassword.tr,
+      textInputAction: TextInputAction.done,
+      obscureText: _isObscureC, // Correctly access the visibility state
+      suffixIcon: IconButton(
+        icon: Icon(
+          _isObscureC ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+          color: Colors.grey,
+        ),
+        onPressed: () {
+
+          _isObscureC = !_isObscureC;
+          update();
+        },
+      ),
+      onPressed: (newValue) => confirmPassword = newValue,
+      onChange: (value) {
+        confirmPasswordController.text = value;
+
+        // Remove errors if the field is not empty
+        if (value.isNotEmpty) {
+          removeError(error: kConfirmPassNullError);
+        }
+
+        // If the passwords match, remove the match error
+        if (passwordController.text == value) {
+          removeError(error: kMatchPassError);
+        } else {
+          addError(error: kMatchPassError); // Add mismatch error
+        }
+      },
+      onValidate: (value) {
+        // Handle empty input
+        if (value == null || value.isEmpty) {
+          addError(error: kConfirmPassNullError);
+          return "Please confirm your password";
+        }
+
+        // Handle password mismatch
+        if (passwordController.text != value) {
+          addError(error: kMatchPassError);
+          return "Passwords do not match";
+        }
+
+        // Remove errors if the passwords match
+        removeError(error: kConfirmPassNullError);
+        removeError(error: kMatchPassError);
+        return null;
+      },
+    );
+  }
+  void removeError({required String error}) {
+    if (errors.contains(error)) {
+      errors.remove(error);
+      print("Removed error: $error");
+      update(); // Notify listeners (if using a state management tool like GetX)
+    }
+  }
+  void addError({required String error}) {
+    if (!errors.contains(error)) {
+      errors.add(error);
+      print("Added error: $error");
+      update(); // Notify listeners
+    }
   }
   CustomTextFormField buildEmailField() {
     return CustomTextFormField(
-      controller: emailController,
+      controller: emailController, // Ensure this is a TextEditingController
       textInputType: TextInputType.emailAddress,
-      hintText: signUpEmail.tr,
+      hintText: signUpEmail.tr, // Ensure this is a String
       onPressed: (value) {
-        email = value;
+        email = value; // Ensure `email` is a String.
       },
-      onValidate: (value) {
+      onChange: (value) {
         if (value.isEmpty) {
           addError(error: kEmailNullError);
-          return "";
-        } else if (!value.toString().isValidEmail()) {
+          removeError(error: kInvalidEmailError);
+        } else if (!isValidEmail(value)) {
           addError(error: kInvalidEmailError);
+          removeError(error: kEmailNullError);
+        } else {
+          removeError(error: kEmailNullError);
+          removeError(error: kInvalidEmailError);
+        }
+      },
+      onValidate: (value) {
+        if (value == null || value.isEmpty) {
+          return kEmailNullError;
+        } else if (!isValidEmail(value)) {
+          return kInvalidEmailError;
+        }
+        return null;
+      },
+    );
+  }
+  bool isValidEmail(String value) {
+    final emailRegex = RegExp(
+      r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+    );
+    return emailRegex.hasMatch(value);
+  }
+  CustomTextFormField buildMobileField() {
+    return CustomTextFormField(
+      controller: mobileNumberController,
+      textInputType: TextInputType.phone,
+      hintText: mobileNO.tr,
+      onPressed: (value) {
+        mobile = value;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kMobileNullError);
+        }
+      },
+      onValidate: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kMobileNullError);
           return "";
         }
         return null;
       },
+    );
+  }
+  CustomTextFormField buildStreetField() {
+    return CustomTextFormField(
+      controller: streetController,
+      hintText: merchantStreet.tr,
+      onPressed: (value) {
+        street = value;
+      },
       onChange: (value) {
         if (value.isNotEmpty) {
-          removeError(error: kEmailNullError);
-        } else if (value.toString().isValidEmail()) {
-          removeError(error: kInvalidEmailError);
+          removeError(error: kStreetNullError);
+        }
+      },
+      onValidate: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kStreetNullError);
+          return "";
+        }
+        return null;
+      },
+    );
+  }
+  CustomTextFormField buildBuildingField() {
+    return CustomTextFormField(
+      controller: buildingController,
+      hintText: merchantBuilding.tr,
+      onPressed: (value) {
+        building = value;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kBuildingNullError);
+        }
+      },
+      onValidate: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kBuildingNullError);
+          return "";
+        }
+        return null;
+      },
+    );
+  }
+  CustomTextFormField buildFlatField() {
+    return CustomTextFormField(
+      controller: apartmentController,
+      hintText: merchantFlat.tr,
+      textInputAction: TextInputAction.done,
+      onPressed: (value) {
+        flat = value;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kFlatNullError);
+        }
+      },
+      onValidate: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kFlatNullError);
+          return "";
+        }
+        return null;
+      },
+    );
+  }
+  CustomTextFormField buildFloorField() {
+    return CustomTextFormField(
+      controller: floorController,
+      hintText: merchantFloor.tr,
+      textInputAction: TextInputAction.next,
+      onPressed: (value) {
+        floor = value;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kFloorNullError);
+        }
+      },
+      onValidate: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kFloorNullError);
+          return "";
         }
         return null;
       },
@@ -375,83 +534,147 @@ SignupController( this.context);
       onPressed: (value) {
         name = value;
       },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kNameNullError);
-          return "";
-        } else if (value.toString().isEmpty) {
-          addError(error: kNameNullError);
-          return "";
-        }
-        return null;
-      },
       onChange: (value) {
         if (value.isNotEmpty) {
           removeError(error: kNameNullError);
         }
-        return null;
-      },
-    );
-  }
-  CustomTextFormField buildMobileField() {
-    return CustomTextFormField(
-      controller: mobileNumberController,
-      textInputType: TextInputType.phone,
-      hintText: mobileNO.tr,
-      onPressed: (value) {
-        mobile = value;
       },
       onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kMobileNullError);
+        if (value == null || value.isEmpty) {
+          addError(error: kNameNullError);
           return "";
-        } else if (value.toString().isEmpty) {
-          addError(error: kMobileNullError);
-          return "";
-        }
-        return null;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kMobileNullError);
         }
         return null;
       },
     );
   }
-  CustomTextFormField buildStreetField() {
-    return CustomTextFormField(
-      controller: streetController,
-        hintText: merchantStreet.tr,
-        onPressed: () {},
-        onChange: () {},
-        onValidate: () {});
+   String kFloorNullError = "Please enter the floor.";
+   String kFlatNullError = "Please enter the flat.";
+   String kBuildingNullError = "Please enter the building.";
+   String kStreetNullError = "Please enter the street.";
+  String? validatePaymentTypes(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kMerchantPaymentTypesNullError);
+      return kMerchantPaymentTypesNullError;
+    }
+    removeError(error: kMerchantPaymentTypesNullError);
+    return null;
   }
-  CustomTextFormField buildBuildingField() {
-    return CustomTextFormField(
-      controller: buildingController,
-        hintText: merchantBuilding.tr,
-        onPressed: () {},
-        onChange: () {},
-        onValidate: () {});
+  String? validateWorkingHours(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kMerchantWorkingHoursNullError);
+      return kMerchantWorkingHoursNullError;
+    }
+    removeError(error: kMerchantWorkingHoursNullError);
+    return null;
   }
-  CustomTextFormField buildFlatField() {
-    return CustomTextFormField(
-      controller: apartmentController,
-        hintText: merchantFlat.tr,
-        textInputAction: TextInputAction.done,
-        onPressed: () {},
-        onChange: () {},
-        onValidate: () {});
+  String? validateAddress(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kAddressNullError);
+      return kAddressNullError;
+    }
+    removeError(error: kAddressNullError);
+    return null;
   }
-  CustomTextFormField buildFloorField() {
-    return CustomTextFormField(
-      controller: floorController,
-        hintText: merchantFloor.tr,
-        textInputAction: TextInputAction.next,
-        onPressed: () {},
-        onChange: () {},
-        onValidate: () {});
+  String? validateMerchantName(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kMerchantNameNullError);
+      return kMerchantNameNullError;
+    }
+    removeError(error: kMerchantNameNullError);
+    return null;
+  }
+  String? validateSummary(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kMerchantSummaryNullError);
+      return kMerchantSummaryNullError;
+    }
+    removeError(error: kMerchantSummaryNullError);
+    return null;
+  }
+  String? validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kPassNullError);
+      return kPassNullError;
+    } else if (value.length < 8) {
+      addError(error: kShortPassError);
+      return kShortPassError;
+    }
+    removeError(error: kPassNullError);
+    removeError(error: kShortPassError);
+    return null;
+  }
+  String? validateConfirmPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kConfirmPassNullError);
+      return kConfirmPassNullError;
+    } else if (value != password) {
+      addError(error: kMatchPassError);
+      return kMatchPassError;
+    }
+    removeError(error: kConfirmPassNullError);
+    removeError(error: kMatchPassError);
+    return null;
+  }
+  String? validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kEmailNullError);
+      return kEmailNullError;
+    } else if (!value.isValidEmail()) {
+      addError(error: kInvalidEmailError);
+      return kInvalidEmailError;
+    }
+    removeError(error: kEmailNullError);
+    removeError(error: kInvalidEmailError);
+    return null;
+  }
+  String? validateMobileNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kMobileNullError);
+      return kMobileNullError;
+    }
+    removeError(error: kMobileNullError);
+    return null;
+  }
+  String? validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kNameNullError);
+      return kNameNullError;
+    }
+    removeError(error: kNameNullError);
+    return null;
+  }
+  String? validateStreet(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kStreetNullError);
+      return kStreetNullError;
+    }
+    removeError(error: kStreetNullError);
+    return null;
+  }
+  String? validateBuilding(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kBuildingNullError);
+      return kBuildingNullError;
+    }
+    removeError(error: kBuildingNullError);
+    return null;
+  }
+  String? validateFlat(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kFlatNullError);
+      return kFlatNullError;
+    }
+    removeError(error: kFlatNullError);
+    return null;
+  }
+  String? validateFloor(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kFloorNullError);
+      return kFloorNullError;
+    }
+    removeError(error: kFloorNullError);
+    return null;
   }
   ListTile buildJobField(BuildContext context) {
     return  ListTile(
@@ -463,11 +686,11 @@ SignupController( this.context);
         textAlign: TextAlign.start,
       ),
       // Display the selected job or prompt to select
-      trailing: Icon(Icons.arrow_drop_down),
+      trailing: const Icon(Icons.arrow_drop_down),
       onTap: () async {
          selectedJob = await showMenu<String>(
           context: context,
-          position: RelativeRect.fromLTRB(200, 400, 200, 0), // Adjust position if needed
+          position: const RelativeRect.fromLTRB(200, 400, 200, 0), // Adjust position if needed
           items: jobNames.map((jobName) {
             return PopupMenuItem<String>(
               value: jobName,
@@ -599,36 +822,37 @@ SignupController( this.context);
       } else {
         // Error handling for failed response
         ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('Failed to load jobs')),
+          const SnackBar(content: Text('Failed to load jobs')),
         );
       }
     } catch (e) {
       // Handle any errors that occur during the API call
       ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(content: Text('Error occurred while connecting to the API')),
+        const SnackBar(content: Text('Error occurred while connecting to the API')),
       );
     }update();
   }
   ListTile buildCityField() {
     return ListTile(
-      title: Text(selectedCity ?? 'Select City'),
-      trailing: Icon(Icons.arrow_drop_down,size: 40,),
+      title: Text(selectedCity),
+      trailing: const Icon(Icons.arrow_drop_down,size: 40,),
       onTap: () async {
         await PostCityLists();
         showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text('Select City'),
+              title:  Text(Get.find<CacheHelper>()
+                  .activeLocale == SupportedLocales.english ?'Select City':"اختر المدينه"),
               content: SingleChildScrollView(
                 child: ListTileTheme(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
                   minLeadingWidth: 40.0, // Set minimum leading width
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: selectCity?.map((city) {
                       return ListTile(
-                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
+                        leading: const Icon(Icons.location_on, size: 24.0), // Adjust icon size
                         title: Text(city),
                         onTap: () {
                           selectedCity = city;
@@ -648,24 +872,25 @@ SignupController( this.context);
   }
   ListTile buildCountryField() {
     return ListTile(
-      title: Text(selectedCountry ?? 'Select Country'),
-      trailing: Icon(Icons.arrow_drop_down,size: 40,),
+      title: Text(selectedCountry),
+      trailing: const Icon(Icons.arrow_drop_down,size: 40,),
       onTap: () async {
         await PostCountryLists();
         showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text('Select Country'),
+              title:  Text(Get.find<CacheHelper>()
+                  .activeLocale == SupportedLocales.english ?'Select Country':"اختر البلد"),
               content: SingleChildScrollView(
                 child: ListTileTheme(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
                   minLeadingWidth: 40.0, // Set minimum leading width
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: selectCountry?.map((country) {
                       return ListTile(
-                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
+                        leading: const Icon(Icons.location_on, size: 24.0), // Adjust icon size
                         title: Text(country),
                         onTap: () {
                           selectedCountry = country;
@@ -686,10 +911,10 @@ SignupController( this.context);
   ListTile buildCompanyTypesField() {
 
     return ListTile(
-      title: Text(selectedCompanyTypes ?? 'Select Type'),
-      trailing: Icon(Icons.arrow_drop_down,size: 40,),
-      onTap: () async {
-        await PostCountryLists();
+      title: Text(selectedCompanyTypes),
+      trailing: const Icon(Icons.arrow_drop_down,size: 40,),
+      onTap: () {
+
         showDialog(
           context: context,
           builder: (context) {
@@ -697,13 +922,13 @@ SignupController( this.context);
               title: Text(merchantType.tr),
               content: SingleChildScrollView(
                 child: ListTileTheme(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
                   minLeadingWidth: 40.0, // Set minimum leading width
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: selectCompanyTypes?.map((country) {
                       return ListTile(
-                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
+                        leading: const Icon(Icons.location_on, size: 24.0), // Adjust icon size
                         title: Text(country),
                         onTap: () {
                           selectedCompanyTypes = country;
@@ -763,13 +988,13 @@ SignupController( this.context);
       } else {
         // Error handling for failed response
         ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('Failed to load company types')),
+          const SnackBar(content: Text('Failed to load company types')),
         );
       }
     } catch (e) {
       // Handle any errors that occur during the API call
       ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(content: Text('Error occurred while connecting to the API')),
+        const SnackBar(content: Text('Error occurred while connecting to the API')),
       );
     }update();
   }
@@ -816,13 +1041,13 @@ SignupController( this.context);
       } else {
         // Error handling for failed response
         ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('Failed to load cities')),
+          const SnackBar(content: Text('Failed to load cities')),
         );
       }
     } catch (e) {
       // Handle any errors that occur during the API call
       ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(content: Text('Error occurred while connecting to the API')),
+        const SnackBar(content: Text('Error occurred while connecting to the API')),
       );
     }update();
   }
@@ -867,19 +1092,26 @@ SignupController( this.context);
       } else {
         // Error handling for failed response
         ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('Failed to load cities')),
+          const SnackBar(content: Text('Failed to load cities')),
         );
       }
     } catch (e) {
       // Handle any errors that occur during the API call
       ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(content: Text('Error occurred while connecting to the API')),
+        const SnackBar(content: Text('Error occurred while connecting to the API')),
       );
     }update();
   }
   Future<void> signUp(BuildContext context) async {
-    int? branchCode = branchesList?.firstWhere((branch) => branch.branchNameAra==selectedBranch ||branch.branchNameEng == selectedBranch).branchCode;
-    await Get.find<CacheHelper>().saveData(key: "mobileNo", value: mobileNumberController.text.trim());
+    int? branchCode = branchesList
+        ?.firstWhere((branch) =>
+    branch.branchNameAra == selectedBranch ||
+        branch.branchNameEng == selectedBranch)
+        .branchCode;
+
+    await Get.find<CacheHelper>().saveData(
+        key: "mobileNo", value: mobileNumberController.text.trim());
+
     print(Get.find<CacheHelper>().getData(key: "year"));
     print(Get.find<CacheHelper>().getData(key: "companyCode"));
     print(emailController.text);
@@ -887,8 +1119,17 @@ SignupController( this.context);
     print(mobileNumberController.text);
     print(nameController.text);
     print(branchCode);
+
     int? jobCode = jobList?.firstWhere((job) => job.jobName == selectedJob).id;
     print(jobCode);
+
+    // Get and increment vendorCode
+    int vendorCode = Get.find<CacheHelper>().getData(key: "vendorCode") ?? 25; // Default to 1 if null
+    print("Current VendorCode: $vendorCode");
+
+    // Increment the vendorCode and save it back
+    vendorCode++;
+    await Get.find<CacheHelper>().saveData(key: "vendorCode", value: vendorCode);
 
     final Dio dio = Dio(BaseOptions(
       baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
@@ -904,60 +1145,56 @@ SignupController( this.context);
           "companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
           "branchCode": branchCode,
           "year": Get.find<CacheHelper>().getData(key: "year"),
-          "vendorcode": "444888",
+          "vendorcode": "$vendorCode", // Use the incremented vendorCode
           "vendorNameEng": nameController.text.trim(),
           "vendorNameAra": nameController.text.trim(),
           "email": emailController.text.trim(),
           "mobile1": mobileNumberController.text.trim(),
           "isMerchant": true,
-          "jobCode": "$jobCode",  // ensure it's a string
+          "jobCode": "$jobCode", // Ensure it's a string
           "password": passwordController.text.trim()
         },
         options: Options(
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: "token")}"
+            "Authorization":
+            "Bearer ${Get.find<CacheHelper>().getData(key: "token")}"
           },
         ),
       );
 
       if (response.statusCode == 200) {
-        print("ttttttttttttttttttttttttttt");
-        int?code=response.data;
+        print("Vendor successfully created!");
         DefaultTabController.of(context).animateTo(1);
-
       } else {
         // Log the entire response for debugging
         print("Response Data: ${response.data}");
 
         // Handle error model
-        SignUpErrorModel responseModel = SignUpErrorModel.fromJson(response.data);
+        SignUpErrorModel responseModel =
+        SignUpErrorModel.fromJson(response.data);
 
-        // Use messages if available
-        String errorMessage = "An error occurred, but no detailed message was provided.";
+        String errorMessage =
+            "An error occurred, but no detailed message was provided.";
 
-        // Check if messages are available and not empty
         if (responseModel.messages?.isNotEmpty == true) {
           errorMessage = responseModel.messages!.join(", ");
-        }
-        // Check if vendorCode errors are available and not empty
-        else if (responseModel.errors?.vendorCode?.isNotEmpty == true) {
+        } else if (responseModel.errors?.vendorCode?.isNotEmpty == true) {
           errorMessage = responseModel.errors!.vendorCode!.join(", ");
         }
 
         print("Messages: ${responseModel.messages}");
         print("VendorCode Errors: ${responseModel.errors?.vendorCode}");
 
-        // Show error dialog
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("Error"),
+              title: const Text("Error"),
               content: Text(errorMessage),
               actions: [
                 TextButton(
-                  child: Text("OK"),
+                  child: const Text("OK"),
                   onPressed: () {
                     Get.back();
                   },
@@ -968,16 +1205,15 @@ SignupController( this.context);
         );
       }
     } catch (e) {
-      // Catch and log unexpected errors
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Error"),
+            title: const Text("Error"),
             content: Text("An unexpected error occurred: $e"),
             actions: [
               TextButton(
-                child: Text("OK"),
+                child: const Text("OK"),
                 onPressed: () {
                   Get.back();
                 },
@@ -1098,11 +1334,11 @@ SignupController( this.context);
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("Error"),
+              title: const Text("Error"),
               content: Text(errorMessage),
               actions: [
                 TextButton(
-                  child: Text("OK"),
+                  child: const Text("OK"),
                   onPressed: () {
                     Get.back();
                   },
@@ -1118,11 +1354,11 @@ SignupController( this.context);
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Error"),
+            title: const Text("Error"),
             content: Text("An unexpected error occurred: $e"),
             actions: [
               TextButton(
-                child: Text("OK"),
+                child: const Text("OK"),
                 onPressed: () {
                   Get.back();
                 },
@@ -1136,24 +1372,25 @@ SignupController( this.context);
   }
   ListTile buildRegionField() {
     return ListTile(
-      title: Text(selectedRegion ?? 'Select region'),
-      trailing: Icon(Icons.arrow_drop_down,size: 40,),
+      title: Text(selectedRegion),
+      trailing: const Icon(Icons.arrow_drop_down,size: 40,),
       onTap: () async {
         await PostRegionLists();
         showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text('Select Region'),
+              title:  Text(Get.find<CacheHelper>()
+                  .activeLocale == SupportedLocales.english ?'Select Region':"اختر المنطقه"),
               content: SingleChildScrollView(
                 child: ListTileTheme(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
                   minLeadingWidth: 40.0, // Set minimum leading width
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: selectRegion?.map((region) {
                       return ListTile(
-                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
+                        leading: const Icon(Icons.location_on, size: 24.0), // Adjust icon size
                         title: Text(region),
                         onTap: () {
                           selectedRegion = region;
@@ -1216,13 +1453,13 @@ SignupController( this.context);
       } else {
         // Error handling for failed response
         ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(content: Text('Failed to load regions')),
+          const SnackBar(content: Text('Failed to load regions')),
         );
       }
     } catch (e) {
       // Handle any errors that occur during the API call
       ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(content: Text('Error occurred while connecting to the API')),
+        const SnackBar(content: Text('Error occurred while connecting to the API')),
       );
 
     }
@@ -1231,16 +1468,98 @@ SignupController( this.context);
     update();
 
   }
-  void submit() {
-    if (formKey.currentState!.validate()) {
-      formKey.currentState!.save();
-      // Proceed with form submission
-      print('Name: $name');
-      print('Email: $email');
-      print('Mobile: $mobile');
-      print('Job: $job');
-      print('Password: $password');
-      print('Confirm Password: $confirmPassword');
+  TextEditingController descController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
+  Map<String, dynamic>? selectedFileData;
+
+  Future<void> pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null && result.files.single.path != null) {
+      File file = File(result.files.single.path!);
+      String fileBase64 = base64Encode(file.readAsBytesSync());
+      String filePath = file.path;
+      String fileName = basename(filePath);
+      String fileExtension = extension(filePath).replaceFirst('.', '');
+      int fileSize = await file.length();
+
+      selectedFileData = {
+        "companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
+        "fileFullName": fileName,
+        "fileName": fileName,
+        "fileExtension": fileExtension,
+        "filePath": filePath,
+        "fileBase64": fileBase64,
+        "originalPath": filePath,
+        "fileSize": fileSize.toString()
+        // description هيتحط وقت الرفع
+      };
+
+      Get.snackbar("تم اختيار الملف", fileName);
+    } else {
+      print('لم يتم اختيار أي ملف');
     }
   }
+  Future<void> uploadSelectedFile(String description) async {
+    print("hellooooooooooooo1");
+
+    if (selectedFileData == null) {
+      Get.snackbar("خطأ", "من فضلك اختر ملف أولاً");
+      return;
+    }
+
+    print("hellooooooooooooo2");
+
+    // إضافة الوصف إلى الداتا قبل الإرسال
+    selectedFileData!["description"] = description;
+
+    // طباعة البيانات للتأكد منها
+    print("Data to send: ${selectedFileData}");
+
+    print("hellooooooooooooo3");
+
+    final Dio dio = Dio(BaseOptions(
+      baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
+      validateStatus: (status) => status != null && status <= 500,
+    ));
+
+    try {
+      print("hellooooooooooooo4");
+
+      final response = await dio.post(
+        "/api/v1/branchAttachments",
+        data: selectedFileData,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: "token")}"
+          },
+        ),
+      );
+
+      // طباعة الاستجابة
+      print("Response status: ${response.statusCode}");
+      print("Response data: ${response.data}");
+
+      if (response.statusCode == 200) {
+        // إغلاق الـ BottomSheet باستخدام Get.back()
+        Get.snackbar("نجاح", "تم رفع الملف بنجاح");
+        update();
+        Navigator.pop(context); // Close the BottomSheet
+      } else {
+        print("Response Data: ${response.data}");
+        Get.snackbar("فشل", "حدث خطأ أثناء رفع الملف: ${response.data}");
+      }
+    } catch (e) {
+      // طباعة الخطأ بالكامل
+      print("Error: $e");
+      Get.defaultDialog(
+        title: "خطأ",
+        middleText: "حدث خطأ أثناء رفع الملف: $e",
+      );
+    }
+  }
+
+
+
 }

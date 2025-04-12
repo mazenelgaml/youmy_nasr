@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:merchant/ui/home/components/product/filter/components/body.dart';
 import '../../../../../components/custom_text.dart';
+import '../../../../../services/localization_services.dart';
+import '../../../../../services/memory.dart';
 import '../../../../../util/Constants.dart';
+import '../controller/products_controller.dart';
 
 class FilterScreen extends StatefulWidget {
   const FilterScreen({Key? key}) : super(key: key);
@@ -13,21 +17,26 @@ class FilterScreen extends StatefulWidget {
 
 class _FilterScreenState extends State<FilterScreen> {
   Icon customIcon = const Icon(Icons.search);
-  Widget customSearchBar = const CustomText(
-    text: 'Filter',
+  Widget customSearchBar =  CustomText(
+    text: Get.find<CacheHelper>()
+        .activeLocale == SupportedLocales.english?'Filter':"تصفية",
     align: Alignment.center,
     fontColor: KPrimaryColor,
   );
 
   @override
   Widget build(BuildContext context) {
+    return GetBuilder<ProductsController>(
+        init: ProductsController(context),
+    builder: (controller) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
 
         centerTitle: true,
         title: CustomText(
-          text: 'Filter',
+          text: Get.find<CacheHelper>()
+              .activeLocale == SupportedLocales.english?'Filter':"تصفية",
           align: Alignment.center,
           fontColor: KPrimaryColor,
         ) ,
@@ -36,8 +45,8 @@ class _FilterScreenState extends State<FilterScreen> {
             onTap: () => Navigator.pop(context),
             child: const Icon(Icons.arrow_back)),
       ),
-      body: const Body(),
-    );
+      body:  Body(),
+    );});
   }
 
 

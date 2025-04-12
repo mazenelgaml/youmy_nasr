@@ -31,7 +31,7 @@ class _SignUpFormAddressState extends State<SignUpFormAddress> {
         init: SignupController(context),
     builder: (SignupController controller) {
     return Form(
-      key: controller.formKey,
+      key: controller.formKey3,
       child: Column(
         children: [
           SizedBox(height: getProportionateScreenHeight(10)),

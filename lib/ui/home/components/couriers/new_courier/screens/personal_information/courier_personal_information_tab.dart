@@ -22,7 +22,7 @@ class PersonalInformationTab extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: SizeConfig.screenHeight * 0.02),
-                 CustomText(text: PersonalInformation.tr,align: Alignment.center,fontColor: KPrimaryColor,fontWeight: FontWeight.bold,),
+                 CustomText(text: personalInformation.tr,align: Alignment.center,fontColor: KPrimaryColor,fontWeight: FontWeight.bold,),
                 SizedBox(height: SizeConfig.screenHeight * 0.02),
                 const PersonalInformationBody(),
                 SizedBox(height: SizeConfig.screenHeight * 0.08),

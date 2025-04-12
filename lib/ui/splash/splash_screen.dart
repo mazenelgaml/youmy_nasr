@@ -6,6 +6,7 @@ import 'package:splash_view/source/presentation/pages/splash_view.dart';
 import 'package:splash_view/source/presentation/widgets/done.dart';
 
 import '../../services/memory.dart';
+import '../auth/start/start_screen.dart';
 import '../home/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -40,7 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
         duration: const Duration(seconds: 4),
         done: Done(
 
-            Get.find<CacheHelper>().checkUserIsSignedIn?const HomeScreen():const LoginScreen()),
+            Get.find<CacheHelper>().checkUserIsSignedIn?const HomeScreen():Get.find<CacheHelper>().checkUserIsEnteredAPI?const LoginScreen(): const StartScreen()),
 
         logo: const Stack(
             alignment: Alignment.topCenter,

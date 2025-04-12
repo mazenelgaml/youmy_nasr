@@ -31,128 +31,130 @@ class _SignUpFormGeneralInformationState
     return GetBuilder(
         init: SignupController(context),
     builder: (SignupController controller) {
-    return Form(
-      key: controller.formKey,
-      child: Column(
-        children: [
-          SizedBox(height: SizeConfig.screenHeight * 0.01),
-          SizedBox(
-            height: 88,
-            width: 88,
-            child: Stack(
-              fit: StackFit.expand,
-              clipBehavior: Clip.none,
-              children: [
-                CircleAvatar(
-                  backgroundColor: Colors.grey,
-                  backgroundImage:controller.getImage(controller.pickedImage),
-                ),
-                Positioned(
-                  right: -16,
-                  bottom: 0,
-                  child: SizedBox(
-                    height: 46,
-                    width: 46,
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
-                          side: const BorderSide(color: Colors.white),
-                        ),
-                        disabledBackgroundColor: Colors.white,
-                        backgroundColor: const Color(0xFFF5F6F9),
-                      ),
-                      onPressed: () {
-                        controller.pickImage(context);
-                      },
-                      child: SvgPicture.asset("assets/icons/Camera.svg",
-                          color: Colors.grey),
-                    ),
+    return SingleChildScrollView(
+      child: Form(
+        key: controller.formKey1,
+        child: Column(
+          children: [
+            SizedBox(height: SizeConfig.screenHeight * 0.01),
+            SizedBox(
+              height: 88,
+              width: 88,
+              child: Stack(
+                fit: StackFit.expand,
+                clipBehavior: Clip.none,
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Colors.grey,
+                    backgroundImage:controller.getImage(controller.pickedImage),
                   ),
-                )
-              ],
-            ),
-          ),
-          SizedBox(height: getProportionateScreenHeight(5)),
-          controller.buildNameField(),
-          SizedBox(height: getProportionateScreenHeight(5)),
-          controller.buildEmailField(),
-          SizedBox(height: getProportionateScreenHeight(5)),
-          controller.buildMobileField(),
-          SizedBox(height: getProportionateScreenHeight(5)),
-          controller.buildJobField(context),
-          Divider(
-            color: Colors.black,  // Color of the divider line
-            thickness: 1,         // Thickness of the divider
-            indent: 3,           // Space from the left edge
-            endIndent: 3,        // Space from the right edge
-          ),
-          SizedBox(height: getProportionateScreenHeight(5)),
-          controller.isLoading?Center(child: CircularProgressIndicator()):DropdownButtonFormField<String>(
-            decoration: InputDecoration(
-              labelText: 'الفروع',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5),
+                  Positioned(
+                    right: -16,
+                    bottom: 0,
+                    child: SizedBox(
+                      height: 46,
+                      width: 46,
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                            side: const BorderSide(color: Colors.white),
+                          ),
+                          disabledBackgroundColor: Colors.white,
+                          backgroundColor: const Color(0xFFF5F6F9),
+                        ),
+                        onPressed: () {
+                          controller.pickImage(context);
+                        },
+                        child: SvgPicture.asset("assets/icons/Camera.svg",
+                            color: Colors.grey),
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
-            items: controller.branchesLogin
-                ?.map((branch) => DropdownMenuItem<String>(
-              value: branch,
-              child: Text(branch),
-            ))
-                .toList(),
-            onChanged: (value) {
-              controller.selectedBranch = value!;
-            },
-          ),
-          SizedBox(height: getProportionateScreenHeight(5)),
-          controller.buildPasswordField(),
-          SizedBox(height: getProportionateScreenHeight(5)),
-          controller.buildConfirmPasswordField(),
-          SizedBox(height: getProportionateScreenHeight(5)),
-          Row(children: [
-            Checkbox(
-              value: controller.remember,
-              activeColor: KPrimaryColor,
+            SizedBox(height: getProportionateScreenHeight(5)),
+            controller.buildNameField(),
+            SizedBox(height: getProportionateScreenHeight(5)),
+            controller.buildEmailField(),
+            SizedBox(height: getProportionateScreenHeight(5)),
+            controller.buildMobileField(),
+            SizedBox(height: getProportionateScreenHeight(5)),
+            controller.buildJobField(context),
+            Divider(
+              color: Colors.black,  // Color of the divider line
+              thickness: 1,         // Thickness of the divider
+              indent: 3,           // Space from the left edge
+              endIndent: 3,        // Space from the right edge
+            ),
+            SizedBox(height: getProportionateScreenHeight(5)),
+            controller.isLoading?Center(child: CircularProgressIndicator()):DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                labelText: 'الفروع',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              items: controller.branchesLogin
+                  ?.map((branch) => DropdownMenuItem<String>(
+                value: branch,
+                child: Text(branch),
+              ))
+                  .toList(),
               onChanged: (value) {
-                setState(() {
-                  controller.remember = value!;
-                });
+                controller.selectedBranch = value!;
               },
             ),
-            GestureDetector(
-                onTap: () {
-
+            SizedBox(height: getProportionateScreenHeight(5)),
+            controller.buildPasswordField(),
+            SizedBox(height: getProportionateScreenHeight(5)),
+            controller.buildConfirmPasswordField(),
+            SizedBox(height: getProportionateScreenHeight(5)),
+            Row(children: [
+              Checkbox(
+                value: controller.remember,
+                activeColor: KPrimaryColor,
+                onChanged: (value) {
+                  setState(() {
+                    controller.remember = value!;
+                  });
                 },
-                child:  CustomRichText(
-                    text1: iAgreeTo.tr, text2: termsAndPrivacyPolicy.tr)),
-          ]),
-          FormError(errors: controller.errors),
-          SizedBox(height: getProportionateScreenHeight(5)),
-          CustomButton(
-            text: next.tr,
-            press: () {
-              // if (_formKey.currentState!.validate()) {
-              //   _formKey.currentState!.save();
-              controller.signUp(context);
-
-              // }
-            },
-          ),
-          SizedBox(height: getProportionateScreenHeight(10)),
-          GestureDetector(
-            onTap: () {
-              KeyboardUtil.hideKeyboard(context);
-              Navigator.popAndPushNamed(context, LoginScreen.routeName);
-            },
-            child:  CustomRichText(
-              align: Alignment.center,
-              text1: haveAnAccount.tr,
-              text2: signInTextBTN.tr,
+              ),
+              GestureDetector(
+                  onTap: () {
+      
+                  },
+                  child:  CustomRichText(
+                      text1: iAgreeTo.tr, text2: termsAndPrivacyPolicy.tr)),
+            ]),
+            FormError(errors: controller.errors),
+            SizedBox(height: getProportionateScreenHeight(5)),
+            CustomButton(
+              text: next.tr,
+              press: () {
+                if (controller.formKey1.currentState!.validate()) {
+                  controller.formKey1.currentState!.save();
+                controller.signUp(context);
+      
+                 }
+              },
             ),
-          )
-          , SizedBox(height: getProportionateScreenHeight(20)),
-        ],
+            SizedBox(height: getProportionateScreenHeight(10)),
+            GestureDetector(
+              onTap: () {
+                KeyboardUtil.hideKeyboard(context);
+                Navigator.popAndPushNamed(context, LoginScreen.routeName);
+              },
+              child:  CustomRichText(
+                align: Alignment.center,
+                text1: haveAnAccount.tr,
+                text2: signInTextBTN.tr,
+              ),
+            )
+            , SizedBox(height: getProportionateScreenHeight(20)),
+          ],
+        ),
       ),
     );});
   }

@@ -79,6 +79,10 @@ class _HomeScreensState extends State<HomeScreens> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+
     });
+    if(index==0){
+      Get.put(BranchesController());
+    }
   }
 }

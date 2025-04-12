@@ -19,7 +19,7 @@ class _NewProductScreen extends State<NewProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title:  CustomText(
           text: createNewProduct.tr,

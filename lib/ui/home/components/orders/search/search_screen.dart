@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/home/components/orders/search/components/body.dart';
 import '../../../../../components/custom_text.dart';
 import '../../../../../util/Constants.dart';
+import 'package:get/get.dart';
 
 class OrderSearchScreen extends StatefulWidget {
   const OrderSearchScreen({Key? key}) : super(key: key);
@@ -13,8 +15,8 @@ class OrderSearchScreen extends StatefulWidget {
 
 class _OrderSearchScreenState extends State<OrderSearchScreen> {
   Icon customIcon = const Icon(Icons.search);
-  Widget customSearchBar = const CustomText(
-    text: 'Search',
+  Widget customSearchBar =  CustomText(
+    text: searchTitle.tr,
     align: Alignment.center,
     fontColor: KPrimaryColor,
   );
@@ -27,7 +29,7 @@ class _OrderSearchScreenState extends State<OrderSearchScreen> {
         automaticallyImplyLeading: false,
         centerTitle: true,
         title: CustomText(
-          text: 'Search',
+          text: searchTitle.tr,
           align: Alignment.center,
           fontColor: KPrimaryColor,
         ) ,

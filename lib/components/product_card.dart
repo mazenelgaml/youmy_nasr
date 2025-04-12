@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 
 import '../data/model/Product.dart';
 import '../details/details_screen.dart';
+import '../services/localization_services.dart';
+import '../services/memory.dart';
+import '../ui/home/components/product/controller/products_controller.dart';
 import '../util/Constants.dart';
 import '../util/size_config.dart';
 import 'custom_text.dart';
@@ -108,12 +112,17 @@ class ProductCard1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.pushNamed(
+    return GetBuilder(
+        init: ProductsController(context),
+        builder: (ProductsController controller) {
+          return GestureDetector(
+      onTap: () {Navigator.pushNamed(
         context,
         DetailsScreen.routeName,
         arguments: ProductDetailsArguments(product: product),
-      ),
+      );
+        controller.detailsOfProduct(product.itemCode??"",product.branchCode??0);
+        },
       child: Hero(
         tag: product.id.toString(),
         child: GridTile(
@@ -122,12 +131,26 @@ class ProductCard1 extends StatelessWidget {
               child: PopupMenuButton<String>(
                 onSelected: handleClick,
                 itemBuilder: (BuildContext context) {
-                  return {'Delete', 'InActive'}.map((String choice) {
+                  return Get.find<CacheHelper>()
+                      .activeLocale == SupportedLocales.english?{'Delete'}.map((String choice) {
                     return PopupMenuItem<String>(
                       value: choice,
                       child: Text(choice),
                       onTap: () {
-                        //   isGridView = !isGridView;
+                        controller.isLoading.value=true;
+                       controller.productDelete(product.id);
+                       controller.productsLists();
+                      },
+                    );
+                  }).toList():{'مسح'}.map((String choice) {
+                    return PopupMenuItem<String>(
+                      value: choice,
+                      child: Text(choice),
+                      onTap: () {
+                        controller.isLoading.value=true;
+                        controller.productDelete(product.id);
+                        controller.productsLists();
+                        controller.update();
                       },
                     );
                   }).toList();
@@ -155,7 +178,7 @@ class ProductCard1 extends StatelessWidget {
                   subtitle: CustomText(text: product.price.toString())),
             )),
       ),
-    );
+    );});
   }
 
   void handleClick(String value) {

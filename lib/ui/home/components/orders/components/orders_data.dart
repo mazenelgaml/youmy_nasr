@@ -4,6 +4,8 @@ import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/components/empty_view.dart';
 import 'package:merchant/components/order_card.dart';
 import 'package:merchant/util/Constants.dart';
+import '../../../../../services/localization_services.dart';
+import '../../../../../services/memory.dart';
 import '../../../../../util/size_config.dart';
 import '../controller/orders_controller.dart';
 
@@ -22,8 +24,9 @@ class OrdersData extends StatelessWidget {
 
         // Show empty state if no orders exist
         if (controller.orders.isEmpty) {
-          return const EmptyView(
-            message: 'No orders found.',
+          return  EmptyView(
+            message: Get.find<CacheHelper>()
+                .activeLocale == SupportedLocales.english? 'No orders found.':'لم يتم العثور على طلبات',
           );
         }
 

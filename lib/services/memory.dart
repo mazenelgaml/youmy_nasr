@@ -19,7 +19,7 @@ class CacheHelper extends GetxService {
 
   //! Logout by clearing specific data
   void loggingOut() {
-    sharedPreferences.remove("id");
+    sharedPreferences.remove("token");
   }
 
   //! Save data to SharedPreferences
@@ -59,7 +59,9 @@ class CacheHelper extends GetxService {
   bool get checkUserIsSignedIn {
     return sharedPreferences.containsKey("token");
   }
-
+  bool get checkUserIsEnteredAPI {
+    return sharedPreferences.containsKey("Api");
+  }
   //! General method to save data
   Future<dynamic> put({
     required String key,

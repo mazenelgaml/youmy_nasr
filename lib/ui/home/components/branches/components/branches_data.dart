@@ -8,7 +8,7 @@ import '../controller/branches_controller.dart';
 
 
 class BranchesData extends StatelessWidget {
-  const BranchesData({Key? key}) : super(key: key);
+  const BranchesData({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,8 @@ class BranchesData extends StatelessWidget {
               ...List.generate(
                 controller.branchesNames?.length??0,
                     (index) {
-                      return BranchCard(branch:controller.branches[index]);// here by default width and height is 0
+                      return controller.isLoading.value // إذا كانت البيانات لم تُجلب بعد، أظهر شاشة التحميل
+                          ? Center(child: CircularProgressIndicator()): BranchCard(branch:controller.branches[index]);// here by default width and height is 0
                 },
               ),
               SizedBox(width: getProportionateScreenWidth(20)),

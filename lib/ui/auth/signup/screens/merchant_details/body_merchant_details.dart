@@ -11,6 +11,7 @@ import '../../../../../util/size_config.dart';
 import 'package:merchant/ui/auth/signup/screens/merchant_details/merchant_details_form.dart';
 
 class BodyMerchantDetails extends StatefulWidget {
+
   const BodyMerchantDetails({Key? key}) : super(key: key);
 
   @override
@@ -72,7 +73,7 @@ class _BodyMerchantDetailsState extends State<BodyMerchantDetails> {
                   ),
                 ),
                 SizedBox(height: SizeConfig.screenHeight * 0.01),
-                const SignUpFormMerchantDetails(),
+                SignUpFormMerchantDetails(),
 
               ],
             ),

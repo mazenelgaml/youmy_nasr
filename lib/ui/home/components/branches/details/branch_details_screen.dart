@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:merchant/data/model/Branch.dart';
 import 'package:merchant/ui/home/components/branches/details/screens/branch_comments/branch_comments_tab.dart';
 import 'package:merchant/ui/home/components/branches/details/screens/branch_courier/branch_details_courier_tab.dart';
@@ -8,6 +9,7 @@ import 'package:merchant/ui/home/components/branches/details/screens/general_det
 import 'package:merchant/util/Constants.dart';
 
 import '../../product/offers/offers_body.dart';
+import '../controller/branches_controller.dart';
 
 
 class BranchDetailsScreen extends StatelessWidget {
@@ -16,12 +18,16 @@ class BranchDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final BranchDetailsArguments args =
-        ModalRoute.of(context)!.settings.arguments as BranchDetailsArguments;
+
     // return Scaffold(
     //   backgroundColor: KBackground,
     //   body: Body(branch: agrs.branch),
     // );
+    return GetBuilder(
+        init: BranchesController(),
+    builder: (BranchesController controller) {
+      final BranchDetailsArguments args =
+      ModalRoute.of(context)!.settings.arguments as BranchDetailsArguments;
     return DefaultTabController(
       initialIndex: 0,
       length: 5,
@@ -72,7 +78,7 @@ class BranchDetailsScreen extends StatelessWidget {
           ],
         ),
       ),
-    );
+    );});
   }
 }
 

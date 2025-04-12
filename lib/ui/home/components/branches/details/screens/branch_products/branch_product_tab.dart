@@ -7,6 +7,8 @@ import '../../../../../../../components/custom_text.dart';
 import '../../../../../../../components/expandable_fab.dart';
 import '../../../../../../../components/product_card.dart';
 import '../../../../../../../data/model/Product.dart';
+import '../../../../../../../services/localization_services.dart';
+import '../../../../../../../services/memory.dart';
 import '../../../../../../../util/Constants.dart';
 import '../../../../../../../util/size_config.dart';
 import '../../../../product/filter/filter_screen.dart';
@@ -43,12 +45,30 @@ class _BranchProductsScreenState extends State<BranchProductsScreen> {
           PopupMenuButton<String>(
             onSelected: handleClick,
             itemBuilder: (BuildContext context) {
-              return {'A to Z', 'Hi to low', 'Grid View'}.map((String choice) {
+              return Get.find<CacheHelper>()
+                  .activeLocale == SupportedLocales.english? {'A to Z', 'Hi to low'}.map((String choice) {
                 return PopupMenuItem<String>(
                   value: choice,
                   child: Text(choice),
                   onTap: () {
-                    isGridView = !isGridView;
+                    if(choice=='A to Z'){
+                      controller.sortProducts();
+                    }else if(choice=='Hi to low'){
+                      controller.sortProductsByPrice();
+                    }
+                  },
+                );
+              }).toList():
+              {'من الألف إلى الياء', 'من الأعلى إلى الأدنى'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                  onTap: () {
+                    if(choice=='من الألف إلى الياء'){
+                      controller.sortProducts();
+                    }else if(choice=='من الأعلى إلى الأدنى'){
+                      controller.sortProductsByPrice();
+                    }
                   },
                 );
               }).toList();
@@ -61,17 +81,10 @@ class _BranchProductsScreenState extends State<BranchProductsScreen> {
           child: Column(
             children: [
               Wrap(
-                spacing: 8,
+                spacing: 4,
                 runSpacing: 4,
-                children: [
-                  "Maadi",
-                  "Helwan",
-                  "Tahrir",
-                  "H-Kopa",
-                  "New Cairo",
-                  "All"
-                ]
-                    .map((String name) => GestureDetector(
+                children: controller.
+                branchess.map((String name) => GestureDetector(
                   child: Chip(
                     avatar: CircleAvatar(
                       child: Text(name.substring(0, 1)),
@@ -80,14 +93,16 @@ class _BranchProductsScreenState extends State<BranchProductsScreen> {
                       name,
                     ),
                   ),
-                  onTap: () {
+                  onTap: () async{
 
                     if(name=="All")
                     {
                       Navigator.pushNamed(context, ProductBranchesFilterScreen.routeName);
                     }
-                    else
-                      _showToast("$name is Pressed");
+                    else{
+                      int branchCode=  controller.branchesNames?.firstWhere((branch) => branch.branchName == name).branchCode??0;
+                      await controller.productsOfBranchList( branchCode);
+                    }
                   },
                 ))
                     .toList(),

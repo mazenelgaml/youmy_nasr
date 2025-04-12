@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:merchant/ui/home/components/branches/details/screens/branch_courier/components/branch_detail_courier_body.dart';
+import '../../../controller/branches_controller.dart';
 import 'components/branch_courier_data.dart';
 
 class BranchDetailsCourierTab extends StatefulWidget {
@@ -13,7 +15,10 @@ class BranchDetailsCourierTab extends StatefulWidget {
 class _BranchDetailsCourierTabState extends State<BranchDetailsCourierTab> {
   @override
   Widget build(BuildContext context) {
-    return Body();
+    return GetBuilder(
+        init: BranchesController(),
+    builder: (BranchesController controller) {
+    return Body();});
   }
 }
 

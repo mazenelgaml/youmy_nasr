@@ -9,6 +9,7 @@ import '../../../../../../../services/translation_key.dart';
 import '../../../../../../../util/Constants.dart';
 import '../../../../../../../util/size_config.dart';
 import '../../../../../home_screen.dart';
+import 'courier_address_body.dart';
 
 final List<String> cities = [
   "Select City",
@@ -57,7 +58,7 @@ class _CourierAddressTabState extends State<CourierAddressTab> {
                 SizedBox(height: SizeConfig.screenHeight * 0.02),
                  CustomText(text: merchantAdrress.tr,align: Alignment.center,fontColor: KPrimaryColor,fontWeight: FontWeight.bold,),
                 SizedBox(height: SizeConfig.screenHeight * 0.02),// 4%
-                const BranchAddressBody(),
+                const CourierAddressBody(),
 
               ],
             ),

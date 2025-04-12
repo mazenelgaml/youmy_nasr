@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:merchant/components/empty_view.dart';
 import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/home/components/product/components/products_data.dart';
-
 import 'package:get/get.dart';
 import '../../../../../components/action_button.dart';
 import '../../../../../components/custom_text.dart';
 import '../../../../../components/expandable_fab.dart';
+import '../../../../../services/localization_services.dart';
+import '../../../../../services/memory.dart';
 import '../../../../../util/Constants.dart';
 import '../../../../../util/size_config.dart';
-import '../../../home_screen.dart';
+import '../controller/products_controller.dart';
 import '../filter/filter_screen.dart';
 import '../new_product/new_product_screen.dart';
 import '../search/search_screen.dart';
@@ -30,6 +30,9 @@ class _ProductsBodyState extends State<ProductsBody> {
   bool isGridView = true;
   @override
   Widget build(BuildContext context) {
+    return GetBuilder(
+        init: ProductsController(context),
+    builder: (ProductsController controller) {
     return Scaffold(
       appBar: AppBar(
         leading: null,
@@ -42,12 +45,30 @@ class _ProductsBodyState extends State<ProductsBody> {
           PopupMenuButton<String>(
             onSelected: handleClick,
             itemBuilder: (BuildContext context) {
-              return {'A to Z', 'Hi to low', 'Grid View'}.map((String choice) {
+              return Get.find<CacheHelper>()
+                  .activeLocale == SupportedLocales.english? {'A to Z', 'Hi to low'}.map((String choice) {
                 return PopupMenuItem<String>(
                   value: choice,
                   child: Text(choice),
                   onTap: () {
-                   _showToast(choice);
+                    if(choice=='A to Z'){
+                   controller.sortProducts();
+                    }else if(choice=='Hi to low'){
+                      controller.sortProductsByPrice();
+                    }
+                  },
+                );
+              }).toList():
+              {'من الألف إلى الياء', 'من الأعلى إلى الأدنى'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                  onTap: () {
+                    if(choice=='من الألف إلى الياء'){
+                      controller.sortProducts();
+                    }else if(choice=='من الأعلى إلى الأدنى'){
+                      controller.sortProductsByPrice();
+                    }
                   },
                 );
               }).toList();
@@ -59,39 +80,38 @@ class _ProductsBodyState extends State<ProductsBody> {
         child: SafeArea(
           child: Column(
             children: [
-              Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                children: [
-                  "Maadi",
-                  "Helwan",
-                  "Tahrir",
-                  "H-Kopa",
-                  "New Cairo",
-                  "All"
-                ]
-                    .map((String name) => GestureDetector(
-                          child: Chip(
-                            avatar: CircleAvatar(
-                              child: Text(name.substring(0, 1)),
+              Padding(
+                padding: const EdgeInsets.only(left: 3.0,right: 3),
+                child: Wrap(
+                  spacing: 4,
+                  runSpacing: 4,
+                  children: controller.
+                  branches.map((String name) => GestureDetector(
+                            child: Chip(
+                              avatar: CircleAvatar(
+                                child: Text(name.substring(0, 1)),
+                              ),
+                              label: Text(
+                                name,
+                              ),
                             ),
-                            label: Text(
-                              name,
-                            ),
-                          ),
-                          onTap: () {
+                            onTap: () async{
 
-                            if(name=="All")
-                              {
-                                Navigator.pushNamed(context, ProductBranchesFilterScreen.routeName);
+                              if(name=="All")
+                                {
+                                  Navigator.pushNamed(context, ProductBranchesFilterScreen.routeName);
+                                }
+                              else{
+                                int branchCode=  controller.branchesNames?.firstWhere((branch) => branch.branchName == name).branchCode??0;
+                                await controller.productsOfBranchList( branchCode);
                               }
-                            else
-                              _showToast("$name is Pressed");
-                          },
-                        ))
-                    .toList(),
+                            },
+                          ))
+                      .toList(),
+                ),
               ),
-               ProductsData(isGridView: true,),
+              controller.isLoading.value // إذا كانت البيانات لم تُجلب بعد، أظهر شاشة التحميل
+                  ? Center(child: CircularProgressIndicator()) :ProductsData(isGridView: true,),
               SizedBox(height: getProportionateScreenWidth(30)),
             ],
           ),
@@ -135,7 +155,7 @@ class _ProductsBodyState extends State<ProductsBody> {
           ),
         ],
       ),
-    );
+    );});
   }
 }
 

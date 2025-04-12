@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:merchant/ui/auth/start/start_controller.dart';
 
 import '../../../components/colored_custom_text.dart';
 import '../../../components/custom_button.dart';
@@ -24,14 +25,14 @@ class StartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    return GetBuilder<LoginController>(
-      init: LoginController(),
-      builder: (LoginController controller) {
+    return GetBuilder<StartController>(
+      init: StartController(),
+      builder: (StartController controller) {
         return Scaffold(
-          resizeToAvoidBottomInset: false,
+          resizeToAvoidBottomInset: true,
           body: SingleChildScrollView(
             child: Form(
-              key: controller.formKey,
+              key: controller.startFormKey,
               child: Container(
                 color: Colors.white,
                 child: Column(
@@ -147,13 +148,15 @@ class StartScreen extends StatelessWidget {
                           // Login Button
                           CustomButton(
                             text: signInTextBTN.tr,
-                            press: () {
-                              if (controller.formKey.currentState!.validate()) {
-                                controller.formKey.currentState!.save();
+                            press: () async{
+                              if (controller.startFormKey.currentState!.validate()) {
+                                controller.startFormKey.currentState!.save();
                                 KeyboardUtil.hideKeyboard(context);
                                 controller.signIn(context);
                                 controller.emailController.clear();
                                 controller.passwordController.clear();
+                                // Get.delete<LoginController>();
+                                await controller.getBranches();
                               }
                             },
                           ),

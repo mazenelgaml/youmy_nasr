@@ -6,7 +6,7 @@ import '../../../../../../../data/model/Product.dart';
 import '../../../controller/branches_controller.dart';
 
 class BranchProductData extends StatefulWidget {
-  const BranchProductData({Key? key}) : super(key: key);
+  const BranchProductData({super.key});
 
   @override
   State<BranchProductData> createState() => _BranchProductDataState();
@@ -19,7 +19,8 @@ class _BranchProductDataState extends State<BranchProductData> {
         init: BranchesController(),
     builder: (BranchesController controller) {
     return GridView.count(
-        shrinkWrap: true,
+
+      controller: controller.scroll,
         crossAxisCount: 2,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,

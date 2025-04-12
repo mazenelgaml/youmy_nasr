@@ -18,7 +18,7 @@ class SignUpScreen extends StatelessWidget {
       initialIndex: 0,
       length: 4,
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(
             backgroundColor: Colors.white,
             leading: GestureDetector(
@@ -46,6 +46,7 @@ class SignUpScreen extends StatelessWidget {
               ],
             )),
         body: const TabBarView(
+
           children: [
             BodyPersonalInformation(),
             BodyMerchantDetails(),

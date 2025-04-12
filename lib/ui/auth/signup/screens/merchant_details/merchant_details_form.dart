@@ -55,10 +55,14 @@ class _SignUpFormMerchantDetailsState extends State<SignUpFormMerchantDetails> {
           CustomButton(
             text: next.tr,
             press: () async{
-              await Get.find<CacheHelper>().saveData(key: "merchantName", value: controller.merchantNameController.text.trim());
-              await Get.find<CacheHelper>().saveData(key: "merchantSummary", value: controller.summaryController.text.trim());
-                DefaultTabController.of(context).animateTo(2);
-
+    if (controller.formKey.currentState!.validate()) {
+      controller.formKey.currentState!.save();
+      await Get.find<CacheHelper>().saveData(key: "merchantName",
+          value: controller.merchantNameController.text.trim());
+      await Get.find<CacheHelper>().saveData(key: "merchantSummary",
+          value: controller.summaryController.text.trim());
+      DefaultTabController.of(context).animateTo(2);
+    }
             },
           ),
           SizedBox(height: getProportionateScreenHeight(20)),

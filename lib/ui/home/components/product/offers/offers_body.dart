@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:merchant/components/empty_view.dart';
 import 'package:merchant/ui/home/components/product/components/products_data.dart';
 
@@ -10,9 +11,13 @@ import 'package:merchant/ui/home/components/product/search/search_screen.dart';
 import '../../../../../components/action_button.dart';
 import '../../../../../components/custom_text.dart';
 import '../../../../../components/expandable_fab.dart';
+import '../../../../../services/localization_services.dart';
+import '../../../../../services/memory.dart';
+import '../../../../../services/translation_key.dart';
 import '../../../../../util/Constants.dart';
 import '../../../../../util/size_config.dart';
 import '../../../home_screen.dart';
+import '../controller/products_controller.dart';
 import '../filter/filter_screen.dart';
 import '../show_all_branches/product_branches_filter_screen.dart';
 
@@ -31,6 +36,9 @@ class _OffersBodyState extends State<OffersBody> {
 
   @override
   Widget build(BuildContext context) {
+    return GetBuilder(
+        init: ProductsController(context),
+    builder: (ProductsController controller) {
     return Scaffold(
       appBar: AppBar(
         leading: null,
@@ -38,20 +46,38 @@ class _OffersBodyState extends State<OffersBody> {
           PopupMenuButton<String>(
             onSelected: handleClick,
             itemBuilder: (BuildContext context) {
-              return {'A to Z', 'Hi to low', 'Grid View'}.map((String choice) {
+              return Get.find<CacheHelper>()
+                  .activeLocale == SupportedLocales.english? {'A to Z', 'Hi to low'}.map((String choice) {
                 return PopupMenuItem<String>(
                   value: choice,
                   child: Text(choice),
                   onTap: () {
-                    isGridView = !isGridView;
+                    if(choice=='A to Z'){
+                      controller.sortProducts();
+                    }else if(choice=='Hi to low'){
+                      controller.sortProductsByPrice();
+                    }
+                  },
+                );
+              }).toList():
+              {'من الألف إلى الياء', 'من الأعلى إلى الأدنى'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                  onTap: () {
+                    if(choice=='من الألف إلى الياء'){
+                      controller.sortProducts();
+                    }else if(choice=='من الأعلى إلى الأدنى'){
+                      controller.sortProductsByPrice();
+                    }
                   },
                 );
               }).toList();
             },
           ),
         ],
-        title: const CustomText(
-          text: 'Offers',
+        title: CustomText(
+          text: offersTitle.tr,
           align: Alignment.center,
           fontColor: KPrimaryColor,
         ),
@@ -61,28 +87,31 @@ class _OffersBodyState extends State<OffersBody> {
           child: Column(
             children: [
               Wrap(
-                spacing: 8,
+                spacing: 4,
                 runSpacing: 4,
-                children:
-                    ["Maadi", "Helwan", "Tahrir", "H-Kopa", "New Cairo", "All"]
-                        .map((String name) => GestureDetector(
-                              child: Chip(
-                                avatar: CircleAvatar(
-                                  child: Text(name.substring(0, 1)),
-                                ),
-                                label: Text(
-                                  name,
-                                ),
-                              ),
-                              onTap: () {
-                                if (name == "All") {
-                                  Navigator.pushNamed(context,
-                                      ProductBranchesFilterScreen.routeName);
-                                } else
-                                  _showToast("$name is Pressed");
-                              },
-                            ))
-                        .toList(),
+                children: controller.
+                branches.map((String name) => GestureDetector(
+                  child: Chip(
+                    avatar: CircleAvatar(
+                      child: Text(name.substring(0, 1)),
+                    ),
+                    label: Text(
+                      name,
+                    ),
+                  ),
+                  onTap: () async{
+
+                    if(name=="All")
+                    {
+                      Navigator.pushNamed(context, ProductBranchesFilterScreen.routeName);
+                    }
+                    else{
+                      int branchCode=  controller.branchesNames?.firstWhere((branch) => branch.branchName == name).branchCode??0;
+                      await controller.productsOfBranchList( branchCode);
+                    }
+                  },
+                ))
+                    .toList(),
               ),
               ProductsData(
                 isGridView: isGridView,
@@ -120,7 +149,7 @@ class _OffersBodyState extends State<OffersBody> {
           ),
         ],
       ),
-    );
+    );});
   }
 }
 

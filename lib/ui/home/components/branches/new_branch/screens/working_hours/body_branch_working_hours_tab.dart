@@ -32,7 +32,7 @@ class _BranchWorkingHoursBodyState extends State<BranchWorkingHoursBody> {
         init: NewBranchController(context),
         builder: (NewBranchController controller) {
           return Form(
-      key: controller.formKey,
+      key: controller.formKey2,
       child: Column(
         children: [
           SizedBox(height: getProportionateScreenHeight(10)),
@@ -145,12 +145,12 @@ class _BranchWorkingHoursBodyState extends State<BranchWorkingHoursBody> {
           CustomButton(
             text: continueText.tr,
             press: () async {
-              // if (_formKey.currentState!.validate()) {
-              //   _formKey.currentState!.save();
+               if (controller.formKey2.currentState!.validate()) {
+                 controller.formKey2.currentState!.save();
               await Get.find<CacheHelper>().saveData(key: "from", value: controller.fromHour);
               await Get.find<CacheHelper>().saveData(key: "to", value: controller.toHour);
               DefaultTabController.of(context)!.animateTo(2);
-              // }
+               }
             },
           ),
           SizedBox(height: getProportionateScreenHeight(30)),

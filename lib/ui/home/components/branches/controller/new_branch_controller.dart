@@ -5,22 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:merchant/models/cities_list_model.dart';
-import 'package:merchant/util/extensions.dart';
-import 'package:path/path.dart';
 import '../../../../../components/custom_text_form_field.dart';
 import '../../../../../models/cities_list_model.dart' as model;
-
 import '../../../../../models/coutry_list_model.dart';
 import '../../../../../models/days_list_model.dart';
 import '../../../../../models/payment_types_list_model.dart';
 import '../../../../../models/region_list_model.dart';
-import '../../../../../models/sign_up_error_model.dart';
 import '../../../../../services/localization_services.dart';
 import '../../../../../services/memory.dart';
 import '../../../../../services/translation_key.dart';
 import '../../../../../util/Constants.dart';
-import '../branches_screen.dart';
+
 
 class NewBranchController extends GetxController {
 // List of job names to show in the dropdown
@@ -35,60 +30,12 @@ class NewBranchController extends GetxController {
   List<PaymentType>? paymentName=[];
   int fromHour = 1, toHour = 1;
   final formKey = GlobalKey<FormState>();
+  final formKey1 = GlobalKey<FormState>();
+  final formKey2 = GlobalKey<FormState>();
+  final formKey3 = GlobalKey<FormState>();
+  final formKey4 = GlobalKey<FormState>();
   String? email, mobile, job, password, confirmPassword;
   bool remember = false;
-  CustomTextFormField buildConfirmPasswordField() {
-    return CustomTextFormField(
-        controller: confirmPasswordController,
-        obscureText: true,
-        textInputType: TextInputType.visiblePassword,
-        hintText: signUpConfirmPassword.tr,
-        textInputAction: TextInputAction.done,
-        suffixIcon: const Icon(Icons.visibility_off),
-        onPressed: (newValue) =>  confirmPassword = newValue,
-        onChange: (value) {
-          if (value.isNotEmpty) {
-            removeError(error: kConfirmPassNullError);
-          } else if (value.isNotEmpty && password == confirmPassword) {
-            removeError(error: kMatchPassError);
-          }
-          confirmPassword = value;
-        },
-        onValidate: (value) {
-          if (value!.isEmpty) {
-            addError(error: kConfirmPassNullError);
-            return "";
-          } else if ((password != value)) {
-            addError(error: kMatchPassError);
-            return "";
-          }
-          return null;
-        });
-  }
-  CustomTextFormField buildStreetField() {
-    return CustomTextFormField(
-        controller: streetController,
-        hintText: merchantStreet.tr,
-      onPressed: (value) {
-        name = value;
-      },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kNameNullError);
-          return "";
-        } else if (value.toString().isEmpty) {
-          addError(error: kNameNullError);
-          return "";
-        }
-        return null;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kNameNullError);
-        }
-        return null;
-      },);
-  }
   Future<void> getCurrentLocation(BuildContext context) async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -157,33 +104,191 @@ class NewBranchController extends GetxController {
       },
     );
   }
+  bool _isPasswordVisible = false;
+  bool _isObscure = true;
   CustomTextFormField buildPasswordField() {
     return CustomTextFormField(
       controller: passwordController,
       onPressed: (value) {
-        password = value;
+        passwordController.text = value;
       },
       onChange: (value) {
         if (value.isNotEmpty) {
-          removeError(error: kPassNullError);
-        } else if (value.length >= 8) {
-          removeError(error: kShortPassError);
+          removeError(error: kPassNullError); // Remove empty password error
+        }
+        if (value.length >= 8) {
+          removeError(error: kShortPassError); // Remove short password error
+        }
+        update(); // Ensure UI updates after change
+      },
+      onValidate: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kPassNullError); // Add error if password is empty
+          return "Password cannot be empty";
+        }
+        if (value.length < 8) {
+          addError(error: kShortPassError); // Add error if password is too short
+          return "Password must be at least 8 characters long";
         }
         return null;
+      },
+      hintText: signInTextPass.tr,
+      textInputType: TextInputType.visiblePassword,
+      textInputAction: TextInputAction.done,
+      obscureText: _isObscure, // Correctly access the visibility state
+      suffixIcon: IconButton(
+        icon: Icon(
+          _isObscure ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+          color: Colors.grey,
+        ),
+        onPressed: () {
+
+          _isObscure = !_isObscure;
+          update();
+        },
+      ),
+    );
+  }
+  CustomTextFormField buildJobField() {
+    return CustomTextFormField(
+      textInputType: TextInputType.text,
+      hintText: job?.tr ?? "Job",
+      suffixIcon: const Icon(Icons.arrow_drop_down),
+      onPressed: (value) {
+        job = value;
       },
       onValidate: (value) {
         if (value!.isEmpty) {
-          addError(error: kPassNullError);
-          return "";
-        } else if (value.length < 8) {
-          addError(error: kShortPassError);
+          addError(error: kJobNullError);
+          return "Job cannot be empty";
+        } else if (value.toString().isEmpty) {
+          addError(error: kJobNullError);
+          return "Job cannot be empty";
+        }
+        return null;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kJobNullError);
+        }
+        return null;
+      },
+    );
+  }
+
+  CustomTextFormField buildNameField() {
+    return CustomTextFormField(
+      controller: merchantNameController,
+      textInputType: TextInputType.text,
+      hintText: signUpName.tr,
+      onPressed: (value) {
+        merchantNameController.text = value;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kNameNullError);
+        }
+      },
+      onValidate: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kNameNullError);
           return "";
         }
         return null;
       },
-      hintText: signUpPassword.tr,
+    );
+  }
+  String? validateMobileNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kMobileNullError);
+      return kMobileNullError;
+    }
+    removeError(error: kMobileNullError);
+    return null;
+  }
+  String? validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      addError(error: kNameNullError);
+      return kNameNullError;
+    }
+    removeError(error: kNameNullError);
+    return null;
+  }
+  CustomTextFormField buildMobileField() {
+    return CustomTextFormField(
+      controller: mobileNumberController,
+      textInputType: TextInputType.phone,
+      hintText: mobileNO.tr,
+      onPressed: (value) {
+        mobile = value;
+      },
+      onChange: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kMobileNullError);
+        }
+      },
+      onValidate: (value) {
+        if (value == null || value.isEmpty) {
+          addError(error: kMobileNullError);
+          return "";
+        }
+        return null;
+      },
+    );
+  }
+  bool _isObscureC = true;
+  CustomTextFormField buildConfirmPasswordField() {
+    return CustomTextFormField(
+      controller: confirmPasswordController,
       textInputType: TextInputType.visiblePassword,
-      suffixIcon: const Icon(Icons.visibility_off),
+      hintText: signUpConfirmPassword.tr,
+      textInputAction: TextInputAction.done,
+      obscureText: _isObscureC, // Correctly access the visibility state
+      suffixIcon: IconButton(
+        icon: Icon(
+          _isObscureC ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+          color: Colors.grey,
+        ),
+        onPressed: () {
+
+          _isObscureC = !_isObscureC;
+          update();
+        },
+      ),
+      onPressed: (newValue) => confirmPassword = newValue,
+      onChange: (value) {
+        confirmPasswordController.text = value;
+
+        // Remove errors if the field is not empty
+        if (value.isNotEmpty) {
+          removeError(error: kConfirmPassNullError);
+        }
+
+        // If the passwords match, remove the match error
+        if (passwordController.text == value) {
+          removeError(error: kMatchPassError);
+        } else {
+          addError(error: kMatchPassError); // Add mismatch error
+        }
+      },
+      onValidate: (value) {
+        // Handle empty input
+        if (value == null || value.isEmpty) {
+          addError(error: kConfirmPassNullError);
+          return "Please confirm your password";
+        }
+
+        // Handle password mismatch
+        if (passwordController.text != value) {
+          addError(error: kMatchPassError);
+          return "Passwords do not match";
+        }
+
+        // Remove errors if the passwords match
+        removeError(error: kConfirmPassNullError);
+        removeError(error: kMatchPassError);
+        return null;
+      },
     );
   }
   CustomTextFormField buildEmailField() {
@@ -196,101 +301,61 @@ class NewBranchController extends GetxController {
       onValidate: (value) {
         if (value.isEmpty) {
           addError(error: kEmailNullError);
-          return "";
-        } else if (!value.toString().isValidEmail()) {
+          return "Email cannot be empty";
+        } else if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(value)) {
           addError(error: kInvalidEmailError);
-          return "";
+          return "Please enter a valid email address";
         }
         return null;
       },
       onChange: (value) {
         if (value.isNotEmpty) {
           removeError(error: kEmailNullError);
-        } else if (value.toString().isValidEmail()) {
+        } else if (RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(value)) {
           removeError(error: kInvalidEmailError);
         }
         return null;
       },
     );
   }
-  CustomTextFormField buildNameField() {
+  // Declare street variable
+  String street = "";
+// Constants for error messages
+  String kStreetNullError = "Street cannot be empty";
+
+  CustomTextFormField buildStreetField() {
     return CustomTextFormField(
-      controller: merchantNameController,
-      textInputType: TextInputType.text,
-      hintText: signUpName.tr,
+      controller: streetController,
+      hintText: merchantStreet.tr,
       onPressed: (value) {
-        name = value;
+        street = value;
       },
       onValidate: (value) {
         if (value!.isEmpty) {
-          addError(error: kNameNullError);
-          return "";
+          addError(error: kStreetNullError);
+          return "Street cannot be empty";
         } else if (value.toString().isEmpty) {
-          addError(error: kNameNullError);
-          return "";
+          addError(error: kStreetNullError);
+          return "Street cannot be empty";
         }
         return null;
       },
       onChange: (value) {
         if (value.isNotEmpty) {
-          removeError(error: kNameNullError);
+          removeError(error: kStreetNullError);
         }
         return null;
       },
     );
   }
-  CustomTextFormField buildMobileField() {
-    return CustomTextFormField(
-      controller: mobileNumberController,
-      textInputType: TextInputType.phone,
-      hintText: mobileNO.tr,
-      onPressed: (value) {
-        mobile = value;
-      },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kMobileNullError);
-          return "";
-        } else if (value.toString().isEmpty) {
-          addError(error: kMobileNullError);
-          return "";
-        }
-        return null;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kMobileNullError);
-        }
-        return null;
-      },
-    );
-  }
-  CustomTextFormField buildJobField() {
-    return CustomTextFormField(
-      textInputType: TextInputType.text,
-      hintText: job?.tr??"Job",
-      suffixIcon: const Icon(Icons.arrow_drop_down),
-      onPressed: (value) {
-        job = value;
-      },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kJobNullError);
-          return "";
-        } else if (value.toString().isEmpty) {
-          addError(error: kJobNullError);
-          return "";
-        }
-        return null;
-      },
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kJobNullError);
-        }
-        return null;
-      },
-    );
-  }
+
+
+
+
+
+
+
+
   void addError({String? error}) {
     if (!errors.contains(error)) {
 
@@ -332,6 +397,9 @@ class NewBranchController extends GetxController {
   TextEditingController apartmentController = TextEditingController();
   TextEditingController timeFromController = TextEditingController();
   TextEditingController   timeToController = TextEditingController();
+  TextEditingController   distanceToController = TextEditingController();
+  TextEditingController   distanceFromController = TextEditingController();
+  TextEditingController   distanceTCostController = TextEditingController();
   ListTile buildRegionField() {
     return ListTile(
       title: Text(selectedRegion ?? 'Select region'),
@@ -802,6 +870,56 @@ class NewBranchController extends GetxController {
     }
   }
 
+  Future<void> postDeliveryFees() async {
+    final Dio dio = Dio(
+      BaseOptions(
+        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
+        validateStatus: (status) {
+          return status != null && status < 500;
+        },
+      ),
+    );
+
+    try {
+      final response = await dio.post(
+        "/api/v1/branchShipingCosts",
+        data: {
+          "companyCode": Get.find<CacheHelper>().getData(key: 'companyCode'),
+          "branchCode": Get.find<CacheHelper>().getData(key: 'branchCode'),
+          "fromDistance": distanceFromController.text.trim(),
+          "toDistance": distanceToController.text.trim(),
+          "shippingCost": int.parse(distanceTCostController.text.trim())
+
+        },
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer ${Get.find<CacheHelper>().getData(key: 'token')}",
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        update();
+        Navigator.pop(context);
+        print("API Response: ${response.data}");
+
+
+
+        update();
+
+      } else {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(content: Text('Failed to load payment methods')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(content: Text('Error occurred while connecting to the API')),
+      );
+    }
+  }
+
   // Toggle payment method state
   void togglePaymentMethod(String paymentMethod) {
     if (selectedPaymentMethods.containsKey(paymentMethod)) {
@@ -913,10 +1031,6 @@ class NewBranchController extends GetxController {
       );
     }
   }
-
-
-
-
 
   int getDayCode(String day) {
     switch (day.toLowerCase()) {

@@ -1,27 +1,20 @@
-import 'dart:ffi';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:merchant/components/branch_card.dart';
 import 'package:merchant/components/custom_chip.dart';
 import 'package:merchant/components/custom_text.dart';
-import 'package:merchant/data/model/Branch.dart';
 import 'package:merchant/data/model/courier.dart';
 import 'package:merchant/services/translation_key.dart';
-import 'package:merchant/ui/auth/signup/screens/address/body_address.dart';
-import 'package:merchant/ui/home/components/branches/components/branches_data.dart';
-import 'package:merchant/ui/home/components/couriers/components/couriers_data.dart';
 import 'package:merchant/ui/home/components/orders/components/orders_data.dart';
 import 'package:merchant/util/Constants.dart';
-
 import '../../../../../components/action_button.dart';
 import '../../../../../components/custom_button.dart';
 import '../../../../../components/custom_text_form_field.dart';
 import '../../../../../components/expandable_fab.dart';
+import '../../../../../services/localization_services.dart';
+import '../../../../../services/memory.dart';
 import '../../../../../util/size_config.dart';
-import '../../product/filter/filter_screen.dart';
-import '../../product/search/search_screen.dart';
-import '../../product/show_all_branches/product_branches_filter_screen.dart';
+import '../controller/orders_controller.dart';
 import '../search/search_screen.dart';
 
 Courier? selectedCourier;
@@ -36,17 +29,14 @@ class Body extends StatefulWidget {
 class _BodyState extends State<Body> {
   bool isGridView = true;
 
-  final List<String> citiesData = [
-    "All",
-    "Cairo",
-    "Alexandria",
-    "Luxor",
-    "See More",
-  ];
+
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GetBuilder(
+        init: OrdersController(),
+        builder: (OrdersController controller) {
+          return Scaffold(
       appBar: AppBar(
         leading: null,
         title:  CustomText(
@@ -58,13 +48,35 @@ class _BodyState extends State<Body> {
           PopupMenuButton<String>(
             onSelected: handleClick,
             itemBuilder: (BuildContext context) {
-              return {'A to Z', 'Oldest to New', 'Grid View'}
+              return Get.find<CacheHelper>()
+                  .activeLocale == SupportedLocales.english?  {'A to Z', 'Oldest to New'}
                   .map((String choice) {
                 return PopupMenuItem<String>(
                   value: choice,
                   child: Text(choice),
                   onTap: () {
-                    isGridView = !isGridView;
+                   if(choice=="'A to Z")
+                   {
+                     controller.sortOrders();
+                   }else
+                   {
+                     controller.sortOrdersOldestToNewest();
+                   }
+                  },
+                );
+              }).toList():{'من الألف إلى الياء', 'الأقدم إلى الأحدث'}
+                  .map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                  onTap: () {
+                    if(choice=="من الألف إلى الياء")
+                    {
+                      controller.sortOrders();
+                    }else
+                    {
+                      controller.sortOrdersOldestToNewest();
+                    }
                   },
                 );
               }).toList();
@@ -99,34 +111,17 @@ class _BodyState extends State<Body> {
                 padding:  EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(10)),
                 child: SizedBox(
                   height: getProportionateScreenHeight(50),
-                  child: ListView.builder(
+                  child: controller.isLoading.value?CircularProgressIndicator():
+                  ListView.builder(
                       shrinkWrap: true,
                       scrollDirection: Axis.horizontal,
-                      itemCount: citiesData.length,
-                      itemBuilder: (BuildContext context, int index) => index < 4
-                          ? CustomChip(
+                      itemCount: controller.branchess.length,
+                      itemBuilder: (BuildContext context, int index) =>  CustomChip(
                               type: 2,
-                              label: citiesData[index],
-                              onSelected: () {},
+                              label: controller.branchess[index],
                               onPressed: () {},
                             )
-                          : Row(
-                            children: [
-                              SizedBox(
-                        width: getProportionateScreenWidth(5),
-                              ),
-                              GestureDetector(
-                                onTap: (){
-                                  _showToast('See More Clicked');
-                                },
-                                child: CustomText(
-                                  align: Alignment.center,
-                                  text: citiesData[index],
-                                  fontColor: KPrimaryColor,
-                                ),
-                              ),
-                            ],
-                          )),
+                          ),
                 ),
               ),
 
@@ -141,7 +136,7 @@ class _BodyState extends State<Body> {
         children: [
           ActionButton(
             onPressed: () {
-              showFilterScreen(context); // add
+              // showFilterScreen(context); // add
             },
             icon: const Icon(
               Icons.sort,
@@ -159,7 +154,7 @@ class _BodyState extends State<Body> {
           ),
         ],
       ),
-    );
+    );});
   }
 
   void showFilterScreen(BuildContext context) {

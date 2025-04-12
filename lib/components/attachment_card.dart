@@ -26,11 +26,11 @@ class _AttachmentCardState extends State<AttachmentCard> {
     return SizedBox(
       width: getProportionateScreenWidth(widget.width),
       child: GestureDetector(
-        onTap: () => Navigator.pushNamed(
-          context,
-          DetailsScreen.routeName,
-          // arguments: ProductDetailsArguments(attachment: attachment),
-        ),
+        // onTap: () => Navigator.pushNamed(
+        //   context,
+        //   DetailsScreen.routeName,
+        //   // arguments: ProductDetailsArguments(attachment: attachment),
+        // ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

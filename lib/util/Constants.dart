@@ -70,7 +70,7 @@ const String kPDescriptionNullError = "Please Enter Description";
 const String kPUOMNameNullError = "Please Enter Unit of Measure";
 const String kPPriceNullError = "Please Enter Price";
 const String kPPriceAfterDiscountNullError = "Please Enter Price after Didcount";
-const String baseUrl= "http://webapi.sudokuano.com/api";
+const String baseUrl= "https://api.yomycart.com/api";
 
 final otpInputDecoration = InputDecoration(
   contentPadding:

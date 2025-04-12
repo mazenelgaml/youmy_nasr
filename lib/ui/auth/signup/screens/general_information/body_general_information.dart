@@ -28,7 +28,7 @@ class BodyPersonalInformation extends StatelessWidget {
                     children: [
                       SizedBox(height: SizeConfig.screenHeight * 0.02),
                       CustomText(
-                        text: PersonalInformation.tr,   // Correct usage of .tr() with parentheses
+                        text: personalInformation.tr,   // Correct usage of .tr() with parentheses
                         align: Alignment.center,
                         fontColor: KPrimaryColor,
                         fontWeight: FontWeight.bold,

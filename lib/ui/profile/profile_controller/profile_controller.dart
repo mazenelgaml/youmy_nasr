@@ -1,17 +1,12 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:merchant/util/extensions.dart';
 
 import '../../../../components/custom_text_form_field.dart';
-import '../../../../models/error_model.dart';
-import '../../../../models/login_model.dart';
 import '../../../../services/memory.dart';
 import '../../../../util/Constants.dart';
 import '../../../models/add_bank_account_error_model.dart';
 import '../../../models/bank_accounts_list_model.dart';
-import '../../../models/respone_bank_error.dart';
 import '../../../services/localization_services.dart';
 import '../../../services/translation_key.dart';
 
@@ -22,12 +17,15 @@ class ProfileController extends GetxController{
   TextEditingController branchNameController =TextEditingController();
   TextEditingController accountNumberrController =TextEditingController();
   List<BankAccount> bankAccounts = [];
+
   // List of job names to show in the dropdown
   var isLoading = false.obs;
+  @override
   Future<void> onInit() async {
     super.onInit();
     await CacheHelper.init();
     await  getBankAccounts();
+
   }
 
   final String TAG = "Add Bank Account ";
@@ -322,6 +320,7 @@ class ProfileController extends GetxController{
 
     update(); // Update UI
   }
+
 
 
 }

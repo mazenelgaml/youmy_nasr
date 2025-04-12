@@ -10,9 +10,12 @@ class Product {
   final List<Color> colors;
   final double rating, price;
   final bool isFavourite, isActive;
+  final int? branchCode;
+  final String? itemCode;
 
-
-  Product({
+  Product(  {
+    this.itemCode,
+    this.branchCode,
     required this.id,
     required this.images,
     required this.colors,

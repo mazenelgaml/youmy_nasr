@@ -1,4 +1,5 @@
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:get/get.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/components/custom_text_form_field.dart';
 import 'package:merchant/ui/auth/confirm_verification/confirm_verification_screen.dart';
@@ -6,6 +7,8 @@ import 'package:merchant/util/Constants.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../components/custom_button.dart';
+import '../../../../services/localization_services.dart';
+import '../../../../services/memory.dart';
 import '../../../../util/size_config.dart';
 
 class Body extends StatelessWidget {
@@ -51,9 +54,10 @@ class Body extends StatelessWidget {
                     Image.asset('assets/images/mobile.png'),
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 10),
-                      child: const CustomText(
+                      child:  CustomText(
                         text:
-                            'Enter your phone number to receive\nverification code ',
+                        Get.find<CacheHelper>()
+                            .activeLocale == SupportedLocales.english?'Enter your phone number to receive\nverification code ':"أدخل رقم هاتفك لاستلام\n رمز التحقق",
                         fontSize: 16,
                         fontFamily: 'Roboto Bold',
                         fontColor: KPrimaryColor,
@@ -93,7 +97,8 @@ class Body extends StatelessWidget {
                 child: Container(
                   margin: const EdgeInsets.only(left: 0, right: 20),
                   child: CustomTextFormField(
-                    hintText: 'Phone No',
+                    hintText: Get.find<CacheHelper>()
+                        .activeLocale == SupportedLocales.english?'Phone No':"رقم الهاتف",
                     textInputType: TextInputType.phone,
                     textInputAction: TextInputAction.done,
                     onValidate: () {},
@@ -109,7 +114,8 @@ class Body extends StatelessWidget {
             margin:
                 const EdgeInsets.only(top: 0, left: 20, right: 20, bottom: 0),
             child: CustomButton(
-              text: "Send",
+              text: Get.find<CacheHelper>()
+                  .activeLocale == SupportedLocales.english?"Send":"ابعت",
               press: () {
                 // if (_formKey.currentState!.validate()) {
                 //   _formKey.currentState!.save();

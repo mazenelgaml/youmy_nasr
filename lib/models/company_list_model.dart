@@ -64,7 +64,7 @@ class Company {
   String? address;
   int? startYear;
   DateTime? startDate;
-  dynamic taxId;
+  String? taxId;
   dynamic commercialId;
   dynamic vendorCode;
   bool? isShowLogInLogin;
@@ -122,8 +122,8 @@ class Company {
   dynamic baseSyncId;
   int? companyCode;
   dynamic lineNum;
-  dynamic branchCode;
-  dynamic year;
+  int? branchCode;
+  int? year;
   String? descriptionAra;
   dynamic attachment;
   String? descriptionEng;
@@ -156,11 +156,13 @@ class Company {
   dynamic glType;
   dynamic deletionTime;
   dynamic confirmationTime;
-  dynamic langId;
+  int? langId;
   dynamic synchronizationStatusCode;
+  dynamic insuranceRegisterationReceiveDestinationCode;
   dynamic isSynchronized;
   dynamic postedToGl;
   dynamic confirmed;
+  dynamic isPaidFinancialTransaction;
   dynamic isLinkWithTaxAuthority;
   dynamic isEditPrice;
   dynamic synchronizationDate;
@@ -275,9 +277,11 @@ class Company {
     this.confirmationTime,
     this.langId,
     this.synchronizationStatusCode,
+    this.insuranceRegisterationReceiveDestinationCode,
     this.isSynchronized,
     this.postedToGl,
     this.confirmed,
+    this.isPaidFinancialTransaction,
     this.isLinkWithTaxAuthority,
     this.isEditPrice,
     this.synchronizationDate,
@@ -393,9 +397,11 @@ class Company {
     confirmationTime: json["confirmationTime"],
     langId: json["langId"],
     synchronizationStatusCode: json["synchronizationStatusCode"],
+    insuranceRegisterationReceiveDestinationCode: json["insuranceRegisterationReceiveDestinationCode"],
     isSynchronized: json["isSynchronized"],
     postedToGl: json["postedToGL"],
     confirmed: json["confirmed"],
+    isPaidFinancialTransaction: json["isPaidFinancialTransaction"],
     isLinkWithTaxAuthority: json["isLinkWithTaxAuthority"],
     isEditPrice: json["isEditPrice"],
     synchronizationDate: json["synchronizationDate"],
@@ -511,9 +517,11 @@ class Company {
     "confirmationTime": confirmationTime,
     "langId": langId,
     "synchronizationStatusCode": synchronizationStatusCode,
+    "insuranceRegisterationReceiveDestinationCode": insuranceRegisterationReceiveDestinationCode,
     "isSynchronized": isSynchronized,
     "postedToGL": postedToGl,
     "confirmed": confirmed,
+    "isPaidFinancialTransaction": isPaidFinancialTransaction,
     "isLinkWithTaxAuthority": isLinkWithTaxAuthority,
     "isEditPrice": isEditPrice,
     "synchronizationDate": synchronizationDate,

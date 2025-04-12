@@ -25,7 +25,7 @@ class _NewBranchScreenState extends State<NewBranchScreen> {
       initialIndex: 0,
       length: 5,
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(
             backgroundColor: Colors.white,
             leading: GestureDetector(

@@ -62,7 +62,7 @@ class _CommentCardState extends State<CommentCard> {
                           SizedBox(height: getProportionateScreenHeight(10)),
                           CustomText(text: widget.comment.text, fontSize: 18),
                           SizedBox(height: getProportionateScreenHeight(10)),
-                          CustomText(text: widget.comment.date, fontSize:16),
+                          CustomText(text: widget.comment.date??"", fontSize:16),
                           SizedBox(height: getProportionateScreenHeight(10)),
                         ],
                       ),

@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:merchant/components/attachment_card.dart';
-import 'package:merchant/components/custom_text.dart';
-import 'package:merchant/data/model/Attachment.dart';
-import 'package:merchant/util/extensions.dart';
+import 'package:merchant/ui/home/components/couriers/new_courier/screens/attachments/attachments_screen.dart';
 import '../../../../../../../data/model/Product.dart';
 import '../../../../../../../util/size_config.dart';
 
 class CourierAttachmentBody extends StatefulWidget {
-  const CourierAttachmentBody({Key? key}) : super(key: key);
+  const CourierAttachmentBody({super.key});
 
   @override
   _CourierAttachmentBodyState createState() => _CourierAttachmentBodyState();

@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:merchant/components/comments_card.dart';
-import 'package:merchant/data/model/Comment.dart';
 
 import '../../../../../components/custom_text.dart';
+import '../../../../../services/translation_key.dart';
 import '../../../../../util/Constants.dart';
 import '../../../../../util/size_config.dart';
+import '../controller/products_controller.dart';
+import '../show_all_branches/product_branches_filter_screen.dart';
 
 class Body extends StatefulWidget {
-  const Body({Key? key}) : super(key: key);
+  const Body({super.key});
 
   @override
   State<Body> createState() => _BodyState();
@@ -16,11 +19,14 @@ class Body extends StatefulWidget {
 class _BodyState extends State<Body> {
   @override
   Widget build(BuildContext context) {
+    return GetBuilder(
+        init: ProductsController(context),
+    builder: (ProductsController controller) {
     return Scaffold(
       appBar: AppBar(
         leading: null,
-        title: const CustomText(
-          text: 'Comments',
+        title:  CustomText(
+          text: commentsTitle.tr,
           align: Alignment.center,
           fontColor: KPrimaryColor,
         ),
@@ -35,35 +41,41 @@ class _BodyState extends State<Body> {
               ),
               SizedBox(height: getProportionateScreenWidth(10)),
               Wrap(
-                spacing: 8,
+                spacing: 4,
                 runSpacing: 4,
-                children: [
-                  "All",
-                  "Maadi",
-                  "Helwan",
-                  "Tahrir",
-                  "H-Kopa",
-                  "New Cairo",
-                ]
-                    .map((String name) => Chip(
-                  avatar: CircleAvatar(
-                    child: Text(name.substring(0, 1)),
+                children: controller.
+                branches.map((String name) => GestureDetector(
+                  child: Chip(
+                    avatar: CircleAvatar(
+                      child: Text(name.substring(0, 1)),
+                    ),
+                    label: Text(
+                      name,
+                    ),
                   ),
-                  label: Text(
-                    name,
-                  ),
+                  onTap: () async{
+
+                    if(name=="All")
+                    {
+                      Navigator.pushNamed(context, ProductBranchesFilterScreen.routeName);
+                    }
+                    else{
+                      int branchCode=  controller.branchesNames.firstWhere((branch) => branch.branchName == name).branchCode??0;
+                      await controller.productsOfBranchList( branchCode);
+                    }
+                  },
                 ))
                     .toList(),
               ),
 
               SingleChildScrollView(
                 scrollDirection: Axis.vertical,
-                child: Column(
+                child: controller.isLoading.value?const CircularProgressIndicator():Column(
                   children: [
                     ...List.generate(
-                      demoComments.length,
+                      controller.commentsD.length,
                           (index) {
-                        return CommentCard(comment: demoComments[index]);// here by default width and height is 0
+                        return CommentCard(comment: controller.commentsD[index]);// here by default width and height is 0
                       },
                     ),
                     SizedBox(width: getProportionateScreenWidth(20)),
@@ -74,6 +86,6 @@ class _BodyState extends State<Body> {
           ),
         ),
       ),
-    );
+    );});
   }
 }

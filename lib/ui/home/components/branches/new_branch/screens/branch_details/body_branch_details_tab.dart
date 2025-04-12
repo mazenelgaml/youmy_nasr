@@ -28,7 +28,7 @@ class _BranchDetailsBodyState extends State<BranchDetailsBody> {
         init: NewBranchController(context),
         builder: (NewBranchController controller) {
           return Form(
-      key: controller.formKey,
+      key: controller.formKey1,
       child: Column(
         children: [
           SizedBox(height: getProportionateScreenHeight(5)),
@@ -45,14 +45,14 @@ class _BranchDetailsBodyState extends State<BranchDetailsBody> {
           CustomButton(
             text: next.tr,
             press: () async{
-              // if (_formKey.currentState!.validate()) {
-              //   _formKey.currentState!.save();
+               if (controller.formKey1.currentState!.validate()) {
+                 (controller.formKey1.currentState!.save());
               await Get.find<CacheHelper>().saveData(key: "Name", value: controller.merchantNameController.text.trim());
               await Get.find<CacheHelper>().saveData(key: "mobileNumber", value: controller.mobileNumberController.text.trim());
               await Get.find<CacheHelper>().saveData(key: "password", value: controller.passwordController.text.trim());
               await Get.find<CacheHelper>().saveData(key: "confirmPassword", value: controller.confirmPasswordController.text.trim());
                 DefaultTabController.of(context).animateTo(1);
-              // }
+               }
             },
           ),
           SizedBox(height: getProportionateScreenHeight(16)),

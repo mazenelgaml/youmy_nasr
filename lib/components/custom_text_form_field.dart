@@ -7,7 +7,7 @@ class CustomTextFormField extends StatelessWidget {
   final String hintText;
   final String fontFamily;
   final double fontSize;
-  final Icon? suffixIcon;
+  final Widget? suffixIcon;
   final Function onPressed;
   final Function onValidate;
   final Function onChange;
@@ -16,9 +16,10 @@ class CustomTextFormField extends StatelessWidget {
   final bool readOnly;
   final TextEditingController? controller;
   final Widget? suffixList;
+  final bool? obscureText;
   const CustomTextFormField(
       {Key? key,
-      obscureText = true,
+      this.obscureText,
       this.textInputType = TextInputType.text,
       this.hintText = '',
       this.fontFamily = 'Roboto Regular',
@@ -40,6 +41,7 @@ class CustomTextFormField extends StatelessWidget {
       maxLines: 1,
       validator: (value) => onValidate(value),
       onChanged: (value) => onChange(value),
+      obscureText: obscureText??false,
       decoration: InputDecoration(
           suffix: suffixList,
           hintText: hintText,

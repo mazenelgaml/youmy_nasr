@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/components/custom_text_form_field.dart';
 import 'package:merchant/ui/auth/confirm_verification/confirm_verification_screen.dart';
@@ -7,6 +8,9 @@ import 'package:flutter/material.dart';
 
 import '../../../../components/custom_button.dart';
 import '../../../../components/form_error.dart';
+import '../../../../services/localization_services.dart';
+import '../../../../services/memory.dart';
+import '../../../../services/translation_key.dart';
 import '../../../../util/keyboard.dart';
 import '../../../../util/size_config.dart';
 
@@ -85,8 +89,11 @@ class _BodyState extends State<Body> {
               child: Column(
                 children: [
                   SizedBox(height: getProportionateScreenHeight(10)),
-                  const CustomText(
-                    text: 'Password Reset',
+                   CustomText(
+                     align:Get.find<CacheHelper>()
+                         .activeLocale == SupportedLocales.english?Alignment.topLeft:Alignment.topRight ,
+                    text: Get.find<CacheHelper>()
+                        .activeLocale == SupportedLocales.english?'Password Reset':"إعادة تعيين كلمة المرور",
                     fontSize: 25,
                     fontColor: KPrimaryColor,
                     fontFamily: 'Roboto Bold',
@@ -99,7 +106,7 @@ class _BodyState extends State<Body> {
                   FormError(errors: errors),
                   SizedBox(height: getProportionateScreenHeight(20)),
                   CustomButton(
-                    text: "Confirm",
+                    text:  merchantConfirm.tr,
                     press: () {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
@@ -124,7 +131,7 @@ class _BodyState extends State<Body> {
     return CustomTextFormField(
         obscureText: true,
         textInputType: TextInputType.visiblePassword,
-        hintText: 'Confirm Password',
+        hintText:signUpConfirmPassword.tr,
         textInputAction: TextInputAction.done,
         suffixIcon: const Icon(Icons.visibility_off),
         onPressed: (newValue) => confirmPassword = newValue,
@@ -151,7 +158,7 @@ class _BodyState extends State<Body> {
   CustomTextFormField buildPasswordField() {
     return CustomTextFormField(
       obscureText: true,
-      hintText: 'Password',
+      hintText: signUpPassword.tr,
       textInputType: TextInputType.visiblePassword,
       suffixIcon: const Icon(Icons.visibility_off),
       onPressed: (newValue) => password = newValue,

@@ -29,11 +29,11 @@ class _DeliveryCardState extends State<DeliveryCard> {
     return SizedBox(
       width: getProportionateScreenWidth(widget.width),
       child: GestureDetector(
-        onTap: () => Navigator.pushNamed(
-          context,
-          DetailsScreen.routeName,
-          // arguments: ProductDetailsArguments(Delivery: Delivery),
-        ),
+        // onTap: () => Navigator.pushNamed(
+        //   context,
+        //   DetailsScreen.routeName,
+        //   // arguments: ProductDetailsArguments(Delivery: Delivery),
+        // ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

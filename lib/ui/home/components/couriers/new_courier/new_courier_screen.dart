@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/ui/home/components/couriers/new_courier/screens/address/courier_address_tab.dart';
 import 'package:merchant/ui/home/components/couriers/new_courier/screens/attachments/attachments_screen.dart';
-import 'package:merchant/ui/home/components/couriers/new_courier/screens/attachments/body_attachment.dart';
 import 'package:merchant/ui/home/components/couriers/new_courier/screens/personal_information/courier_personal_information_tab.dart';
 import 'package:merchant/ui/home/components/couriers/new_courier/screens/vehicle/courier_vehicle_information_tab.dart';
-
+import '../../../../../services/translation_key.dart';
 import '../../../../../util/Constants.dart';
-
+import 'package:get/get.dart';
 class NewCourierScreen extends StatefulWidget {
   static String routeName = "/new_Courier";
 
@@ -27,7 +26,7 @@ class _NewCourierScreenState extends State<NewCourierScreen> {
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
             backgroundColor: Colors.white,
-            title: const CustomText(text: 'New Courier',fontColor: KPrimaryColor,),
+            title:  CustomText(text: newCourier.tr,fontColor: KPrimaryColor,),
             leading: GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: const Icon(Icons.arrow_back)),

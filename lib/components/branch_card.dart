@@ -41,13 +41,17 @@ class _BranchCardState extends State<BranchCard> {
         onTap: ()  {
           controller.productsOfBranchList(widget.branch.id??0);
           controller.CouriersLists(widget.branch.id??0);
+          controller.branchDetails(widget.branch.id??0);
+          controller.branchDeliveryCosts(widget.branch.id??0);
           Navigator.pushNamed(
             context,
             BranchDetailsScreen.routeName,
             arguments: BranchDetailsArguments(branch: widget.branch),
           );
+          controller.commentsOfBranchList(widget.branch.id??0);
         },
-        child: Column(
+        child: controller.isLoading.value // إذا كانت البيانات لم تُجلب بعد، أظهر شاشة التحميل
+            ? Center(child: CircularProgressIndicator()) : Column(
           children: [
             Container(
               width: getProportionateScreenWidth(double.infinity),
@@ -85,7 +89,7 @@ class _BranchCardState extends State<BranchCard> {
                       Column(
                         children: [
                           CustomText(
-                              text: widget.branch.name??"",
+                              text: controller.branchDetailsModel?.branchName??"",
                               fontSize: 20,
                               fontColor: KPrimaryColor),
                           SizedBox(height: getProportionateScreenHeight(10)),
@@ -93,7 +97,7 @@ class _BranchCardState extends State<BranchCard> {
                           SizedBox(height: getProportionateScreenHeight(10)),
                           RatingBar.builder(
                             itemSize: 30,
-                            initialRating: widget.branch.rating??0,
+                            initialRating:controller.branchDetailsModel?.rate??0,
                             minRating: 1,
                             direction: Axis.horizontal,
                             allowHalfRating: true,
@@ -108,7 +112,7 @@ class _BranchCardState extends State<BranchCard> {
                         ],
                       ),
                       Container(
-                        color: getStatus(widget.branch.status),
+                        color: getStatus(widget.branch.isOpen),
                         width: 10,
                         height: getProportionateScreenHeight(150),
                       ),

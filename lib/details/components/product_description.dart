@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:merchant/components/custom_text.dart';
-import 'package:merchant/util/CustomAlertDialog.dart';
-
 import '../../data/model/Product.dart';
+import '../../services/localization_services.dart';
+import '../../services/memory.dart';
 import '../../util/Constants.dart';
 import '../../util/size_config.dart';
 
@@ -13,10 +14,10 @@ var isActive = false;
 
 class ProductDescription extends StatefulWidget {
   const ProductDescription({
-    Key? key,
+    super.key,
     required this.product,
     this.pressOnSeeMore,
-  }) : super(key: key);
+  });
 
   final Product product;
   final GestureTapCallback? pressOnSeeMore;
@@ -39,7 +40,8 @@ class _ProductDescriptionState extends State<ProductDescription> {
               Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  widget.product.price.toString(),
+                  Get.find<CacheHelper>()
+                      .activeLocale == SupportedLocales.english?"Price${widget.product.price}LE":"السعر${widget.product.price}ج.م",
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
               ),
@@ -78,7 +80,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
           alignment: Alignment.centerRight,
           child: Container(
             padding: EdgeInsets.all(getProportionateScreenWidth(15)),
-            width: getProportionateScreenWidth(64),
+            width: getProportionateScreenWidth(70),
             decoration: BoxDecoration(
               color:
                   widget.product.isActive ? KActiveColor : KInActiveColor,
@@ -89,15 +91,19 @@ class _ProductDescriptionState extends State<ProductDescription> {
             ),
             child: GestureDetector(
               onTap: () {
-                _displayDialog(context, 'Change Status',
-                    'Do you want to change product to InActive!!');
+                _displayDialog(context, Get.find<CacheHelper>()
+                    .activeLocale == SupportedLocales.english?'Change Status':"تغيير الحالة",
+                    Get.find<CacheHelper>()
+                        .activeLocale == SupportedLocales.english?'Do you want to change product to InActive!!':"هل تريد تغيير المنتج إلى غير نشط!!");
               },
               child: Stack(
                 children: [
                    CustomText(
                     text: widget.product.isActive
-                        ?'ON'
-                        :"OFF",
+                        ?Get.find<CacheHelper>()
+                        .activeLocale == SupportedLocales.english?'ON':"مشغل"
+                        :Get.find<CacheHelper>()
+                        .activeLocale == SupportedLocales.english?"OFF":"مغلق",
                      fontColor: Colors.white,
                   ),
                   SvgPicture.asset(
@@ -105,7 +111,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
                     color: widget.product.isActive
                         ? KActiveColor
                         : KInActiveColor,
-                    height: getProportionateScreenWidth(16),
+                    height: getProportionateScreenWidth(20),
                   ),
                 ],
               ),
@@ -129,12 +135,14 @@ class _ProductDescriptionState extends State<ProductDescription> {
           ),
           child: GestureDetector(
             onTap: () {
-              _showToast('See More is clicked');
+              _showToast(Get.find<CacheHelper>()
+                  .activeLocale == SupportedLocales.english?'See More is clicked':"تم الضغط على عرض المزيد");
             },
-            child: Row(
-              children: const [
+            child:  Row(
+              children: [
                 Text(
-                  "See More Detail",
+                  Get.find<CacheHelper>()
+                      .activeLocale == SupportedLocales.english?"See More Detail":"عرض المزيد من التفاصيل",
                   style: TextStyle(
                       fontWeight: FontWeight.w600, color: KPrimaryColor),
                 ),
@@ -178,10 +186,19 @@ class _ProductDescriptionState extends State<ProductDescription> {
               content: Text(message),
               actions: [
                 MaterialButton(
-                    child: const Text("OK"),
-                    onPressed: () => Navigator.pop(context)),
+                    child:  Text(Get.find<CacheHelper>()
+                        .activeLocale == SupportedLocales.english?"OK":"حسنًا"),
+
+                    onPressed: () {
+                      isActive= !widget.product.isActive;
+                      Navigator.pop(context);
+                    setState(() {
+
+                    });
+                    }),
                 MaterialButton(
-                    child: const Text("Cancel"),
+                    child: Text(Get.find<CacheHelper>()
+                        .activeLocale == SupportedLocales.english?"Cancel":"إلغاء"),
                     onPressed: () => Navigator.pop(context))
               ]);
         });

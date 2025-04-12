@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:merchant/details/components/custom_app_bar.dart';
-
+import 'package:get/get.dart';
 import '../../../../../components/custom_text.dart';
+import '../../../../../services/translation_key.dart';
 import '../../../../../util/Constants.dart';
+import '../controller/products_controller.dart';
 import 'components/body.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -15,21 +16,24 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   Icon customIcon = const Icon(Icons.search);
-  Widget customSearchBar = const CustomText(
-    text: 'Search',
+  Widget customSearchBar =  CustomText(
+    text: searchTitle.tr,
     align: Alignment.center,
     fontColor: KPrimaryColor,
   );
 
   @override
   Widget build(BuildContext context) {
+    return GetBuilder(
+        init: ProductsController(context),
+    builder: (ProductsController controller) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         centerTitle: true,
         title: CustomText(
-          text: 'Search',
+          text: searchTitle.tr,
           align: Alignment.center,
           fontColor: KPrimaryColor,
         ) ,
@@ -38,8 +42,8 @@ class _SearchScreenState extends State<SearchScreen> {
             onTap: () => Navigator.pop(context),
             child: const Icon(Icons.arrow_back)),
       ),
-      body: const Body(),
-    );
+      body: controller.isLoading.value?CircularProgressIndicator():const Body(),
+    );});
   }
 
 }

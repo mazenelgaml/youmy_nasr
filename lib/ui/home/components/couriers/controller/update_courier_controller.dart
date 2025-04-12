@@ -1,15 +1,10 @@
-
 import 'dart:io';
-
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:merchant/ui/home/components/couriers/controller/couriers_controller.dart';
 import 'package:merchant/ui/home/components/couriers/courier_screen.dart';
-import 'package:path/path.dart';
-
 import '../../../../../components/custom_text_form_field.dart';
 import '../../../../../models/sign_up_error_model.dart';
 import '../../../../../services/memory.dart';

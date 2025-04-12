@@ -314,10 +314,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   }
 }
 
-_getStatusIcon(OrderState status) {
+Icon _getStatusIcon(OrderState status) {
   switch (status) {
     case OrderState.DELIEVERED:
-      // IconData(),
       return const Icon(
         Icons.done,
         color: KActiveColor,
@@ -332,6 +331,14 @@ _getStatusIcon(OrderState status) {
         Icons.cancel,
         color: KInActiveColor,
       );
+    case OrderState.InProgress:
+    // Handle the InProgress state, for example:
+      return const Icon(
+        Icons.access_time,
+        color: Colors.orange, // Or any other color or icon that fits
+      );
+    default:
+      throw UnimplementedError();
   }
 }
 
@@ -362,7 +369,21 @@ class OrderDetailsArguments {
 
   OrderDetailsArguments({required this.order});
 }
-
+OrderState _mapEnglishStatus(String? status) {
+  switch (status) {
+    case "In Progress":
+    case "New":
+      return OrderState.InProgress;
+    case "Delivery Done":
+    case "Arrival Done":
+    case "Receive Done":
+      return OrderState.DELIEVERED;
+    case "In Way":
+      return OrderState.InWay;
+    default:
+      return OrderState.CANCELLED;
+  }
+}
 void _showToast(String message) {
   Fluttertoast.showToast(
       msg: message,

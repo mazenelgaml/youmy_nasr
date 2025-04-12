@@ -82,7 +82,7 @@ class _ProductBranchCardState extends State<ProductBranchCard> {
                         ],
                       ),
                       Container(
-                        color: getStatus(widget.branch.status),
+                        color: getStatus(widget.branch.isOpen),
                         width: 10,
                         height: getProportionateScreenHeight(150),
                       ),

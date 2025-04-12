@@ -1,18 +1,19 @@
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:merchant/data/model/Branch.dart';
 import '../../../../../../../components/custom_button.dart';
 import '../../../../../../../util/Constants.dart';
 import '../../../../../../../util/size_config.dart';
+import '../../../controller/branches_controller.dart';
 import '../../../new_branch/new_branch_screen.dart';
 
 bool _switchValue = true;
 
 class BranchGeneralDetailsTab extends StatefulWidget {
-  const BranchGeneralDetailsTab({Key? key, required this.branch})
-      : super(key: key);
+  const BranchGeneralDetailsTab({super.key, required this.branch});
 
   final Branch branch;
 
@@ -24,6 +25,9 @@ class BranchGeneralDetailsTab extends StatefulWidget {
 class _BranchGeneralDetailsTabState extends State<BranchGeneralDetailsTab> {
   @override
   Widget build(BuildContext context) {
+    return GetBuilder(
+        init: BranchesController(),
+    builder: (BranchesController controller) {
     return SafeArea(
       child: SingleChildScrollView(
         padding:
@@ -44,15 +48,16 @@ class _BranchGeneralDetailsTabState extends State<BranchGeneralDetailsTab> {
                 aspectRatio: 1,
                 child: Hero(
                   tag: widget.branch.id??0,
-                  child: Image.asset(
+                  child: controller.branchDetailsModel?.image==null||controller.branchDetailsModel?.image==""?Image.asset(
                     'assets/images/logo.png',
                     fit: BoxFit.fill,
-                  ),
+                  ):
+                  Image.network(controller.branchDetailsModel?.image,fit: BoxFit.fill,),
                 ),
               ),
             ),
             CustomText(
-              text: widget.branch.name??"",
+              text: controller.branchDetailsModel?.branchName??"",
               fontSize: 25,
               fontColor: KPrimaryColor,
               align: Alignment.center,
@@ -61,15 +66,15 @@ class _BranchGeneralDetailsTabState extends State<BranchGeneralDetailsTab> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CustomText(
-                  text: getStatusDescription(widget.branch.status),
+                  text: getStatusDescription(controller.branchDetailsModel?.isOpen??false),
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  fontColor: getStatus(widget.branch.status),
+                  fontColor: getStatus(controller.branchDetailsModel?.isOpen??false),
                 ),
                 Switch(
-                  value: isOpened(widget.branch.status),
-                  activeColor: getStatus(widget.branch.status),
-                  inactiveThumbColor: getStatus(widget.branch.status),
+                  value: controller.branchDetailsModel?.isOpen ?? false,
+                  activeColor: getStatus(controller.branchDetailsModel?.isOpen??false),
+                  inactiveThumbColor: getStatus(controller.branchDetailsModel?.isOpen??false),
                   onChanged: (value) {
                     setState(() {
                       _switchValue = value;
@@ -90,7 +95,7 @@ class _BranchGeneralDetailsTabState extends State<BranchGeneralDetailsTab> {
             ),
             RatingBar.builder(
               itemSize: 30,
-              initialRating: widget.branch.rating??0,
+              initialRating: controller.branchDetailsModel?.rate??0,
               minRating: 1,
               direction: Axis.horizontal,
               allowHalfRating: true,
@@ -107,12 +112,12 @@ class _BranchGeneralDetailsTabState extends State<BranchGeneralDetailsTab> {
             ),
             CustomText(text:'Working Hours',fontColor: KPrimaryColor,
             fontWeight: FontWeight.bold,),
-            CustomText(text:widget.branch.workingHours??""),
+            CustomText(text:controller.branchDetailsModel?.workingHours??""),
             SizedBox(
               height: getProportionateScreenHeight(10),
             ),
             CustomText(text:'Payment Methods', fontWeight: FontWeight.bold,fontColor: KPrimaryColor,),
-            CustomText(text:widget.branch.paymentMethods??""),
+            CustomText(text:controller.branchDetailsModel?.paymentMethods??""),
             SizedBox(
               height: getProportionateScreenHeight(100),
             ),
@@ -125,6 +130,6 @@ class _BranchGeneralDetailsTabState extends State<BranchGeneralDetailsTab> {
           ],
         ),
       ),
-    );
+    );});
   }
 }

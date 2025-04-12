@@ -1,0 +1,2 @@
+D:/youmy_nasr/android/app/.cxx/Debug/2p5n161p/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/youmy_nasr/android/app/.cxx/Debug/2p5n161p/armeabi-v7a/CMakeFiles/rebuild_cache.dir

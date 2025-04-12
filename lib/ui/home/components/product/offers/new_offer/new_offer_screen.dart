@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:merchant/ui/home/components/product/offers/new_offer/body.dart';
-
+import 'package:get/get.dart';
 import '../../../../../../components/custom_text.dart';
+import '../../../../../../services/translation_key.dart';
 import '../../../../../../util/Constants.dart';
 
 class NewOfferScreen extends StatefulWidget {
@@ -18,8 +19,8 @@ class _NewOfferScreenState extends State<NewOfferScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const CustomText(
-          text: 'Create New Offer',
+        title: CustomText(
+          text: createNewOffer.tr,
           align: Alignment.center,
           fontColor: KPrimaryColor,
         ),

@@ -28,7 +28,7 @@ class _BranchAddressBodyState extends State<BranchAddressBody> {
         init: NewBranchController(context),
         builder: (NewBranchController controller) {
           return Form(
-            key: controller.formKey,
+            key: controller.formKey4,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -57,10 +57,12 @@ class _BranchAddressBodyState extends State<BranchAddressBody> {
                 CustomButton(
                   text: finishBTN.tr,
                   press: () {
-                    KeyboardUtil.hideKeyboard(context);
-                    controller.createBranch(context);
-                    Get.delete<NewBranchController>();
-
+    if (controller.formKey4.currentState!.validate()) {
+      (controller.formKey4.currentState!.save());
+      KeyboardUtil.hideKeyboard(context);
+      controller.createBranch(context);
+      Get.delete<NewBranchController>();
+    }
                   },
                 ),
                 SizedBox(height: getProportionateScreenHeight(40)),

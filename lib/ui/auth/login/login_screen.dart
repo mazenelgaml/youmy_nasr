@@ -23,28 +23,25 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
     return GetBuilder<LoginController>(
       init: LoginController(),
       builder: (LoginController controller) {
+        SizeConfig().init(context);
         return Scaffold(
-          resizeToAvoidBottomInset: false,
+          resizeToAvoidBottomInset: true, // Ensure proper handling of the keyboard
           body: SingleChildScrollView(
             child: Form(
-              key: controller.formKey,
+              key: controller.loginFormKey,
               child: Container(
-                width: Get.width,
-                height: Get.height,
                 color: Colors.white,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Stack(
                       alignment: Alignment.topRight, // Align settings button to top-right
                       children: [
                         Container(
-                          height: 222,
+                          height: SizeConfig.screenHeight! * 0.3, // Adjust height for responsiveness
                           decoration: const BoxDecoration(
                             color: KOpacityPrimaryColor,
                             borderRadius: BorderRadius.only(
@@ -56,96 +53,91 @@ class LoginScreen extends StatelessWidget {
                         Center(
                           child: Image.asset(
                             'assets/images/trans.png',
-                            width: 200,
-                            height: 200,
+                            width: SizeConfig.screenWidth! * 0.5, // Adjust image width responsively
+                            height: SizeConfig.screenWidth! * 0.5, // Adjust image height responsively
                             alignment: Alignment.center,
                           ),
                         ),
-                        // Settings Button
-                    
                       ],
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(
-                        top: 5,
-                        left: 20,
-                        right: 20,
-                        bottom: 5,
-                      ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           SizedBox(height: getProportionateScreenHeight(10)),
-                          Center(
+                          // Title text with dynamic alignment based on locale
+                          CustomText(
+                            text: signInTitle.tr,
+                            fontSize: 25,
+                            fontColor: KPrimaryColor,
+                            fontFamily: 'Roboto Italic',
+                            align: Get.find<CacheHelper>().activeLocale == SupportedLocales.english
+                                ? Alignment.centerLeft
+                                : Alignment.centerRight,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
                             child: CustomText(
-                              text: signInTitle.tr,
-                              fontSize: 25,
-                              fontColor: KPrimaryColor,
+                              align: Get.find<CacheHelper>().activeLocale == SupportedLocales.english
+                                  ? Alignment.centerLeft
+                                  : Alignment.centerRight,
+                              text: Get.find<CacheHelper>().getData(key: "companyName"),
+                              fontSize: 20,
+                              fontColor: Colors.black,
                               fontFamily: 'Roboto Italic',
-                              align: Get.find<CacheHelper>()
-                                  .activeLocale == SupportedLocales.english ?Alignment.centerLeft:Alignment.centerRight,
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 10.0),
-                            child: Center(
-                              child: CustomText(
-                                align: Get.find<CacheHelper>()
-                                    .activeLocale == SupportedLocales.english ?Alignment.centerLeft:Alignment.centerRight,
-                                text:Get.find<CacheHelper>().getData(key: "companyName") ,
-                                fontSize:20,
-                                fontColor: Colors.black,
-                                fontFamily: 'Roboto Italic',
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10.0),
-                            child: Center(
-                              child: CustomText(
-                                align: Get.find<CacheHelper>()
-                                    .activeLocale == SupportedLocales.english ?Alignment.centerLeft:Alignment.centerRight,
-                                text:Get.find<CacheHelper>().getData(key: "year") ,
-                                fontSize:20,
-                                fontColor: Colors.black,
-                                fontFamily: 'Roboto Italic',
-                              ),
+                            child: CustomText(
+                              align: Get.find<CacheHelper>().activeLocale == SupportedLocales.english
+                                  ? Alignment.centerLeft
+                                  : Alignment.centerRight,
+                              text: Get.find<CacheHelper>().getData(key: "year"),
+                              fontSize: 20,
+                              fontColor: Colors.black,
+                              fontFamily: 'Roboto Italic',
                             ),
                           ),
                           SizedBox(height: getProportionateScreenHeight(12)),
+
                           // Email Field
                           controller.buildEmailField(),
                           SizedBox(height: getProportionateScreenHeight(12)),
+
                           // Password Field
                           controller.buildPasswordField(),
                           SizedBox(height: getProportionateScreenHeight(12)),
-            
+
                           // Branch Dropdown moved below email and password
-                          controller.isLoading?Center(child: CircularProgressIndicator()):DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              labelText: 'الفروع',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            items: controller.branchesLogin
-                                ?.map((branch) => DropdownMenuItem<String>(
-                              value: branch,
-                              child: Text(branch),
-                            ))
-                                .toList(),
-                            onChanged: (value) {
-                              controller.selectedBranch = value!;
-                            },
-                          ),
-                          SizedBox(height: getProportionateScreenHeight(15)),
-            
-                          // Settings Fields (Merchant Name & Year) shown when showSettingsFields is true
-                          if (controller.showSettingsFields) ...[ controller
-                              .isLoading // إذا كانت البيانات لم تُجلب بعد، أظهر شاشة التحميل
-                              ? Center(child: CircularProgressIndicator()) :
-                            // Merchant Name
+                          if (controller.isLoading)
+                            Center(child: CircularProgressIndicator())
+                          else
                             DropdownButtonFormField<String>(
+                              decoration: InputDecoration(
+                                labelText: 'الفروع',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              items: controller.branchesLogin
+                                  ?.map((branch) => DropdownMenuItem<String>(
+                                value: branch,
+                                child: Text(branch),
+                              ))
+                                  .toList(),
+                              onChanged: (value) {
+                                controller.selectedBranch = value!;
+                              },
+                            ),
+                          SizedBox(height: getProportionateScreenHeight(15)),
+
+                          // Settings Fields (Merchant Name & Year) shown when showSettingsFields is true
+                          if (controller.showSettingsFields) ...[
+                            controller.isLoading
+                                ? Center(child: CircularProgressIndicator())
+                                : DropdownButtonFormField<String>(
                               decoration: InputDecoration(
                                 labelText: 'اسم المتجر',
                                 border: OutlineInputBorder(
@@ -162,8 +154,6 @@ class LoginScreen extends StatelessWidget {
                               },
                             ),
                             SizedBox(height: getProportionateScreenHeight(15)),
-            
-                            // Year
                             TextFormField(
                               controller: controller.yearController,
                               decoration: InputDecoration(
@@ -179,11 +169,11 @@ class LoginScreen extends StatelessWidget {
                             ),
                             SizedBox(height: getProportionateScreenHeight(15)),
                           ],
-            
+
                           // Error messages
                           FormError(errors: controller.errors),
                           SizedBox(height: getProportionateScreenHeight(15)),
-            
+
                           GestureDetector(
                             onTap: () => Get.toNamed(ForgetPasswordScreen.routeName),
                             child: CustomText(
@@ -194,13 +184,13 @@ class LoginScreen extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: getProportionateScreenHeight(15)),
-            
+
                           // Login Button
                           CustomButton(
                             text: signInTextBTN.tr,
                             press: () {
-                              if (controller.formKey.currentState!.validate()) {
-                                controller.formKey.currentState!.save();
+                              if (controller.loginFormKey.currentState!.validate()) {
+                                controller.loginFormKey.currentState!.save();
                                 KeyboardUtil.hideKeyboard(context);
                                 controller.signInBranches(context);
                               }

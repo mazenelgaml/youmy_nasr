@@ -1,69 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:merchant/services/translation_key.dart';
 import 'package:get/get.dart';
 import '../../../../../../components/custom_button.dart';
-import '../../../../../../components/custom_text.dart';
-import '../../../../../../components/custom_text_form_field.dart';
 import '../../../../../../components/form_error.dart';
 import '../../../../../../util/keyboard.dart';
 import '../../../../../../util/size_config.dart';
-import '../../../../../home/home_screen.dart';
 import '../../../controller/signup_controller.dart';
-
 class SignUpFormNewAddress extends StatefulWidget {
   const SignUpFormNewAddress({Key? key}) : super(key: key);
-
   @override
   State<SignUpFormNewAddress> createState() => _SignUpFormNewAddressState();
 }
-
 class _SignUpFormNewAddressState extends State<SignUpFormNewAddress> {
-  //region variables
-  // final List<String> cities = [
-  //   merchantSelectCity.tr,
-  //   "Cairo",
-  //   "Alexandria",
-  //   "Luxor",
-  //   "Sharkia",
-  //   "Marsa Matrouh",
-  //   "Suiez",
-  //   "Phayioum"
-  // ];
-  //
-  // final List<String> regions = [
-  //   merchantSelectRegion.tr,
-  //   "Maddi",
-  //   "Tahrir",
-  //   "Down Town",
-  //   "5th Setellment",
-  //   "Aobour",
-  //   "Nasr City",
-  //   "Hadayek Helwan"
-  // ];
-
-
-
-
-  //endregion
-
-  //region helper functions
-
-
-
-
-
-
-
-//endregion
-
   @override
   Widget build(BuildContext context) {
     return GetBuilder(
         init: SignupController(context),
         builder: (SignupController controller) {
           return Form(
-            key: controller.formKey,
+            key: controller.formKey3,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -92,9 +47,11 @@ class _SignUpFormNewAddressState extends State<SignUpFormNewAddress> {
                 CustomButton(
                   text: finishBTN.tr,
                   press: () {
+    if (controller.formKey3.currentState!.validate()) {
+    controller.formKey3.currentState!.save();
                     KeyboardUtil.hideKeyboard(context);
                     controller.createStore(context);
-
+}
                   },
                 ),
                 SizedBox(height: getProportionateScreenHeight(40)),

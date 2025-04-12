@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -7,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:merchant/services/memory.dart';
 import 'package:merchant/services/translation_key.dart';
+import 'package:merchant/ui/auth/login/controller/login_controller.dart';
 import 'package:merchant/ui/auth/login/login_screen.dart';
 import 'package:merchant/ui/auth/signup/signup_screen.dart';
 import 'package:merchant/ui/profile/components/bank_account/bank_account_screen.dart';
@@ -20,7 +20,9 @@ import '../../../services/localization_services.dart';
 import '../../../util/Constants.dart';
 
 import '../../auth/start/start_screen.dart';
+import '../../home/components/branches/controller/branches_controller.dart';
 import '../../home/components/branches/new_branch/new_branch_screen.dart';
+import '../about_us_screen.dart';
 import '../notification/notifiction_screen.dart';
 import 'profile_menu.dart';
 
@@ -34,6 +36,9 @@ class _BodyState extends State<Body> {
 
   @override
   Widget build(BuildContext context) {
+    return GetBuilder(
+        init: LoginController(),
+    builder: (LoginController controller) {
     return Scaffold(
       appBar: AppBar(
         leading: null,
@@ -87,8 +92,8 @@ class _BodyState extends State<Body> {
             ProfileMenu(
               text: merchantAndStoreDetails.tr,
               icon: Icons.store,
-              press: () =>
-                  {Navigator.pushNamed(context, SignUpScreen.routeName)},
+              press: () {}
+                  // {Navigator.pushNamed(context, SignUpScreen.routeName)},
             ),
             ProfileMenu(
               text: securityAndLogIn.tr,
@@ -103,7 +108,7 @@ class _BodyState extends State<Body> {
             ProfileMenu(
               text: settlementReports.tr,
               icon: Icons.description,
-              press: () {Navigator.pushNamed(context, ReportScreen.routeName);},
+              press: () {}//Navigator.pushNamed(context, ReportScreen.routeName);},
             ),
             ProfileMenu(
               text: bankAccountInformation.tr,
@@ -132,7 +137,7 @@ class _BodyState extends State<Body> {
               icon: Icons.info_outline,
               press: () {
                 print("https://www.google.com/");
-                _launchInWebViewOrVC("https://www.google.com/");
+                Get.to(() => AboutUsScreen(htmlData: controller.aboutUs.first.aboutUsBody ?? 'No content available'));
               },
             ),
             ProfileMenu(
@@ -147,8 +152,8 @@ class _BodyState extends State<Body> {
               text: privacyPolicy.tr,
               icon: Icons.privacy_tip_sharp,
               press: () {
-                Get.to(()=>StartScreen());
-                // _launchInWebViewOrVC("https://twitter.com/home");
+                // Get.to(()=>StartScreen());
+                _launchInWebViewOrVC("https://twitter.com/home");
               },
             ),
             ProfileMenu(
@@ -164,6 +169,10 @@ class _BodyState extends State<Body> {
               text: logOut.tr,
               icon: Icons.logout,
               press: () {
+                // Get.to(()=>LoginScreen);
+                // Get.find<CacheHelper>().loggingOut();
+                Get.put(LoginController);
+                controller.getBranches();
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (BuildContext context) => const LoginScreen()));
               },
@@ -171,7 +180,7 @@ class _BodyState extends State<Body> {
           ],
         ),
       ),
-    );
+    );});
   }
 
   void _pickImage() {
@@ -225,6 +234,7 @@ class _BodyState extends State<Body> {
     );
     await launchUrl(launchUri);
   }
+
 
   void _showToast(String message) {
     Fluttertoast.showToast(

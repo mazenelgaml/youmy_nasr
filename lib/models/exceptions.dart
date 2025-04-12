@@ -36,5 +36,8 @@ void handleDioExceptions(DioException e) {
           message: 'No response received from the server.',
         );
       }
+    case DioExceptionType.badCertificate:
+      // TODO: Handle this case.
+      throw UnimplementedError();
   }
 }

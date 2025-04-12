@@ -49,6 +49,7 @@ class _ProductsDataState extends State<ProductsData> {
                 onDismissed: (direction) {
                   setState(() {
                     controller.productsD.removeAt(index);
+                    // controller.productDelete(controller.productsD[index].id);
                   });
                 },
                 background: Container(

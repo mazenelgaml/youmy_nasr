@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:merchant/data/model/Delivery.dart';
-
-import '../../../../../../../../components/attachment_card.dart';
 import '../../../../../../../../components/delivery_card.dart';
-import '../../../../../../../../data/model/Attachment.dart';
-import '../../../../../../../../data/model/Product.dart';
 import '../../../../../../../../util/size_config.dart';
+import '../branch_dlivery_screen.dart';
 
 class Body extends StatefulWidget {
-  const Body({Key? key}) : super(key: key);
+  const Body({super.key});
 
   @override
   State<Body> createState() => _BodyState();
@@ -28,8 +24,6 @@ class _BodyState extends State<Body> {
                 demoDeliveries.length,
                     (index) {
                       return DeliveryCard(delivery: demoDeliveries[index]);
-                  return const SizedBox
-                      .shrink(); // here by default width and height is 0
                 },
               ),
 
