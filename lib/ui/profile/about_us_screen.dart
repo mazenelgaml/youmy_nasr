@@ -29,7 +29,7 @@ class AboutUsScreen extends StatelessWidget {
               centerTitle: true,
               elevation: 0,
             ),
-            body: Container(
+            body: controller.isLoading?Center(child: CircularProgressIndicator(),):Container(
               color: Colors.grey[100],
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(16.0),

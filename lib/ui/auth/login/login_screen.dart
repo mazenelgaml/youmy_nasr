@@ -14,6 +14,7 @@ import '../../../util/size_config.dart';
 import '../forget_password/forget_password_screen.dart';
 import '../signup/controller/signup_controller.dart';
 import '../signup/signup_screen.dart';
+import '../verification/verification_screen.dart';
 import 'controller/login_controller.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -175,7 +176,7 @@ class LoginScreen extends StatelessWidget {
                           SizedBox(height: getProportionateScreenHeight(15)),
 
                           GestureDetector(
-                            onTap: () => Get.toNamed(ForgetPasswordScreen.routeName),
+                            onTap: () => Get.toNamed(VerificationScreen.routeName),
                             child: CustomText(
                               text: signInTextForgetPass.tr,
                               fontFamily: 'Roboto Bold',

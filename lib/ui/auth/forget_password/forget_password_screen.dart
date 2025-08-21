@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import '../login/login_screen.dart';
 
 class ForgetPasswordScreen extends StatelessWidget {
-  const ForgetPasswordScreen({Key? key}) : super(key: key);
+  final String email;
+  const ForgetPasswordScreen({super.key, required this.email});
   static var routeName="forget_password";
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,7 @@ class ForgetPasswordScreen extends StatelessWidget {
             onTap: () => Navigator.pop(context),
             child: const Icon(Icons.arrow_back)),
       ),
-      body: const Body(),
+      body:  Body(email: email,),
     );
   }
 }

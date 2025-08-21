@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:merchant/ui/auth/confirm_verification/components/body.dart';
 
 class ConfirmVerificationScreen extends StatelessWidget {
-  const ConfirmVerificationScreen({Key? key}) : super(key: key);
+  final String email;
+  const ConfirmVerificationScreen({super.key, required this.email});
   static var routeName = "/confirm_verification";
 
   @override
@@ -15,7 +16,7 @@ class ConfirmVerificationScreen extends StatelessWidget {
             onTap: () => Navigator.pop(context),
             child: const Icon(Icons.arrow_back)),
       ),
-      body: const Body(),
+      body:  Body(email: email,),
     );
   }
 }

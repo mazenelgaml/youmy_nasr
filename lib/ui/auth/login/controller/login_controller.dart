@@ -6,6 +6,7 @@ import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/models/about_us_model.dart' as us;
 import '../../../../components/custom_text_form_field.dart';
 import '../../../../models/branches_login_model.dart';
+import '../../../../models/contact_us_model.dart' as c;
 import '../../../../models/error_model.dart';
 import '../../../../models/login_model.dart';
 import '../../../../models/privacy_model.dart' as p;
@@ -30,6 +31,7 @@ bool isLoading=true;
   bool showSettingsFields = false;
   List<us.Datum> aboutUs = [];
   List<p.Datum> privacy = [];
+  List<c.Datum> contactUs = [];
   void toggleSettingsFields() {
 
     showSettingsFields = !showSettingsFields;
@@ -213,6 +215,7 @@ bool isLoading=true;
     await getBranches();
     await getCompany();
     await getAboutUs();
+    await getContactUs();
 
   }
 
@@ -305,6 +308,59 @@ bool isLoading=true;
         p.PrivacyModel aprivacyModel = p.PrivacyModel.fromJson(response.data);
         privacy = aprivacyModel.data ?? [];
         print(privacy); // Save full job data if needed
+      } else {
+        // Error handling for failed response
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(content: Text('Failed to load about us')),
+        );
+      }
+    } catch (e) {
+      // Handle any errors that occur during the API call
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(content: Text('Error occurred while connecting to the API')),
+      );
+    } finally {
+      isLoading = false; // Stop loading
+    }
+
+    update(); // Update UI
+  }
+  Future<void> getContactUs() async {
+    aboutUs = [];
+    String? token = await Get.find<CacheHelper>().getData(key: "token");
+    print("hello");
+    final Dio dio = Dio(
+      BaseOptions(
+        baseUrl:Get.find<CacheHelper>().getData(key: "Api"),
+        validateStatus: (status) {
+          return status != null && status < 500;
+        },
+      ),
+    );
+
+    isLoading = true; // Start loading
+
+    try {
+      final response = await dio.post(
+        "/api/v1/contentManagementContactUs/search",
+        data: {
+          "search": {
+            "companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
+          },
+        },
+        options: Options(
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer ${token}"
+            }
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        // Successful response
+        c.ContactUsModel contactUsModel = c.ContactUsModel.fromJson(response.data);
+        contactUs = contactUsModel.data ?? [];
+        print(contactUs); // Save full job data if needed
       } else {
         // Error handling for failed response
         ScaffoldMessenger.of(Get.context!).showSnackBar(

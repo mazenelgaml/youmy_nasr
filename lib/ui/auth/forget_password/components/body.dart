@@ -13,9 +13,11 @@ import '../../../../services/memory.dart';
 import '../../../../services/translation_key.dart';
 import '../../../../util/keyboard.dart';
 import '../../../../util/size_config.dart';
+import '../controller/forget_password_controller.dart';
 
 class Body extends StatefulWidget {
-  const Body({Key? key}) : super(key: key);
+  final String email;
+  const Body({super.key, required this.email});
 
   @override
   State<Body> createState() => _BodyState();
@@ -25,39 +27,17 @@ class _BodyState extends State<Body> {
   //region variables
   final String TAG = "LOG IN: ";
 
-  final _formKey = GlobalKey<FormState>();
 
-  String? password;
-
-  String? confirmPassword;
-
-  List<String?> errors = [];
-
-//endregion
-
-  //region helper functions
-  void addError({String? error}) {
-    if (!errors.contains(error)) {
-      setState(() {
-        errors.add(error!);
-      });
-    }
-  }
-
-  void removeError({String? error}) {
-    if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
-    }
-  }
 
   //endregion
 
   @override
   Widget build(BuildContext context) {
+    return GetBuilder<ForgetPasswordController>(
+        init: ForgetPasswordController(),
+    builder: (ForgetPasswordController controller) {
     return Form(
-      key: _formKey,
+      key: controller.formKey,
       child: Container(
         // height: MediaQuery.of(context).size.height,
         // width: MediaQuery.of(context).size.width,
@@ -99,21 +79,20 @@ class _BodyState extends State<Body> {
                     fontFamily: 'Roboto Bold',
                   ),
                   SizedBox(height: getProportionateScreenHeight(20)),
-                  buildPasswordField(),
+                  controller.buildPasswordField(),
                   SizedBox(height: getProportionateScreenHeight(20)),
-                  buildConfirmPasswordField(),
+                  controller.buildConfirmPasswordField(),
                   SizedBox(height: getProportionateScreenHeight(20)),
-                  FormError(errors: errors),
+                  FormError(errors: controller.errors),
                   SizedBox(height: getProportionateScreenHeight(20)),
                   CustomButton(
                     text:  merchantConfirm.tr,
                     press: () {
-                      if (_formKey.currentState!.validate()) {
-                        _formKey.currentState!.save();
+                      if (controller.formKey.currentState!.validate()) {
+                        controller.formKey.currentState!.save();
                         // if all are valid then go to success screen
                         KeyboardUtil.hideKeyboard(context);
-                        Navigator.popAndPushNamed(
-                            context, ConfirmVerificationScreen.routeName);
+                        controller.resetPassword(context, widget.email);
                       }
                     },
                   ),
@@ -124,63 +103,7 @@ class _BodyState extends State<Body> {
           ],
         ),
       ),
-    );
+    );});
   }
 
-  CustomTextFormField buildConfirmPasswordField() {
-    return CustomTextFormField(
-        obscureText: true,
-        textInputType: TextInputType.visiblePassword,
-        hintText:signUpConfirmPassword.tr,
-        textInputAction: TextInputAction.done,
-        suffixIcon: const Icon(Icons.visibility_off),
-        onPressed: (newValue) => confirmPassword = newValue,
-        onChange: (value) {
-          if (value.isNotEmpty) {
-            removeError(error: kConfirmPassNullError);
-          } else if (value.isNotEmpty && password == confirmPassword) {
-            removeError(error: kMatchPassError);
-          }
-          confirmPassword = value;
-        },
-        onValidate: (value) {
-          if (value!.isEmpty) {
-            addError(error: kConfirmPassNullError);
-            return "";
-          } else if ((password != value)) {
-            addError(error: kMatchPassError);
-            return "";
-          }
-          return null;
-        });
-  }
-
-  CustomTextFormField buildPasswordField() {
-    return CustomTextFormField(
-      obscureText: true,
-      hintText: signUpPassword.tr,
-      textInputType: TextInputType.visiblePassword,
-      suffixIcon: const Icon(Icons.visibility_off),
-      onPressed: (newValue) => password = newValue,
-      onChange: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kPassNullError);
-        } else if (value.length >= 8) {
-          removeError(error: kShortPassError);
-        }
-        password = value;
-      },
-      onValidate: (value) {
-        if (value!.isEmpty) {
-          addError(error: kPassNullError);
-          return "";
-        } else if (value.length < 8) {
-          addError(error: kShortPassError);
-          return "";
-        }
-
-        return null;
-      },
-    );
-  }
 }

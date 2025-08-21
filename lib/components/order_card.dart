@@ -10,12 +10,12 @@ import 'custom_text.dart';
 
 class OrderCard extends StatefulWidget {
   const OrderCard({
-    Key? key,
+    super.key,
     this.width = 30,
     this.height = 20,
     this.aspectRatio = 1.02,
     required this.order,
-  }) : super(key: key);
+  });
 
   final double width, height, aspectRatio;
   final Order order;
@@ -32,11 +32,7 @@ class _OrderCardState extends State<OrderCard> {
       EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
       child: GestureDetector(
         onTap: () => {
-          Navigator.pushNamed(
-            context,
-            OrderDetailsScreen.routeName,
-            arguments: OrderDetailsArguments(order: widget.order),
-          )
+          Get.to(()=>OrderDetailsScreen(id: widget.order.id, empId: 0,))
         },
         child: Column(
           children: [

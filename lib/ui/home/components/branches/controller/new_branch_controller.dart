@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:merchant/ui/home/home_screen.dart';
 import '../../../../../components/custom_text_form_field.dart';
 import '../../../../../models/cities_list_model.dart' as model;
 import '../../../../../models/coutry_list_model.dart';
@@ -20,12 +21,14 @@ import '../../../../../util/Constants.dart';
 class NewBranchController extends GetxController {
 // List of job names to show in the dropdown
   NewBranchController( this.context);
+  bool isLoading=false;
   BuildContext context;
   String? name, type, summary, address, workingHours, paymentTypes;
   bool daily = false;
   final List<String?> errors = [];
   final List<int> hoursList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
    List<DaysList>? daysName=[];
+  List<String> exceptDays = [];
    List<String>selectDay=[];
   List<PaymentType>? paymentName=[];
   int fromHour = 1, toHour = 1;
@@ -403,41 +406,48 @@ class NewBranchController extends GetxController {
   ListTile buildRegionField() {
     return ListTile(
       title: Text(selectedRegion ?? 'Select region'),
-      trailing: Icon(Icons.arrow_drop_down,size: 40,),
+      trailing: Icon(Icons.arrow_drop_down, size: 40),
       onTap: () async {
         await PostRegionLists();
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('Select Region'),
-              content: SingleChildScrollView(
-                child: ListTileTheme(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
-                  minLeadingWidth: 40.0, // Set minimum leading width
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: selectRegion?.map((region) {
-                      return ListTile(
-                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
-                        title: Text(region),
-                        onTap: () {
-                          selectedRegion = region;
-                          Navigator.pop(context);
-                          regionCode = RegionName?.firstWhere((region) => region.zoneName == selectedRegion).zoneCode;// Close the dialog
-                          update(); // Update the UI
-                        },
-                      );
-                    }).toList() ?? [],
-                  ),
+        Get.dialog(
+          AlertDialog(
+            title: Text('Select Region'),
+            content: SingleChildScrollView(
+              child: ListTileTheme(
+                contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+                minLeadingWidth: 40.0,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: selectRegion?.map((region) {
+                    return ListTile(
+                      leading: Icon(Icons.location_on, size: 24.0),
+                      title: Text(region),
+                      onTap: () {
+                        selectedRegion = region;
+
+                        Region? selected;
+                        try {
+                          selected = RegionName?.firstWhere(
+                                (r) => r.zoneName == selectedRegion,
+                          );
+                        } catch (e) {
+                          selected = null;
+                        }
+
+                        regionCode = selected?.zoneCode;
+
+                        Get.back(); // إغلاق الـ Dialog
+                        update();   // تحديث الواجهة
+                      },
+                    );
+                  }).toList() ?? [],
                 ),
               ),
-            );
-          },
+            ),
+          ),
         );
       },
-    );
-  }
+    );}
   Future<void> PostRegionLists() async {
     cityCode = citiesName?.firstWhere((city) => city.cityName == selectedCity).cityCode;
 
@@ -499,78 +509,73 @@ class NewBranchController extends GetxController {
   }
   ListTile buildCityField() {
     return ListTile(
-      title: Text(selectedCity ?? 'Select City'),
-      trailing: Icon(Icons.arrow_drop_down,size: 40,),
+      title: Text(selectedCity),
+      trailing: Icon(Icons.arrow_drop_down, size: 40),
       onTap: () async {
         await PostCityLists();
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('Select City'),
-              content: SingleChildScrollView(
-                child: ListTileTheme(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
-                  minLeadingWidth: 40.0, // Set minimum leading width
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: selectCity?.map((city) {
-                      return ListTile(
-                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
-                        title: Text(city),
-                        onTap: () async{
-                          selectedCity = city;
-                          await PostRegionLists();
-                          Navigator.pop(context); // Close the dialog
-                          update(); // Update the UI
-                        },
-                      );
-                    }).toList() ?? [],
-                  ),
+        Get.dialog(
+          AlertDialog(
+            title: Text('Select City'),
+            content: SingleChildScrollView(
+              child: ListTileTheme(
+                contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+                minLeadingWidth: 40.0,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: selectCity?.map((city) {
+                    return ListTile(
+                      leading: Icon(Icons.location_on, size: 24.0),
+                      title: Text(city),
+                      onTap: () async {
+                        selectedCity = city;
+                        await PostRegionLists();
+                        Get.back(); // يغلق الـ Dialog
+                        update();   // لتحديث الواجهة
+                      },
+                    );
+                  }).toList() ?? [],
                 ),
               ),
-            );
-          },
+            ),
+          ),
         );
       },
     );
   }
+
   ListTile buildCountryField() {
     return ListTile(
-      title: Text(selectedCountry ?? 'Select Country'),
+      title: Text(selectedCountry),
       trailing: Icon(Icons.arrow_drop_down,size: 40,),
       onTap: () async {
         await PostCountryLists();
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('Select Country'),
-              content: SingleChildScrollView(
-                child: ListTileTheme(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
-                  minLeadingWidth: 40.0, // Set minimum leading width
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: selectCountry?.map((country) {
-                      return ListTile(
-                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
-                        title: Text(country),
-                        onTap: () async{
-                          selectedCountry = country;
-                          await PostCityLists();
-                          Navigator.pop(context); // Close the dialog
-                          update();
-                          // Update the UI
-                        },
-                      );
-                    }).toList() ?? [],
-                  ),
+        Get.dialog(
+          AlertDialog(
+            title: Text('Select Country'),
+            content: SingleChildScrollView(
+              child: ListTileTheme(
+                contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+                minLeadingWidth: 40.0,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: selectCountry?.map((country) {
+                    return ListTile(
+                      leading: Icon(Icons.location_on, size: 24.0),
+                      title: Text(country),
+                      onTap: () async {
+                        selectedCountry = country;
+                        await PostCityLists();
+                        Get.back(); // Close the dialog
+                        update(); // Update the UI
+                      },
+                    );
+                  }).toList() ?? [],
                 ),
               ),
-            );
-          },
+            ),
+          ),
         );
+
       },
     );
   }
@@ -901,7 +906,7 @@ class NewBranchController extends GetxController {
 
       if (response.statusCode == 200) {
         update();
-        Navigator.pop(context);
+        Get.back();
         print("API Response: ${response.data}");
 
 
@@ -1020,7 +1025,7 @@ class NewBranchController extends GetxController {
         ), );
 
       if (response.statusCode == 200) {
-        Get.back();
+        Get.to(()=>HomeScreen());
       } else {
         print('Failed to create branch');
       }

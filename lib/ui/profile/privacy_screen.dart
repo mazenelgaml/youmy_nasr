@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../util/Constants.dart';
+import '../../services/localization_services.dart';
+import '../../services/memory.dart';
 import '../auth/login/controller/login_controller.dart';
 
 class PrivacyScreen extends StatelessWidget {
@@ -17,8 +19,9 @@ class PrivacyScreen extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: KPrimaryColor,
             iconTheme: const IconThemeData(color: Colors.white),
-            title: const Text(
-              "About Us",
+            title:  controller.isLoading?Center(child: CircularProgressIndicator(),):Text(
+              Get.find<CacheHelper>()
+                  .activeLocale == SupportedLocales.english ? controller.privacy[0].privacyNameEng??"":controller.privacy[0].privacyNameAra??"",
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -27,7 +30,7 @@ class PrivacyScreen extends StatelessWidget {
             centerTitle: true,
             elevation: 0,
           ),
-          body: Container(
+          body:controller.isLoading?Center(child: CircularProgressIndicator(),): Container(
             color: Colors.grey[100],
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),

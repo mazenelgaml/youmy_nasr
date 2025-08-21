@@ -37,10 +37,9 @@ final Map<String, WidgetBuilder> routes = {
   SplashScreen.routeName: (context) => const SplashScreen(),
   LoginScreen.routeName: (context) => const LoginScreen(),
   SignUpScreen.routeName: (context) => const SignUpScreen(),
-  ForgetPasswordScreen.routeName: (context) => const ForgetPasswordScreen(),
+
   VerificationScreen.routeName: (context) => const VerificationScreen(),
-  ConfirmVerificationScreen.routeName: (context) =>
-      const ConfirmVerificationScreen(),
+
   HomeScreen.routeName: (context) => const HomeScreen(),
   CourierScreen.routeName: (context) => const CourierScreen(),
   DetailsScreen.routeName: (context) => const DetailsScreen(),
@@ -60,11 +59,10 @@ final Map<String, WidgetBuilder> routes = {
   FilterScreen.routeName: (context) => const FilterScreen(),
   CommentsScreen.routeName: (context) => const CommentsScreen(),
   OrderSearchScreen.routeName: (context) => const OrderSearchScreen(),
-  OrderDetailsScreen.routeName: (context) => const OrderDetailsScreen(),
   NotificationScreen.routeName: (context) => const NotificationScreen(),
   NotificationDetailsScreen.routeName: (context) =>
       const NotificationDetailsScreen(),
   BranchNewOfferScreen.routeName: (context) => const BranchNewOfferScreen(),
   LocationScreen.routeName: (context) => const LocationScreen(),
-  OrderChangeCourierScreen.routeName: (context) => const OrderChangeCourierScreen()
+  OrderChangeCourierScreen.routeName: (context) => const OrderChangeCourierScreen(id: 0,)
 };

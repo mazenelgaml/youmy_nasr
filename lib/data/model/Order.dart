@@ -9,8 +9,8 @@ import 'Product.dart';
 
 class Order {
   final int id,branchId;
-  final String date,orderNo,statusDescription,clientNo,clientName,branchName;
-  final OrderState status;
+   String date,orderNo,statusDescription,clientNo,clientName,branchName;
+   OrderState status;
   final List<Product> productList;
    Courier? courier=null;
 

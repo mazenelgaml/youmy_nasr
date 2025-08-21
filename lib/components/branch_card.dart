@@ -13,13 +13,13 @@ class BranchCard extends StatefulWidget {
 
 
   const BranchCard({
-    Key? key,
+    super.key,
     this.width = 30,
     this.height = 20,
     this.aspectRatio = 1.02,
     required this.branch,
 
-  }) : super(key: key);
+  });
 
   final double width, height, aspectRatio;
   final Branch branch;
@@ -43,11 +43,11 @@ class _BranchCardState extends State<BranchCard> {
           controller.CouriersLists(widget.branch.id??0);
           controller.branchDetails(widget.branch.id??0);
           controller.branchDeliveryCosts(widget.branch.id??0);
-          Navigator.pushNamed(
-            context,
+          Get.toNamed(
             BranchDetailsScreen.routeName,
             arguments: BranchDetailsArguments(branch: widget.branch),
           );
+
           controller.commentsOfBranchList(widget.branch.id??0);
         },
         child: controller.isLoading.value // إذا كانت البيانات لم تُجلب بعد، أظهر شاشة التحميل

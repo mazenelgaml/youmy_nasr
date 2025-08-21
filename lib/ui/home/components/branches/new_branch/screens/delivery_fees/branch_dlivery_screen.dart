@@ -142,15 +142,18 @@ class _BottomSheetBodyState extends State<BottomSheetBody> {
               CustomButton(
                 text: create.tr,
                 press: ()  async{
-                  controller.postDeliveryFees();
-                  Delivery newDelivery=Delivery(
-                      id:DateTime.now().millisecondsSinceEpoch,
-                      title: "Delivery Cost",
-                      from: double.parse(controller.distanceFromController.text.trim()),
-                      to: double.parse(controller.distanceToController.text.trim()),
-                      cost: double.parse(controller.distanceTCostController.text.trim()));
-                  demoDeliveries.add(newDelivery);
-
+                  controller.isLoading=true;
+                  setState(() {
+                    controller.postDeliveryFees();
+                    Delivery newDelivery=Delivery(
+                        id:DateTime.now().millisecondsSinceEpoch,
+                        title: "Delivery Cost",
+                        from: double.parse(controller.distanceFromController.text.trim()),
+                        to: double.parse(controller.distanceToController.text.trim()),
+                        cost: double.parse(controller.distanceTCostController.text.trim()));
+                    demoDeliveries.add(newDelivery);
+                  });
+                 controller.isLoading=false;
                 },
               ),
               SizedBox(height: getProportionateScreenHeight(40)),

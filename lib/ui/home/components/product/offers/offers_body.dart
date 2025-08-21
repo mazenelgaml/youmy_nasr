@@ -20,6 +20,7 @@ import '../../../home_screen.dart';
 import '../controller/products_controller.dart';
 import '../filter/filter_screen.dart';
 import '../show_all_branches/product_branches_filter_screen.dart';
+import 'controller/offers_controller.dart';
 
 bool haveData = true;
 
@@ -37,8 +38,8 @@ class _OffersBodyState extends State<OffersBody> {
   @override
   Widget build(BuildContext context) {
     return GetBuilder(
-        init: ProductsController(context),
-    builder: (ProductsController controller) {
+        init: OffersController(context),
+    builder: (OffersController controller) {
     return Scaffold(
       appBar: AppBar(
         leading: null,

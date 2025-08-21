@@ -9,6 +9,7 @@ import '../../../models/add_bank_account_error_model.dart';
 import '../../../models/bank_accounts_list_model.dart';
 import '../../../services/localization_services.dart';
 import '../../../services/translation_key.dart';
+import '../components/bank_account/bank_accounts_inserted_screen.dart';
 
 
 class ProfileController extends GetxController{
@@ -18,7 +19,7 @@ class ProfileController extends GetxController{
   TextEditingController accountNumberrController =TextEditingController();
   List<BankAccount> bankAccounts = [];
 
-  // List of job names to show in the dropdown
+
   var isLoading = false.obs;
   @override
   Future<void> onInit() async {
@@ -199,7 +200,7 @@ class ProfileController extends GetxController{
 
       if (response.statusCode == 200) {
         // Successful login
-
+        Get.off(()=>BankAccountsInsertedScreen());
           showDialog(
             context: context,
             builder: (BuildContext context) {

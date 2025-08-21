@@ -48,7 +48,7 @@ class BankAccountsInsertedScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Get.to(()=>BankAccountScreen()); // Replace this with your action.
+          Get.off(()=>BankAccountScreen()); // Replace this with your action.
         },
         backgroundColor: KPrimaryColor,
         child: const Icon(Icons.add),

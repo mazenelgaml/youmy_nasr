@@ -100,6 +100,8 @@ class BranchesController extends GetxController {
 
   List<ProductDetails> productsNames = [];
   List<Product> productsD = [];
+  List<ProductDetails> offersNames = [];
+  List<Product> offersD = [];
  // Track loading state
 
   List<CommentsListB>commentsNames=[];
@@ -163,6 +165,68 @@ class BranchesController extends GetxController {
         // Error handling for failed response
         ScaffoldMessenger.of(Get.context!).showSnackBar(
           SnackBar(content: Text('Failed to load products')),
+        );
+      }
+    } catch (e) {
+      // Handle any errors that occur during the API call
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(content: Text('Error occurred while connecting to the API')),
+      );
+    } finally {
+      isLoading.value = false;
+      update();// Stop loading
+    }
+
+    update(); // Update UI
+  }
+  Future<void> offersOfBranchList(int branchCode) async {
+    isLoading.value=true;
+    String? token = await Get.find<CacheHelper>().getData(key: "token");
+    final Dio dio = Dio(
+      BaseOptions(
+        baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
+        validateStatus: (status) {
+          return status != null && status < 500;
+        },
+      ),
+    );
+    // Start loading
+
+    try {
+      final response = await dio.post(
+        "/api/v1/items/offers",
+        data: {
+          "search": {"companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
+            "branchCode": branchCode,
+            "LangId": Get.find<CacheHelper>()
+                .activeLocale == SupportedLocales.english?2:1,},
+        },
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${token}"
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Successful response
+        ProductsListModel couriesListModel =
+        ProductsListModel.fromJson(response.data);
+        offersNames = couriesListModel.data ?? [];
+        offersD = offersNames.map((productData) {
+          return Product(
+
+              id: productData.itemCode??"",
+              isActive: true, images: [], colors: [], title: Get.find<CacheHelper>()
+              .activeLocale == SupportedLocales.english? productData.itemNameEng??"":productData.itemNameAra??"",
+              price: productData.defaultSellPrice?.toDouble()??0, description: productData.defaultUnitName??"");
+        }).toList();
+
+        print(offersD);
+        print(offersNames); // Save full job data if needed
+      } else {
+        // Error handling for failed response
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(content: Text('Failed to load offers')),
         );
       }
     } catch (e) {

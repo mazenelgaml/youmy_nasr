@@ -23,7 +23,9 @@ import '../../auth/start/start_screen.dart';
 import '../../home/components/branches/controller/branches_controller.dart';
 import '../../home/components/branches/new_branch/new_branch_screen.dart';
 import '../about_us_screen.dart';
+import '../contact_us.dart';
 import '../notification/notifiction_screen.dart';
+import '../privacy_screen.dart';
 import 'profile_menu.dart';
 
 class Body extends StatefulWidget {
@@ -108,7 +110,7 @@ class _BodyState extends State<Body> {
             ProfileMenu(
               text: settlementReports.tr,
               icon: Icons.description,
-              press: () {}//Navigator.pushNamed(context, ReportScreen.routeName);},
+              press: () {Navigator.pushNamed(context, ReportScreen.routeName);}//Navigator.pushNamed(context, ReportScreen.routeName);},
             ),
             ProfileMenu(
               text: bankAccountInformation.tr,
@@ -137,14 +139,20 @@ class _BodyState extends State<Body> {
               icon: Icons.info_outline,
               press: () {
                 print("https://www.google.com/");
-                Get.to(() => AboutUsScreen(htmlData: controller.aboutUs.first.aboutUsBody ?? 'No content available'));
+                if (controller.aboutUs.isNotEmpty && controller.aboutUs.first.aboutUsBody != null) {
+                  Get.to(() => AboutUsScreen(
+                    htmlData: controller.aboutUs.first.aboutUsBody!,
+                  ));
+                } else {
+                  Get.snackbar('تنبيه', 'لا توجد معلومات لعرضها');
+                }
               },
             ),
             ProfileMenu(
               text: contactUs.tr,
               icon: Icons.call,
               press: () {
-                _makePhoneCall('+201022248887');
+               Get.to(()=>ContactUsScreen(text: controller.contactUs[0].contactUsBody??"",));
                 // _launchInWebViewOrVC("https://www.facebook.com/");
               },
             ),
@@ -152,8 +160,10 @@ class _BodyState extends State<Body> {
               text: privacyPolicy.tr,
               icon: Icons.privacy_tip_sharp,
               press: () {
-                // Get.to(()=>StartScreen());
-                _launchInWebViewOrVC("https://twitter.com/home");
+                controller.getPrivacy();
+
+                Get.to(()=>PrivacyScreen(text: controller.privacy[0].privacyBody??"",));
+
               },
             ),
             ProfileMenu(

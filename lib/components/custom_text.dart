@@ -17,7 +17,7 @@ class CustomText extends StatelessWidget {
   final TextOverflow? over;
 
   const CustomText(
-      {Key? key,
+      {super.key,
       this.text = '',
       this.fontColor = Colors.black,
       this.align = Alignment.topLeft,
@@ -25,8 +25,7 @@ class CustomText extends StatelessWidget {
       this.fontWeight = FontWeight.normal,
       this.fontFamily = 'Roboto Regular',
       this.maxLine=1,
-      this.over})
-      : super(key: key);
+      this.over});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +34,7 @@ class CustomText extends StatelessWidget {
         child: Text(
           text,
           overflow:over,
-          maxLines: 1,
+          maxLines: maxLine,
           textAlign:Get.find<CacheHelper>()
             .activeLocale == SupportedLocales.english ?TextAlign.left:TextAlign.right
           ,style: TextStyle(

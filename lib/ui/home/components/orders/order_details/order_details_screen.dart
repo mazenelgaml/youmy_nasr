@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:merchant/components/action_button.dart';
 import 'package:merchant/components/product_card.dart';
 import 'package:merchant/data/model/Product.dart';
+import 'package:merchant/data/model/courier.dart';
+import 'package:merchant/services/translation_key.dart';
 import 'package:merchant/ui/home/components/orders/client_location/location_screen.dart';
 import 'package:merchant/ui/home/components/orders/order_change_courier/order_courier_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:merchant/models/order_details_model.dart' as d;
 import '../../../../../components/custom_text.dart';
 import '../../../../../data/model/Order.dart';
 import '../../../../../util/Constants.dart';
 import '../../../../../util/size_config.dart';
-import 'package:timelines/timelines.dart';
+import 'package:timelines_plus/timelines_plus.dart';
+
+
+import '../controller/orders_controller.dart';
 
 class OrderDetailsScreen extends StatefulWidget {
-  const OrderDetailsScreen({Key? key}) : super(key: key);
+  final int id;
+  const OrderDetailsScreen({super.key, required this.id, required this.empId});
   static var routeName = "/order_details";
-
+final int empId;
   @override
   State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
 }
@@ -24,10 +32,16 @@ class OrderDetailsScreen extends StatefulWidget {
 class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   @override
   Widget build(BuildContext context) {
-    final OrderDetailsArguments args =
-        ModalRoute.of(context)!.settings.arguments as OrderDetailsArguments;
 
-    return Scaffold(
+    return GetBuilder(
+        init: OrdersController(),
+    builder: (OrdersController controller) {
+
+    d.Datum? details= controller.findOrderById(widget.id);
+    Courier? courier= controller.findCourierById(details?.courierCode??0);
+    Order? order= controller.findOrdersById(widget.id);
+    List<Product>orderProducts=details?.fullSellOrderDetailMobileDto?.map((product){return Product(id: product.id.toString(), images: [], colors: [], title: product.itemName??"", price: product.price?.toDouble()??0, quantity: product.quantity??0, description: '' );}).toList()??[];
+          return  Scaffold(
       appBar: AppBar(
         leading: null,
         title: const CustomText(
@@ -47,7 +61,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                   onTap: () {
                     if(choice=="Change Courier") {
                       _showToast(choice);
-                      Navigator.pushNamed(context, OrderChangeCourierScreen.routeName);
+                      Get.to(()=>OrderChangeCourierScreen(id: order?.id??0,));
+                    }  if(choice=="Cancel Order") {
+                      controller.orderDelete(order?.id??0);
                     }
                     else
                       _showToast(choice);
@@ -75,7 +91,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                   text: "Order Number: ",
                 ),
                 CustomText(
-                    text: args.order.id.toString(),
+                    text: widget.id.toString(),
                     fontSize: 22,
                     fontColor: KPrimaryColor),
               ],
@@ -86,7 +102,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               children: [
                 const CustomText(text: "Date: "),
                 CustomText(
-                  text: args.order.date,
+                  text: order?.date??"",
                 ),
               ],
             ),
@@ -96,7 +112,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               children: [
                 const CustomText(text: "Branch Name: "),
                 CustomText(
-                  text: args.order.branchName,
+                  text: details?.branchName??"",
                 ),
               ],
             ),
@@ -105,16 +121,36 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             ),
             Row(
               children: [
-                _getStatusIcon(args.order.status),
-                SizedBox(
-                  width: getProportionateScreenWidth(4),
-                ),
-                CustomText(
-                  text: args.order.statusDescription,
-                  fontColor: getStatus(args.order.status),
+                _getStatusIcon(order?.status ?? OrderState.InProgress),
+                SizedBox(width: getProportionateScreenWidth(8)),
+                DropdownButton<String>(
+                  value: order?.statusDescription ?? "InProgress",
+                  underline: SizedBox(), // Removes default underline
+                  items: orderStatusList.map((status) {
+                    return DropdownMenuItem<String>(
+                      value: status,
+                      child: CustomText(
+                        text: status,
+                        fontColor: getStatus(_mapEnglishStatus(status)),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null && value != order?.statusDescription) {
+                      setState(() {
+                        // Update locally
+                        order?.statusDescription = value;
+                        order?.status = _mapEnglishStatus(value);
+                      });
+                      // Update on backend
+                      controller.updateOrderStatus(order?.id??0, value);
+                      print("ORDERRRRRRRRRRRRRRRRRRRRRRRRRRSSSSSSSSSSSSSSSSSSS${order?.id}");
+                    }
+                  },
                 ),
               ],
             ),
+
             SizedBox(
               height: getProportionateScreenHeight(150),
               child: Timeline.tileBuilder(
@@ -136,8 +172,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               ),
             ),
             const Divider(),
-            ...List.generate(subList.length,
-                (index) => ProductCard(product: subList[index])),
+            ...List.generate(orderProducts.length,
+                (index) => ProductCard(product: orderProducts[index])),
             const Divider(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -146,8 +182,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                 SizedBox(
                   width: getProportionateScreenWidth(4),
                 ),
-                const CustomText(
-                  text: "10 LE",
+                 CustomText(
+                  text: "${details?.deliveryFee}"+"LE",
                 ),
               ],
             ),
@@ -168,8 +204,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                   SizedBox(
                     width: getProportionateScreenWidth(4),
                   ),
-                  const CustomText(
-                    text: "380 LE",
+                   CustomText(
+                    text:"${details?.totalValue??0}",
                     align: Alignment.center,
                     fontColor: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -178,8 +214,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               ),
             ),
             SizedBox(height: getProportionateScreenHeight(16)),
-            const CustomText(
-              text: "Cash ",
+             CustomText(
+              text: details?.invoiceTypeName??"",
               align: Alignment.centerLeft,
               fontWeight: FontWeight.bold,
             ),
@@ -190,7 +226,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               fontWeight: FontWeight.bold,
             ),
             CustomText(
-              text: "PLease don't forget to ring before leave",
+              text: details?.notes??"No notes",
             ),
             const Divider(),
             SizedBox(height: getProportionateScreenHeight(16)),
@@ -208,7 +244,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                     child: Image.asset('assets/images/profile.png')),
 
                 CustomText(
-                  text: args.order.clientName,
+                  text: order?.clientName??"Not available",
                 ),
                 ActionButton(
                   icon: const Icon(
@@ -216,7 +252,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                     color: Colors.white,
                   ),
                   onPressed: () {
-                    _makePhoneCall(args.order.clientNo);
+                    _makePhoneCall(details?.customerMobile??"Not available");
                   },
                 ),
                 ActionButton(
@@ -236,17 +272,17 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               children: [
                 const CustomText(text: "Client Number: "),
                 CustomText(
-                  text: args.order.clientNo,
+                  text: details?.customerMobile??"Not available",
                 ),
               ],
             ),
             SizedBox(height: getProportionateScreenHeight(16)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
+              children:  [
                 CustomText(text: "Address: "),
                 CustomText(
-                  text: "10 yehia zakaria st.",
+                  text:details?.customerAddress??"Not available" ,
                 ),
               ],
             ),
@@ -264,7 +300,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                     width: getProportionateScreenWidth(50),
                     child: Image.asset('assets/images/profile.png')),
                 CustomText(
-                  text: args.order.clientName,
+                  text: details?.salesManName??"Not available",
                 ),
                 ActionButton(
                   icon: const Icon(
@@ -272,7 +308,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                     color: Colors.white,
                   ),
                   onPressed: () {
-                    _makePhoneCall(args.order.clientNo);
+                    _makePhoneCall(courier?.mobile??"Not available");
                   },
                 ),
                 ActionButton(
@@ -290,19 +326,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const CustomText(text: "Client Number: "),
+                const CustomText(text: "Courier Number: "),
                 CustomText(
-                  text: args.order.clientNo,
-                ),
-              ],
-            ),
-            SizedBox(height: getProportionateScreenHeight(16)),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                CustomText(text: "Address: "),
-                CustomText(
-                  text: "10 yehia zakaria st.",
+                  text: courier?.mobile??"Not available",
                 ),
               ],
             ),
@@ -310,7 +336,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
           ],
         ),
       ),
-    );
+    );});
   }
 }
 

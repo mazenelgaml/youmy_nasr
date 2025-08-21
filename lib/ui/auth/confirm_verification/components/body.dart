@@ -1,109 +1,212 @@
-import 'package:merchant/components/colored_custom_text.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:merchant/components/custom_text.dart';
 import 'package:merchant/components/custom_text_phone_verified.dart';
-import 'package:flutter/material.dart';
 import 'package:merchant/util/Constants.dart';
-
 import '../../../../components/custom_button.dart';
 import '../../../../util/keyboard.dart';
 import '../../../../util/size_config.dart';
 import '../../../home/home_screen.dart';
+import '../controller/confirm_verification_controller.dart';
 
-class Body extends StatelessWidget {
-  const Body({
-    Key? key,
-  }) : super(key: key);
+class Body extends StatefulWidget {
+  final String email;
+  const Body({super.key, required this.email});
+
+  @override
+  State<Body> createState() => _BodyState();
+}
+
+class _BodyState extends State<Body> {
+  bool isResendActive = false;
+  int timerSeconds = 59;
+  Key timerKey = UniqueKey();
+
+  final TextEditingController code1Controller = TextEditingController();
+  final TextEditingController code2Controller = TextEditingController();
+  final TextEditingController code3Controller = TextEditingController();
+  final TextEditingController code4Controller = TextEditingController();
+  final TextEditingController code5Controller = TextEditingController();
+  final TextEditingController code6Controller = TextEditingController();
+  final TextEditingController code7Controller = TextEditingController();
+  final TextEditingController code8Controller = TextEditingController();
+
+  void restartTimer() {
+    setState(() {
+      timerSeconds = 59;
+      isResendActive = false;
+      timerKey = UniqueKey();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  height: 250,
-                  decoration: const BoxDecoration(
-                      color: KOpacityPrimaryColor,
-                      borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(40),
-                          bottomRight: Radius.circular(40))),
-                ),
-                Image.asset(
-                  'assets/images/trans.png',
-                  width: 200,
-                  height: 200,
-                  alignment: Alignment.center,
-                )
-              ],
-            ),
-            SizedBox(height: getProportionateScreenHeight(20)),
-            const CustomText(
-              text: 'Enter the confirmation code',
-              align: Alignment.center,
-              fontSize: 16,
-              fontFamily: 'Roboto Bold',
-              fontColor: Colors.black,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return GetBuilder<ConfirmVerificationController>(
+      init: ConfirmVerificationController(),
+      builder: (ConfirmVerificationController controller) {
+        return SizedBox(
+          width: double.infinity,
+          child: SingleChildScrollView(
+            child: Form(
+              key: controller.formKey,
+              child: Column(
                 children: [
-                  CustomTextPhoneVerified(context: context, autoFocus: true),
-                  CustomTextPhoneVerified(context: context, autoFocus: false),
-                  CustomTextPhoneVerified(context: context, autoFocus: false),
-                  CustomTextPhoneVerified(
-                      context: context,
-                      textInputAction: TextInputAction.done,
-                      autoFocus: false),
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        height: 250,
+                        decoration: const BoxDecoration(
+                          color: KOpacityPrimaryColor,
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(40),
+                            bottomRight: Radius.circular(40),
+                          ),
+                        ),
+                      ),
+                      Image.asset(
+                        'assets/images/trans.png',
+                        width: 200,
+                        height: 200,
+                        alignment: Alignment.center,
+                      )
+                    ],
+                  ),
+                  SizedBox(height: getProportionateScreenHeight(20)),
+                  const CustomText(
+                    text: 'Enter the confirmation code',
+                    align: Alignment.center,
+                    fontSize: 16,
+                    fontFamily: 'Roboto Bold',
+                    fontColor: Colors.black,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CustomTextPhoneVerified(
+                          context: context,
+                          autoFocus: true,
+                          controller: code1Controller,
+                        ),
+                        CustomTextPhoneVerified(
+                          context: context,
+                          autoFocus: false,
+                          controller: code2Controller,
+                        ),
+                        CustomTextPhoneVerified(
+                          context: context,
+                          autoFocus: false,
+                          controller: code3Controller,
+                        ),
+                        CustomTextPhoneVerified(
+                          context: context,
+                          autoFocus: false,
+                          controller: code4Controller,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CustomTextPhoneVerified(
+                          context: context,
+                          autoFocus: false,
+                          controller: code5Controller,
+                        ),
+                        CustomTextPhoneVerified(
+                          context: context,
+                          autoFocus: false,
+                          controller: code6Controller,
+                        ),
+                        CustomTextPhoneVerified(
+                          context: context,
+                          autoFocus: false,
+                          controller: code7Controller,
+                        ),
+
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: getProportionateScreenHeight(30)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: CustomButton(
+                      text: "Send",
+                      press: () {
+                        KeyboardUtil.hideKeyboard(context);
+                        final code = code1Controller.text +
+                            code2Controller.text +
+                            code3Controller.text +
+                            code4Controller.text +
+                            code5Controller.text +
+                            code6Controller.text +
+                            code7Controller.text;
+
+                        controller.forgetPassword(context, widget.email, code);
+                      },
+                    ),
+                  ),
+                  SizedBox(height: getProportionateScreenHeight(30)),
+
+                  /// 🔁 التايمر
+                  TweenAnimationBuilder(
+                    key: timerKey,
+                    tween: Tween(begin: timerSeconds.toDouble(), end: 0),
+                    duration: Duration(seconds: timerSeconds),
+                    builder: (BuildContext context, num value, Widget? child) {
+                      return CustomText(
+                        text: "00:${value.toInt().toString().padLeft(2, '0')}",
+                        align: Alignment.center,
+                        fontColor: KPrimaryColor,
+                      );
+                    },
+                    onEnd: () {
+                      setState(() {
+                        isResendActive = true;
+                      });
+                    },
+                  ),
+
+                  SizedBox(height: getProportionateScreenHeight(27)),
+
+                  /// 🔘 زرار الإعادة
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CustomText(
+                        text: "Didn't receive the code? ",
+                        fontSize: 14,
+                        fontColor: Colors.grey,
+                      ),
+                      GestureDetector(
+                        onTap: isResendActive
+                            ? () {
+                          restartTimer();
+                          // ممكن تبعتي API هنا لو حبيتي
+                        }
+                            : null,
+                        child: CustomText(
+                          text: 'Resend',
+                          fontSize: 14,
+                          fontColor: isResendActive ? KPrimaryColor : Colors.grey,
+                          fontFamily: 'Roboto Bold',
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: getProportionateScreenHeight(30)),
                 ],
               ),
             ),
-            SizedBox(height: getProportionateScreenHeight(30)),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: CustomButton(
-                text: "Send",
-                press: () {
-                  // if all are valid then go to success screen
-                  KeyboardUtil.hideKeyboard(context);
-                  Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                          builder: (BuildContext context) => const HomeScreen()),
-                      (Route<dynamic> route) => false);
-                },
-              ),
-            ),
-            SizedBox(height: getProportionateScreenHeight(30)),
-            TweenAnimationBuilder(
-              tween: Tween(begin: 59.0, end: 0),
-              duration: const Duration(seconds: 59),
-              builder: (BuildContext context, num value, Widget? child) =>
-                  CustomText(
-                text: "00:${value.toInt()}",
-                align: Alignment.center,
-                fontColor: KPrimaryColor,
-              ),
-              onEnd: () {},
-            ),
-            SizedBox(height: getProportionateScreenHeight(27)),
-            GestureDetector(
-              child: const CustomRichText(
-                align: Alignment.center,
-                text1: 'Did n\'t receive the code ?',
-                text2: ' Resend',
-              ),
-              onTap: () {
-           //resend your otp
-              },
-            ),SizedBox(height: getProportionateScreenHeight(30)),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

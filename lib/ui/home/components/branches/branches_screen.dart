@@ -46,7 +46,7 @@ class BranchesScreen extends StatelessWidget {
         backgroundColor: KPrimaryColor,
         onPressed: () {
           Get.put(NewBranchController(context));
-          Navigator.pushNamed(context, NewBranchScreen.routeName);
+          Get.offNamed(NewBranchScreen.routeName);
         },
         child: const Icon(
           Icons.add, size: 29,

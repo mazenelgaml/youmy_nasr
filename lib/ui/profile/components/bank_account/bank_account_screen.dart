@@ -7,7 +7,7 @@ import '../../../../util/size_config.dart';
 class BankAccountScreen extends StatelessWidget {
   static var routeName = "/bank_account";
 
-  const BankAccountScreen({Key? key}) : super(key: key);
+  const BankAccountScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

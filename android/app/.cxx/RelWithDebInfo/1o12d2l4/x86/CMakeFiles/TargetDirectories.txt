@@ -1,0 +1,2 @@
+D:/youmy_nasr/android/app/.cxx/RelWithDebInfo/1o12d2l4/x86/CMakeFiles/edit_cache.dir
+D:/youmy_nasr/android/app/.cxx/RelWithDebInfo/1o12d2l4/x86/CMakeFiles/rebuild_cache.dir

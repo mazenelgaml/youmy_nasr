@@ -1,6 +1,6 @@
 name: merchant
 description: A new Flutter project.
-version: 1.0.0+1
+version: 1.0.0+9
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -18,7 +18,7 @@ dependencies:
   country_code_picker: ^3.1.0
   flutter_rating_bar: ^4.0.1
   shared_preferences: ^2.3.5
-  timelines: ^0.1.0
+  timelines_plus: ^1.0.6
   intl_phone_field: ^3.2.0
   dropdown_textfield: ^1.2.0
   splash_view: ^2.0.1

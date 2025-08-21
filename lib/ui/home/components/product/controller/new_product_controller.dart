@@ -892,42 +892,39 @@ int?productGroup;
     update();
   }
   Future<void> createProduct(BuildContext context) async {
-    int productGroupCode = productsGroupsNames
-        .firstWhere((group) =>
-    group.itemGroupNameAra == selectedGroup ||
-        group.itemGroupNameEng == selectedGroup)
-        .id ??
-        0;
-    int productClassCode = productsClassificationsNames
-        .firstWhere((group) =>
-    group.itemClassName == selectedProductClassification)
-        .id ??
-        0;
-    int productBrandCode = productsBrandsNames
-        .firstWhere((brand) =>
-    Get.find<CacheHelper>().activeLocale == SupportedLocales.english
-        ? brand.itemBrandNameEng == selectedProductBrand
-        : brand.itemBrandNameAra == selectedProductBrand)
-        .id ??
-        0;
+    final productGroupCode = productsGroupsNames.firstWhere(
+          (group) =>
+      group.itemGroupNameAra == selectedGroup ||
+          group.itemGroupNameEng == selectedGroup,
+      orElse: () => ProductGroups(id: 0),
+    ).id;
+
+    final productClassCode = productsClassificationsNames.firstWhere(
+          (group) => group.itemClassName == selectedProductClassification,
+      orElse: () => ProductsClassifications(id: 0),
+    ).id;
+
+    final productBrandCode = productsBrandsNames.firstWhere(
+          (brand) =>
+      Get.find<CacheHelper>().activeLocale == SupportedLocales.english
+          ? brand.itemBrandNameEng == selectedProductBrand
+          : brand.itemBrandNameAra == selectedProductBrand,
+      orElse: () => ProductsBrands(id: 0),
+    ).id;
 
     final Dio dio = Dio(
       BaseOptions(
         baseUrl: Get.find<CacheHelper>().getData(key: "Api"),
-        validateStatus: (status) {
-          return status != null && status <= 500;
-        },
+        validateStatus: (status) => status != null && status <= 500,
       ),
     );
 
     try {
-      // Encode images to Base64
       List<String> base64Images = productImages.map((imagePath) {
         final bytes = File(imagePath).readAsBytesSync();
         return base64Encode(bytes);
       }).toList();
 
-      // Prepare request body
       final requestBody = {
         "companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
         "branchCode": Get.find<CacheHelper>().getData(key: "branchCode"),
@@ -941,17 +938,16 @@ int?productGroup;
         "price1": priceAfterDiscountController.text.trim(),
         "price2": priceAfterDiscountController.text.trim(),
         "price3": priceAfterDiscountController.text.trim(),
-        "productImageName": "string", // Update this with proper image names if needed
-        "productImageExtension": "jpg", // Update this based on actual extensions
+        "productImageName": "string",
+        "productImageExtension": "jpg",
         "productImageData": base64Images.isNotEmpty ? base64Images.first : "",
-        "request": {}, // Add required fields as per API documentation
+        "request": {},
       };
 
-      // Print the request body for debugging
       print("Request Body: ${jsonEncode(requestBody)}");
 
       final response = await dio.post(
-        "/api/v1/items", // Updated API endpoint
+        "/api/v1/items",
         data: requestBody,
         options: Options(
           headers: {
@@ -962,30 +958,20 @@ int?productGroup;
         ),
       );
 
-      // Log the raw response data and status code for debugging
       print("Response Status Code: ${response.statusCode}");
       print("Raw Response Data: ${response.data}");
       print("Response Headers: ${response.headers}");
 
-      // Handle the response
       if (response.statusCode == 200) {
-        if (response.data != null) {
-          if (response.data is int) {
-            print("Product created successfully with code: ${response.data}");
-            int code = response.data;
-            print("Code: $code");
-          } else {
-            print("Unexpected data format: ${response.data}");
-          }
+        if (response.data is int) {
+          print("Product created successfully with code: ${response.data}");
         } else {
-          print("Empty response from API.");
+          print("Unexpected data format: ${response.data}");
         }
 
-        // Refresh product lists
         await productsLists();
         Get.back();
       } else {
-        // Handle errors
         SignUpErrorModel responseModel =
         SignUpErrorModel.fromJson(response.data);
 
@@ -995,7 +981,6 @@ int?productGroup;
 
         print("Error messages: $errorMessage");
 
-        // Show error dialog
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -1036,4 +1021,6 @@ int?productGroup;
       );
     }
   }
+
+
 }

@@ -92,7 +92,7 @@ class _BranchPaymentBodyState extends State<BranchPaymentBody> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("Selected Payment Methods: ${controller.selectedPayments}")),
 
-                  );DefaultTabController.of(context).animateTo(4);
+                  );DefaultTabController.of(context).animateTo(3);
                 },
               ),
               SizedBox(height: getProportionateScreenHeight(30)),

@@ -22,6 +22,35 @@ class CouriersController extends GetxController {
     await CouriersLists();
     await BranchesLists();
   }
+  Future<void> updateSalesMan(int id,int salesCode) async {
+    final dio = Dio();
+    String? token = await Get.find<CacheHelper>().getData(key: "token");
+    String url = "https://api.yomycart.com/api/v1/sellOrderHeaders/$id";
+
+    final data = {
+      "companyCode": Get.find<CacheHelper>().getData(key: "companyCode"),
+      "branchCode": Get.find<CacheHelper>().getData(key: "branchCode"),
+      "id": id,
+      "SalesManCode": "$salesCode" // Ensure it's a String
+    };
+
+    try {
+      final response = await dio.put(
+        url,
+        data: data,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      print("✅ Update successful: ${response.data}");
+    } catch (e) {
+      print("❌ Error updating: $e");
+    }
+  }
   Future<void> BranchesLists() async {
     branches = [];
     branchesNames = [];

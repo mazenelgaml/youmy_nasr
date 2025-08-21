@@ -80,8 +80,8 @@ class Datum {
   dynamic descriptionAra;
   dynamic descriptionEng;
   dynamic requestTypeCode;
+  dynamic shipmentStatusColor;
   dynamic empCode;
-  dynamic logo;
   dynamic notes;
   bool? notActive;
   bool? flgDelete;
@@ -120,6 +120,7 @@ class Datum {
   dynamic isNew;
   dynamic isUpdated;
   dynamic isMuffled;
+  dynamic tableName;
 
   Datum({
     this.aboutUsCode,
@@ -153,8 +154,8 @@ class Datum {
     this.descriptionAra,
     this.descriptionEng,
     this.requestTypeCode,
+    this.shipmentStatusColor,
     this.empCode,
-    this.logo,
     this.notes,
     this.notActive,
     this.flgDelete,
@@ -193,6 +194,7 @@ class Datum {
     this.isNew,
     this.isUpdated,
     this.isMuffled,
+    this.tableName,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -227,8 +229,8 @@ class Datum {
     descriptionAra: json["descriptionAra"],
     descriptionEng: json["descriptionEng"],
     requestTypeCode: json["requestTypeCode"],
+    shipmentStatusColor: json["shipmentStatusColor"],
     empCode: json["empCode"],
-    logo: json["logo"],
     notes: json["notes"],
     notActive: json["notActive"],
     flgDelete: json["flgDelete"],
@@ -267,6 +269,7 @@ class Datum {
     isNew: json["isNew"],
     isUpdated: json["isUpdated"],
     isMuffled: json["isMuffled"],
+    tableName: json["tableName"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -301,8 +304,8 @@ class Datum {
     "descriptionAra": descriptionAra,
     "descriptionEng": descriptionEng,
     "requestTypeCode": requestTypeCode,
+    "shipmentStatusColor": shipmentStatusColor,
     "empCode": empCode,
-    "logo": logo,
     "notes": notes,
     "notActive": notActive,
     "flgDelete": flgDelete,
@@ -341,5 +344,6 @@ class Datum {
     "isNew": isNew,
     "isUpdated": isUpdated,
     "isMuffled": isMuffled,
+    "tableName": tableName,
   };
 }

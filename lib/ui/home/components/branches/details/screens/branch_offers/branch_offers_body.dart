@@ -20,8 +20,11 @@ import '../../../../../../../util/size_config.dart';
 import '../../../../product/controller/products_controller.dart';
 import '../../../../product/filter/filter_screen.dart';
 import '../../../../product/new_product/new_product_screen.dart';
+import '../../../../product/offers/controller/offers_controller.dart';
 import '../../../../product/show_all_branches/product_branches_filter_screen.dart';
 import '../../../../product/update_product/update_product_screen.dart';
+import '../../../controller/branches_controller.dart';
+import 'branch_new_offer/branch_new_offer_screen.dart';
 
 
 bool haveData = true;
@@ -40,8 +43,8 @@ class _BranchOffersBodyState extends State<BranchOffersBody> {
   @override
   Widget build(BuildContext context) {
     return GetBuilder(
-        init: ProductsController(context),
-        builder: (ProductsController controller) {
+        init: BranchesController(),
+        builder: (BranchesController controller) {
           return Scaffold(
             appBar: AppBar(
               leading: null,
@@ -95,7 +98,7 @@ class _BranchOffersBodyState extends State<BranchOffersBody> {
                         spacing: 4,
                         runSpacing: 4,
                         children: controller.
-                        branches.map((String name) => GestureDetector(
+                        branchess.map((String name) => GestureDetector(
                           child: Chip(
                             avatar: CircleAvatar(
                               child: Text(name.substring(0, 1)),
@@ -112,7 +115,7 @@ class _BranchOffersBodyState extends State<BranchOffersBody> {
                             }
                             else{
                               int branchCode=  controller.branchesNames?.firstWhere((branch) => branch.branchName == name).branchCode??0;
-                              await controller.productsOfBranchList( branchCode);
+                              await controller.offersOfBranchList( branchCode);
                             }
                           },
                         ))
@@ -141,7 +144,7 @@ class _BranchOffersBodyState extends State<BranchOffersBody> {
               children: [
                 ActionButton(
                   onPressed: () {
-                    Get.to(()=>NewProductScreen()); // add
+                    Get.to(()=>BranchNewOfferScreen()); // add
                   },
                   icon: const Icon(
                     Icons.add,

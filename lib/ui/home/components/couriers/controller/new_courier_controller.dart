@@ -516,41 +516,49 @@ class NewCourierController extends GetxController {
   ListTile buildRegionField() {
     return ListTile(
       title: Text(selectedRegion ?? 'Select region'),
-      trailing: Icon(Icons.arrow_drop_down,size: 40,),
+      trailing: Icon(Icons.arrow_drop_down, size: 40),
       onTap: () async {
         await PostRegionLists();
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('Select Region'),
-              content: SingleChildScrollView(
-                child: ListTileTheme(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
-                  minLeadingWidth: 40.0, // Set minimum leading width
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: selectRegion?.map((region) {
-                      return ListTile(
-                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
-                        title: Text(region),
-                        onTap: () {
-                          selectedRegion = region;
-                          Navigator.pop(context);
-                          regionCode = RegionName?.firstWhere((region) => region.zoneName == selectedRegion).zoneCode;// Close the dialog
-                          update(); // Update the UI
-                        },
-                      );
-                    }).toList() ?? [],
-                  ),
+        Get.dialog(
+          AlertDialog(
+            title: Text('Select Region'),
+            content: SingleChildScrollView(
+              child: ListTileTheme(
+                contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+                minLeadingWidth: 40.0,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: selectRegion?.map((region) {
+                    return ListTile(
+                      leading: Icon(Icons.location_on, size: 24.0),
+                      title: Text(region),
+                      onTap: () {
+                        selectedRegion = region;
+
+                        Region? selected;
+                        try {
+                          selected = RegionName?.firstWhere(
+                                (r) => r.zoneName == selectedRegion,
+                          );
+                        } catch (e) {
+                          selected = null;
+                        }
+
+                        regionCode = selected?.zoneCode;
+
+                        Get.back(); // إغلاق الـ Dialog
+                        update();   // تحديث الواجهة
+                      },
+                    );
+                  }).toList() ?? [],
                 ),
               ),
-            );
-          },
+            ),
+          ),
         );
       },
-    );
-  }
+    );}
+
   Future<void> PostRegionLists() async {
     cityCode = citiesName?.firstWhere((city) => city.cityName == selectedCity).cityCode;
 
@@ -613,77 +621,72 @@ class NewCourierController extends GetxController {
   ListTile buildCityField() {
     return ListTile(
       title: Text(selectedCity),
-      trailing: Icon(Icons.arrow_drop_down,size: 40,),
+      trailing: Icon(Icons.arrow_drop_down, size: 40),
       onTap: () async {
         await PostCityLists();
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('Select City'),
-              content: SingleChildScrollView(
-                child: ListTileTheme(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
-                  minLeadingWidth: 40.0, // Set minimum leading width
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: selectCity?.map((city) {
-                      return ListTile(
-                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
-                        title: Text(city),
-                        onTap: () async{
-                          selectedCity = city;
-                          await PostRegionLists();
-                          Navigator.pop(context); // Close the dialog
-                          update(); // Update the UI
-                        },
-                      );
-                    }).toList() ?? [],
-                  ),
+        Get.dialog(
+          AlertDialog(
+            title: Text('Select City'),
+            content: SingleChildScrollView(
+              child: ListTileTheme(
+                contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+                minLeadingWidth: 40.0,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: selectCity?.map((city) {
+                    return ListTile(
+                      leading: Icon(Icons.location_on, size: 24.0),
+                      title: Text(city),
+                      onTap: () async {
+                        selectedCity = city;
+                        await PostRegionLists();
+                        Get.back(); // يغلق الـ Dialog
+                        update();   // لتحديث الواجهة
+                      },
+                    );
+                  }).toList() ?? [],
                 ),
               ),
-            );
-          },
+            ),
+          ),
         );
       },
     );
   }
+
   ListTile buildCountryField() {
     return ListTile(
       title: Text(selectedCountry),
       trailing: Icon(Icons.arrow_drop_down,size: 40,),
       onTap: () async {
         await PostCountryLists();
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('Select Country'),
-              content: SingleChildScrollView(
-                child: ListTileTheme(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
-                  minLeadingWidth: 40.0, // Set minimum leading width
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: selectCountry?.map((country) {
-                      return ListTile(
-                        leading: Icon(Icons.location_on, size: 24.0), // Adjust icon size
-                        title: Text(country),
-                        onTap: () async{
-                          selectedCountry = country;
-                          await PostCityLists();
-                          Navigator.pop(context); // Close the dialog
-                          update();
-                          // Update the UI
-                        },
-                      );
-                    }).toList() ?? [],
-                  ),
+        Get.dialog(
+          AlertDialog(
+            title: Text('Select Country'),
+            content: SingleChildScrollView(
+              child: ListTileTheme(
+                contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+                minLeadingWidth: 40.0,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: selectCountry?.map((country) {
+                    return ListTile(
+                      leading: Icon(Icons.location_on, size: 24.0),
+                      title: Text(country),
+                      onTap: () async {
+                        selectedCountry = country;
+                        await PostCityLists();
+                        Get.back(); // Close the dialog
+                        update(); // Update the UI
+                      },
+                    );
+                  }).toList() ?? [],
                 ),
               ),
-            );
-          },
+            ),
+          ),
         );
+
       },
     );
   }

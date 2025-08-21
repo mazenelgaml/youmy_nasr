@@ -9,7 +9,7 @@ class NotificationDetailsScreen extends StatelessWidget {
   static var routeName = "/notification_details";
 
 
-  const NotificationDetailsScreen({Key? key}) : super(key: key);
+  const NotificationDetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

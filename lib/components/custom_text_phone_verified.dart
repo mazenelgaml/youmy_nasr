@@ -5,15 +5,17 @@ class CustomTextPhoneVerified extends StatelessWidget {
   final BuildContext context;
   final TextInputType textInputType;
   final TextInputAction textInputAction;
+  final TextEditingController? controller;
 
   const CustomTextPhoneVerified(
-      {Key? key,
+      {super.key,
       required this.context,
+      this.controller,
       required this.autoFocus,
         this.textInputType = TextInputType.number,
         this.textInputAction=TextInputAction.next,
-      })
-      : super(key: key);
+
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +30,7 @@ class CustomTextPhoneVerified extends StatelessWidget {
       child: AspectRatio(
         aspectRatio: 1,
         child: TextField(
+          controller: controller,
           autofocus: autoFocus,
           textInputAction: textInputAction,
           decoration: const InputDecoration(

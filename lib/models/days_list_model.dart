@@ -1,73 +1,59 @@
-// To parse this JSON data, do
-//
-//     final daysListModel = daysListModelFromJson(jsonString);
-
 import 'dart:convert';
 
-DaysListModel daysListModelFromJson(String str) => DaysListModel.fromJson(json.decode(str));
-
-String daysListModelToJson(DaysListModel data) => json.encode(data.toJson());
+DaysListModel daysListModelFromJson(String str) =>
+    DaysListModel.fromJson(json.decode(str));
 
 class DaysListModel {
-  List<DaysList>? data;
-  int? currentPage;
-  int? totalPages;
-  int? totalCount;
-  int? pageSize;
-  bool? hasPreviousPage;
-  bool? hasNextPage;
+  final List<DaysList> data;
+  final int currentPage;
+  final int totalPages;
+  final int totalCount;
+  final int pageSize;
+  final bool hasPreviousPage;
+  final bool hasNextPage;
 
   DaysListModel({
-    this.data,
-    this.currentPage,
-    this.totalPages,
-    this.totalCount,
-    this.pageSize,
-    this.hasPreviousPage,
-    this.hasNextPage,
+    required this.data,
+    required this.currentPage,
+    required this.totalPages,
+    required this.totalCount,
+    required this.pageSize,
+    required this.hasPreviousPage,
+    required this.hasNextPage,
   });
 
-  factory DaysListModel.fromJson(Map<String, dynamic> json) => DaysListModel(
-    data: json["data"] == null ? [] : List<DaysList>.from(json["data"]!.map((x) => DaysList.fromJson(x))),
-    currentPage: json["currentPage"],
-    totalPages: json["totalPages"],
-    totalCount: json["totalCount"],
-    pageSize: json["pageSize"],
-    hasPreviousPage: json["hasPreviousPage"],
-    hasNextPage: json["hasNextPage"],
-  );
-
-  Map<String, dynamic> toJson() => {
-    "data": data == null ? [] : List<dynamic>.from(data!.map((x) => x.toJson())),
-    "currentPage": currentPage,
-    "totalPages": totalPages,
-    "totalCount": totalCount,
-    "pageSize": pageSize,
-    "hasPreviousPage": hasPreviousPage,
-    "hasNextPage": hasNextPage,
-  };
+  factory DaysListModel.fromJson(Map<String, dynamic> json) {
+    return DaysListModel(
+      data: (json["data"] as List<dynamic>?)
+          ?.map((x) => DaysList.fromJson(x))
+          .toList() ??
+          [],
+      currentPage: json["currentPage"] ?? 0,
+      totalPages: json["totalPages"] ?? 0,
+      totalCount: json["totalCount"] ?? 0,
+      pageSize: json["pageSize"] ?? 0,
+      hasPreviousPage: json["hasPreviousPage"] ?? false,
+      hasNextPage: json["hasNextPage"] ?? false,
+    );
+  }
 }
 
 class DaysList {
-  int? id;
-  int? dayCode;
-  String? name;
+  final int id;
+  final int dayCode;
+  final String name;
 
   DaysList({
-    this.id,
-    this.dayCode,
-    this.name,
+    required this.id,
+    required this.dayCode,
+    required this.name,
   });
 
-  factory DaysList.fromJson(Map<String, dynamic> json) => DaysList(
-    id: json["id"],
-    dayCode: json["dayCode"],
-    name: json["name"],
-  );
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "dayCode": dayCode,
-    "name": name,
-  };
+  factory DaysList.fromJson(Map<String, dynamic> json) {
+    return DaysList(
+      id: json["id"] ?? 0,
+      dayCode: json["dayCode"] ?? 0,
+      name: json["name"] ?? '',
+    );
+  }
 }
