@@ -40,7 +40,7 @@ class Body extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: KPrimaryColor,
         onPressed: () {
-          Navigator.pushNamed(context, NewCourierScreen.routeName);
+          Get.toNamed(NewCourierScreen.routeName);
         },
         child:  const Icon(
           Icons.add,size: 29,

@@ -97,7 +97,7 @@ class _BranchCardState extends State<BranchCard> {
                           SizedBox(height: getProportionateScreenHeight(10)),
                           RatingBar.builder(
                             itemSize: 30,
-                            initialRating:controller.branchDetailsModel?.rate??0,
+                            initialRating:controller.branchDetailsModel?.rate??2.5,
                             minRating: 1,
                             direction: Axis.horizontal,
                             allowHalfRating: true,

@@ -75,7 +75,8 @@ class BranchesController extends GetxController {
             name: branchData.branchName,
             address: "${branchData.branchName}, Egypt",
             isOpen: true,
-            rating: branchData.branchRate
+            rating: branchData.branchRate??2.5
+
           );
         }).toList() ?? [];
         branchess = branchesNames?.map((branch) => branch.branchName ?? '').toList() ?? [];
